@@ -14,7 +14,7 @@ public class AveragingTrailWidthDeterminerModule implements TrailBordersMonitorM
 	Deque<Point> bordersR = new LinkedList<Point>();
 	Deque<Double> borderDistances = new LinkedList<Double>();
 
-	int widthSum = 0;
+	double widthSum = 0;
 	Point borderLSum = new Point();
 	Point borderRSum = new Point();
 	int actualCount = 0;
@@ -27,7 +27,7 @@ public class AveragingTrailWidthDeterminerModule implements TrailBordersMonitorM
 	@Override
 	public double getTrailWidth() {
 		// return borderDistances.stream().collect(Collectors.averagingDouble(e -> e));
-		return ((double) widthSum) / actualCount;
+		return widthSum / actualCount;
 	}
 
 	@Override

@@ -12,11 +12,22 @@ public class BasicBorderFinderModule implements BorderFinderModule {
 	int movedst;
 	int tresholdWidthMax;
 	int tresholdWidthMin;
+	double divergenceFactor;
 
-	public BasicBorderFinderModule(int movedst, int tresholdWidthMax, int tresholdWidthMin) {
+	/**
+	 * @param movedst
+	 * @param tresholdWidthMax
+	 *            max width of detected trail
+	 * @param tresholdWidthMin
+	 *            min width of detected trail
+	 * @param divergenceFactor
+	 *            max divergence from expected border (R,L independently)
+	 */
+	public BasicBorderFinderModule(int movedst, int tresholdWidthMax, int tresholdWidthMin, double divergenceFactor) {
 		this.movedst = movedst;
 		this.tresholdWidthMax = tresholdWidthMax;
 		this.tresholdWidthMin = tresholdWidthMin;
+		this.divergenceFactor = divergenceFactor;
 	}
 
 	@Override
@@ -28,7 +39,7 @@ public class BasicBorderFinderModule implements BorderFinderModule {
 		Point l = d.findBorder(expected, perpAngle, movedst, -1);
 		Point r = d.findBorder(expected, perpAngle, movedst, 1);
 
-		double maxDivergence = d.mTrailBordersMonitor.getTrailWidth() / 2;
+		double maxDivergence = d.mTrailBordersMonitor.getTrailWidth() * divergenceFactor;
 		Point lastL = d.mTrailBordersMonitor.getBorderL();
 		Point lastR = d.mTrailBordersMonitor.getBorderR();
 		if (lastL != null && lastR != null && (d.dst(l, lastL) > maxDivergence || d.dst(r, lastR) > maxDivergence)) {

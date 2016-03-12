@@ -33,15 +33,16 @@ public class Robot {
 
 		// @formatter:off
 		lineFollowingStrategy = new LineFollowingStrategy(
+				"Strategy1",
 				param,
 				new BlurImageModifierModule(),
 				new BWBooleanImageFilterModule(100),
 				new BottomLineStartFinderModule(),
 				(d) -> new AveragingTrailWidthDeterminerModule(d, 3),
-				(d) -> new VectorDirectionManagerModule(12, 4),
+				(d) -> new VectorDirectionManagerModule(8, 3),
 				new BasicLineFinderModule(
 						20.0 * (Math.PI / 180),
-						new BasicBorderFinderModule(2, 70, 8),
+						new BasicBorderFinderModule(2, 140, 10, 0.5),
 						new BasicAngularTurnHandlerModule()
 				)
 		);

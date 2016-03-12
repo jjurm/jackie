@@ -103,15 +103,14 @@ public class ImageRecognitionPreview {
 				instruction.momentData.image.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics g = target.getGraphics();
 
-		/*-for (int y = 0; y < image.getHeight() - 10; y++) {
+		for (int y = 0; y < image.getHeight() - 10; y++) {
 			for (int x = 0; x < image.getWidth() - 10; x++) {
 				g.setColor(instruction.momentData.bw[x][y] ? Color.BLACK : Color.WHITE);
 				g.fillRect(x, y, 1, 1);
 			}
-		}*/
+		}
 
 		//g.drawImage(image, -5, -5, null);
-		g.drawImage(image, 0, 0, image.getWidth()*2, image.getHeight()*2, null);
 		drawPolyline(g, instruction.momentData.line, Color.red, 3);
 		drawPolyline(g, instruction.momentData.bordersL, Color.green, 2);
 		drawPolyline(g, instruction.momentData.bordersR, Color.green, 2);

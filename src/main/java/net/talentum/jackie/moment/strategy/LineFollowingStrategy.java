@@ -20,11 +20,11 @@ public class LineFollowingStrategy extends RobotStrategy {
 	ModuleSupplier<DirectionManagerModule> msDirectionManager;
 	LineFinderModule mLineFinder;
 
-	public LineFollowingStrategy(Parameters param, ImageModifierModule mImageModifier,
+	public LineFollowingStrategy(String name, Parameters param, ImageModifierModule mImageModifier,
 			BooleanImageFilterModule mBooleanImageFilter, LineStartFinderModule mLineStartFinder,
 			ModuleSupplier<TrailBordersMonitorModule> msTrailBordersMonitor,
 			ModuleSupplier<DirectionManagerModule> msDirectionManager, LineFinderModule mLineFinder) {
-		super(param);
+		super(name, param);
 		this.mImageModifier = mImageModifier;
 		this.mBooleanImageFilter = mBooleanImageFilter;
 		this.mLineStartFinder = mLineStartFinder;
@@ -56,7 +56,7 @@ public class LineFollowingStrategy extends RobotStrategy {
 
 		// recognize line
 		boolean res = true;
-		for (int i = 0; res && i < 1000; i++) {
+		for (int i = 0; res && i < 2000; i++) {
 			res = mLineFinder.findNext(d);
 		}
 
