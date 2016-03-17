@@ -9,6 +9,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import net.talentum.jackie.ir.BWBooleanImageOutput;
+import net.talentum.jackie.ir.BlurredBWBooleanImageOutput;
 import net.talentum.jackie.ir.ImageRecognitionOutput;
 import net.talentum.jackie.ir.RobotStrategyIROutput;
 import net.talentum.jackie.ir.SourceImageOutput;
@@ -53,7 +54,9 @@ public class StrategyComparatorPreview {
 
 		// @formatter:off
 		list.add(new SourceImageOutput("Source"));
-		list.add(new BWBooleanImageOutput("BW (treshold=100)", 100));
+		list.add(new BlurImageModifierModule("Blur"));
+		list.add(new BWBooleanImageOutput("BW(100)", 100));
+		list.add(new BlurredBWBooleanImageOutput("Blur + BW(100)", 100));
 		list.add(new RobotStrategyIROutput("Strategy1", new LineFollowingStrategy(
 				param,
 				new BlurImageModifierModule(),
@@ -82,43 +85,12 @@ public class StrategyComparatorPreview {
 
 		previewFrame = new JFrame("StrategyComparatorPreview");
 		previewFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		previewFrame.setBounds(100, 100, 900, 420);
+		previewFrame.setBounds(100, 100, 900, 700);
 
 		strategyComparatorPanel = new StrategyComparatorPanel(irOutputs);
 		previewFrame.setContentPane(strategyComparatorPanel);
 
-		/*-robot.setWebcamImageSupplier(() -> lastImage);
-		strategyComparatorPanel.addProcessImageListener(image -> {
-			lastImage = image;
-			executor.submit(() -> {
-				try {
-					robot.constructMoment();
-					long start = System.currentTimeMillis();
-					robot.process(robot.moments.element());
-					System.out.println(System.currentTimeMillis() - start);
-					previewPanel.repaintResults();
-		
-					ImageIO.write(paintInstructionOnImage(lastImage, robot.lastInstruction), "png",
-							new File("C:\\Users\\JJurM\\Documents\\output.png"));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			});
-		});
-		strategyComparatorPanel.init();*/
-
 		previewFrame.setVisible(true);
-	}
-
-	/*-public static BufferedImage getLastInstructionPaintedImage() {
-		if (robot.lastInstruction == null)
-			return null;
-	
-		return paintInstructionOnImage(lastImage, robot.lastInstruction);
-	}*/
-
-	public void shot() {
-
 	}
 
 }

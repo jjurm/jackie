@@ -1,6 +1,7 @@
 package net.talentum.jackie.moment.module;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class BWBooleanImageFilterModule implements BooleanImageFilterModule {
@@ -27,6 +28,22 @@ public class BWBooleanImageFilterModule implements BooleanImageFilterModule {
 		}
 
 		return bool;
+	}
+	
+	public BufferedImage getImage(boolean[][] filtered) {
+		int width = filtered.length, height = filtered[0].length;
+		BufferedImage target = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_RGB);
+		Graphics g = target.getGraphics();
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				g.setColor(filtered[x][y] ? Color.BLACK : Color.WHITE);
+				g.fillRect(x, y, 1, 1);
+			}
+		}
+
+		return target;
 	}
 
 }

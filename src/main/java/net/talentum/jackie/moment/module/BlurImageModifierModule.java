@@ -6,7 +6,18 @@ import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 
-public class BlurImageModifierModule implements ImageModifierModule {
+import net.talentum.jackie.ir.ImageRecognitionOutput;
+import net.talentum.jackie.moment.Moment;
+
+public class BlurImageModifierModule extends ImageRecognitionOutput implements ImageModifierModule {
+
+	public BlurImageModifierModule(String name) {
+		super(name);
+	}
+	
+	public BlurImageModifierModule() {
+		this("Blur");
+	}
 
 	private static final float[] matrix = new float[] { 1.0f / 121.0f, 2.0f / 121.0f, 3.0f / 121.0f, 2.0f / 121.0f, 1.0f / 121.0f,
 			2.0f / 121.0f, 7.0f / 121.0f, 11.0f / 121.0f, 7.0f / 121.0f, 2.0f / 121.0f, 3.0f / 121.0f,
@@ -30,6 +41,11 @@ public class BlurImageModifierModule implements ImageModifierModule {
 
 		return dest;
 		
+	}
+
+	@Override
+	public BufferedImage process(Moment moment) {
+		return modify(moment.image);
 	}
 
 }

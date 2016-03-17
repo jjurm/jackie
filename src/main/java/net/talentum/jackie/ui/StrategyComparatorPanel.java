@@ -1,15 +1,15 @@
 package net.talentum.jackie.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,12 +20,12 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPicker;
@@ -38,10 +38,12 @@ public class StrategyComparatorPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private ImageRecognitionOutput[] irOutputs;
-	private ArrayList<IROutputPanel> irOutputPanels = new ArrayList<IROutputPanel>();
+	private ArrayList<IROutputFrame> irOutputPanels = new ArrayList<IROutputFrame>();
+	private Webcam lastWebcam;
 	private boolean webcamOpen = false;
 	static ExecutorService executor = Executors.newSingleThreadExecutor();
 	private boolean startedContinuous = false;
+	static int openFrameCount = 0;
 
 	private JPanel menu1;
 	private WebcamPicker webcamSelection;
@@ -51,17 +53,21 @@ public class StrategyComparatorPanel extends JPanel {
 	private JComboBox<ImageRecognitionOutput> irOutputSelection;
 	private JButton btnAddStrategy;
 	private Component horizontalStrut;
-	private JScrollPane scrollPane;
 	private JPanel centerPanel;
 	private JButton btnShot;
 	private JButton btnStart;
 	private JButton btnStop;
+	private Component horizontalStrut_1;
+	private JLabel lblScale;
+	private JComboBox<Double> scaleSelection;
+	private JDesktopPane desktopPane;
 
 	public StrategyComparatorPanel(ImageRecognitionOutput[] irOutputs) {
 		this.irOutputs = irOutputs;
 
 		setLayout(new BorderLayout(0, 0));
 		createElements();
+		webcamChanged();
 	}
 
 	private void createElements() {
@@ -79,10 +85,12 @@ public class StrategyComparatorPanel extends JPanel {
 		webcamSelection = new WebcamPicker(webcams);
 		webcamSelection.setSelectedIndex(webcams.size() - 1);
 		webcamSelection.setPreferredSize(new Dimension(160, 20));
+		webcamSelection.addActionListener(e -> webcamChanged());
 		menu1.add(webcamSelection);
 
 		viewSizeSelection = new JComboBox<DimensionComboBoxItem>();
 		viewSizeSelection.setPreferredSize(new Dimension(80, 20));
+		viewSizeSelection.addActionListener(e -> viewSizeChanged());
 		menu1.add(viewSizeSelection);
 
 		btnOpenClose = new JButton("Open");
@@ -104,6 +112,8 @@ public class StrategyComparatorPanel extends JPanel {
 				});
 			} else {
 				// camera open
+				startedContinuous = false;
+
 				executor.submit(() -> {
 					webcamOpen = false;
 					webcamSelection.getSelectedWebcam().close();
@@ -116,6 +126,18 @@ public class StrategyComparatorPanel extends JPanel {
 			}
 		});
 		menu1.add(btnOpenClose);
+
+		horizontalStrut_1 = Box.createHorizontalStrut(20);
+		menu1.add(horizontalStrut_1);
+
+		lblScale = new JLabel("Scale:");
+		menu1.add(lblScale);
+
+		scaleSelection = new JComboBox<Double>();
+		scaleSelection.setModel(new DefaultComboBoxModel<Double>(new Double[] { 0.25, 0.5, 1.0, 2.0, 4.0 }));
+		scaleSelection.setSelectedItem(1.0);
+		scaleSelection.addActionListener(e -> scaledViewSizeChanged());
+		menu1.add(scaleSelection);
 
 		menu2 = new JPanel();
 		FlowLayout flowLayout_1 = (FlowLayout) menu2.getLayout();
@@ -131,12 +153,16 @@ public class StrategyComparatorPanel extends JPanel {
 		btnAddStrategy.addActionListener(e -> {
 			// create new strategy panel
 			ImageRecognitionOutput irOutput = (ImageRecognitionOutput) irOutputSelection.getSelectedItem();
-			IROutputPanel panel = new IROutputPanel(irOutput);
-			irOutputPanels.add(panel);
-			centerPanel.add(panel);
+			IROutputFrame frame = new IROutputFrame(irOutput);
+			irOutputPanels.add(frame);
+			desktopPane.add(frame);
+			try {
+				frame.setSelected(true);
+			} catch (Exception e1) {
+			}
 
-			revalidate();
-			repaint();
+			desktopPane.revalidate();
+			desktopPane.repaint();
 		});
 		menu2.add(btnAddStrategy);
 
@@ -181,27 +207,74 @@ public class StrategyComparatorPanel extends JPanel {
 		});
 		menu2.add(btnStop);
 
-		scrollPane = new JScrollPane();
-		scrollPane.setBorder(null);
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		add(scrollPane, BorderLayout.CENTER);
-
 		centerPanel = new JPanel();
-		scrollPane.setViewportView(centerPanel);
-		centerPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+		add(centerPanel, BorderLayout.CENTER);
+		centerPanel.setLayout(new BorderLayout(0, 0));
+
+		desktopPane = new JDesktopPane();
+		centerPanel.add(desktopPane, BorderLayout.CENTER);
+		desktopPane.setPreferredSize(new Dimension(500, 500));
+	}
+
+	private void webcamChanged() {
+		Webcam webcam = webcamSelection.getSelectedWebcam();
+
+		if (webcam != lastWebcam) {
+			lastWebcam = webcam;
+			viewSizeSelection.setModel(new DefaultComboBoxModel<DimensionComboBoxItem>(Arrays
+					.stream(webcam.getViewSizes()).map((Dimension dimension) -> new DimensionComboBoxItem(dimension))
+					.toArray(size -> new DimensionComboBoxItem[size])));
+			viewSizeSelection.setSelectedIndex(webcam.getViewSizes().length - 1);
+		}
+
+		viewSizeChanged();
+	}
+
+	private Dimension getViewSize() {
+		return ((DimensionComboBoxItem) viewSizeSelection.getSelectedItem()).getValue();
+	}
+
+	private double getScale() {
+		return (Double) scaleSelection.getSelectedItem();
+	}
+
+	private Dimension getScaledViewSize() {
+		Dimension orig = getViewSize();
+		double scale = getScale();
+		return new Dimension((int) (orig.width * scale), (int) (orig.height * scale));
+	}
+
+	private void viewSizeChanged() {
+		Dimension viewSize = getViewSize();
+		webcamSelection.getSelectedWebcam().setViewSize(viewSize);
+
+		scaledViewSizeChanged();
+	}
+
+	private void scaledViewSizeChanged() {
+		Dimension scaled = getScaledViewSize();
+		irOutputPanels.stream().forEach(panel -> {
+			panel.viewSizeChanged(scaled);
+		});
+
+		revalidate();
+		repaint();
 	}
 
 	private void shot() {
-		// contruct Moment
-		Webcam webcam = webcamSelection.getSelectedWebcam();
-		BufferedImage image = webcam.getImage();
-		SensorData sensorData = SensorData.collect();
-		Moment moment = new Moment(image, sensorData);
+		try {
+			// contruct Moment
+			Webcam webcam = webcamSelection.getSelectedWebcam();
+			BufferedImage image = webcam.getImage();
+			SensorData sensorData = SensorData.collect();
+			Moment moment = new Moment(image, sensorData);
 
-		// arrange for processing
-		for (IROutputPanel p : irOutputPanels) {
-			p.receive(moment);
+			// arrange for processing
+			for (IROutputFrame p : irOutputPanels) {
+				p.receive(moment);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -217,48 +290,38 @@ public class StrategyComparatorPanel extends JPanel {
 	 * 
 	 * @author JJurM
 	 */
-	class IROutputPanel extends JPanel {
+	class IROutputFrame extends JInternalFrame {
 		private static final long serialVersionUID = 1L;
+		static final int xOffset = 20, yOffset = 20;
 
 		private ImageRecognitionOutput irOutput;
-
 		private ImagePanel imagePanel;
 
-		public IROutputPanel(ImageRecognitionOutput irOutput) {
+		public IROutputFrame(ImageRecognitionOutput irOutput) {
+			super(irOutput.getName(), false, true, false, true);
 			this.irOutput = irOutput;
+			openFrameCount++;
 
-			Dimension dimension = new Dimension(320, 240);
-			setPreferredSize(dimension);
-			setMaximumSize(dimension);
-			setBorder(new LineBorder(Color.GRAY, 1));
-
+			setLocation(xOffset * openFrameCount, yOffset * openFrameCount);
 			setLayout(new BorderLayout(0, 0));
-
-			JPanel panel = new JPanel();
-			panel.setLayout(new BorderLayout());
-			add(panel, BorderLayout.NORTH);
-
-			JLabel lblName = new JLabel(irOutput.getName());
-			lblName.setBorder(new EmptyBorder(5, 5, 5, 5));
-			panel.add(lblName, BorderLayout.WEST);
-
-			JButton btnRemove = new JButton("Remove");
-			btnRemove.setBorder(new EmptyBorder(5, 5, 5, 5));
-			btnRemove.addActionListener(e -> {
-				Container parent = getParent();
-				parent.remove(this);
-				irOutputPanels.remove(this);
-
-				parent.revalidate();
-				parent.repaint();
-			});
-			panel.add(btnRemove, BorderLayout.EAST);
+			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+			addInternalFrameListener(new IROutputPanelListener());
 
 			imagePanel = new ImagePanel();
-			imagePanel.setPreferredSize(dimension);
-			imagePanel.setMaximumSize(dimension);
-			imagePanel.setBackground(Color.GRAY);
+			imagePanel.setPreferredSize(getScaledViewSize());
+			// imagePanel.setBackground(Color.GRAY);
 			add(imagePanel, BorderLayout.CENTER);
+
+			pack();
+			setVisible(true);
+		}
+
+		private void viewSizeChanged(Dimension d) {
+			imagePanel.setPreferredSize(d);
+			pack();
+
+			imagePanel.revalidate();
+			imagePanel.repaint();
 		}
 
 		/**
@@ -266,10 +329,30 @@ public class StrategyComparatorPanel extends JPanel {
 		 * 
 		 * @param moment
 		 */
-		public void receive(Moment moment) {
-			BufferedImage image = irOutput.process(moment);
+		void receive(Moment moment) {
+			Image image = irOutput.process(moment);
+
+			Dimension scaled = getScaledViewSize();
+			image = image.getScaledInstance(scaled.width, scaled.height, Image.SCALE_FAST);
+
 			imagePanel.setImage(image);
 			imagePanel.repaint();
+		}
+
+		class IROutputPanelListener extends InternalFrameAdapter {
+
+			@Override
+			public void internalFrameClosing(InternalFrameEvent e) {
+				openFrameCount--;
+
+				JInternalFrame frame = e.getInternalFrame();
+				desktopPane.remove(frame);
+				irOutputPanels.remove(frame);
+
+				desktopPane.revalidate();
+				desktopPane.repaint();
+			}
+
 		}
 
 	}
@@ -282,9 +365,9 @@ public class StrategyComparatorPanel extends JPanel {
 	static class ImagePanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 
-		private BufferedImage image = null;
+		private Image image = null;
 
-		public void setImage(BufferedImage image) {
+		public void setImage(Image image) {
 			this.image = image;
 		}
 
