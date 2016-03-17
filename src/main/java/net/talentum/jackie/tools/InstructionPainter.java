@@ -10,19 +10,19 @@ import net.talentum.jackie.moment.RobotInstruction;
 
 public class InstructionPainter {
 
-	public BufferedImage paintInstructionOnImage(BufferedImage image, RobotInstruction instruction) {
+	public static BufferedImage paintOnImage(BufferedImage base, RobotInstruction instruction) {
 		BufferedImage target = new BufferedImage(instruction.momentData.image.getWidth(),
 				instruction.momentData.image.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics g = target.getGraphics();
 
-		for (int y = 0; y < image.getHeight() - 10; y++) {
-			for (int x = 0; x < image.getWidth() - 10; x++) {
+		/*-for (int y = 0; y < base.getHeight() - 10; y++) {
+			for (int x = 0; x < base.getWidth() - 10; x++) {
 				g.setColor(instruction.momentData.bw[x][y] ? Color.BLACK : Color.WHITE);
 				g.fillRect(x, y, 1, 1);
 			}
-		}
+		}*/
 
-		//g.drawImage(image, -5, -5, null);
+		g.drawImage(base, -5, -5, null);
 		drawPolyline(g, instruction.momentData.line, Color.red, 3);
 		drawPolyline(g, instruction.momentData.bordersL, Color.green, 2);
 		drawPolyline(g, instruction.momentData.bordersR, Color.green, 2);
@@ -33,17 +33,17 @@ public class InstructionPainter {
 		g.setColor(Color.CYAN);
 		instruction.momentData.highlight.stream().forEach(p -> g.fillRect(p.x - 2, p.y - 2, 4, 4));
 
-		/*
-		 * g.setColor(Color.blue); for (Point p : notFound) { g.fillRect(p.x -
-		 * 1, p.y - 1, 2, 2); }
-		 */
+		/*-g.setColor(Color.BLUE);
+		for (Point p : instruction.momentData.notFound) {
+			g.fillRect(p.x - 1, p.y - 1, 2, 2);
+		}*/
 
 		g.dispose();
 
 		return target;
 	}
-	
-	private void drawPolyline(Graphics g, List<Point> points, Color color, int width) {
+
+	private static void drawPolyline(Graphics g, List<Point> points, Color color, int width) {
 		g.setColor(color);
 		Point a, b;
 		b = points.get(0);
@@ -54,5 +54,5 @@ public class InstructionPainter {
 			b = a;
 		}
 	}
-	
+
 }

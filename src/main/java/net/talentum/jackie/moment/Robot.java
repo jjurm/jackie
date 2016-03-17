@@ -33,7 +33,6 @@ public class Robot {
 
 		// @formatter:off
 		lineFollowingStrategy = new LineFollowingStrategy(
-				"Strategy1",
 				param,
 				new BlurImageModifierModule(),
 				new BWBooleanImageFilterModule(100),

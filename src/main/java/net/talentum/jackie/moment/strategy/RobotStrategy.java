@@ -1,18 +1,16 @@
 package net.talentum.jackie.moment.strategy;
 
-import net.talentum.jackie.moment.Parameters;
 import net.talentum.jackie.moment.Moment;
 import net.talentum.jackie.moment.MomentData;
+import net.talentum.jackie.moment.Parameters;
 import net.talentum.jackie.moment.RobotInstruction;
 
 public abstract class RobotStrategy {
 
-	private String name;
 	protected Parameters param;
 	protected MomentData d;
 
-	public RobotStrategy(String name, Parameters param) {
-		this.name = name;
+	public RobotStrategy(Parameters param) {
 		this.param = param;
 	}
 
@@ -21,14 +19,5 @@ public abstract class RobotStrategy {
 	}
 
 	public abstract RobotInstruction evaluate();
-
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public String toString() {
-		return getName();
-	}
 
 }

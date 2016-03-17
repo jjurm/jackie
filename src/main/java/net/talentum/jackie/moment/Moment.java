@@ -4,8 +4,8 @@ import java.awt.image.BufferedImage;
 
 public class Moment {
 
-	BufferedImage image;
-	SensorData sensorData;
+	public final BufferedImage image;
+	public final SensorData sensorData;
 	
 	public Moment(BufferedImage image, SensorData sensorData) {
 		this.image = image;

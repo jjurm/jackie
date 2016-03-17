@@ -1,18 +1,18 @@
 package net.talentum.jackie.system;
 
 import java.awt.EventQueue;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import net.talentum.jackie.ir.BWBooleanImageOutput;
+import net.talentum.jackie.ir.ImageRecognitionOutput;
+import net.talentum.jackie.ir.RobotStrategyIROutput;
+import net.talentum.jackie.ir.SourceImageOutput;
 import net.talentum.jackie.moment.Parameters;
-import net.talentum.jackie.moment.Robot;
 import net.talentum.jackie.moment.module.AveragingTrailWidthDeterminerModule;
 import net.talentum.jackie.moment.module.BWBooleanImageFilterModule;
 import net.talentum.jackie.moment.module.BasicAngularTurnHandlerModule;
@@ -22,23 +22,15 @@ import net.talentum.jackie.moment.module.BlurImageModifierModule;
 import net.talentum.jackie.moment.module.BottomLineStartFinderModule;
 import net.talentum.jackie.moment.module.VectorDirectionManagerModule;
 import net.talentum.jackie.moment.strategy.LineFollowingStrategy;
-import net.talentum.jackie.moment.strategy.RobotStrategy;
-import net.talentum.jackie.tools.InstructionPainter;
 import net.talentum.jackie.ui.StrategyComparatorPanel;
 
 public class StrategyComparatorPreview {
 
 	static Parameters param;
-	static RobotStrategy[] strategies;
+	static ImageRecognitionOutput[] irOutputs;
 
 	static JFrame previewFrame;
 	static StrategyComparatorPanel strategyComparatorPanel;
-
-	static BufferedImage lastImage;
-	public static Robot robot;
-
-	static InstructionPainter painter = new InstructionPainter();
-	static ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	public static void main(String[] args) {
 
@@ -50,26 +42,19 @@ public class StrategyComparatorPreview {
 		param = new Parameters();
 
 		createStrategies();
-		// robot = new Robot(param);
 
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					createFrame();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+		EventQueue.invokeLater(() -> {
+			createFrame();
 		});
 	}
 
 	private static void createStrategies() {
-		List<RobotStrategy> strategiesList = new ArrayList<RobotStrategy>();
+		List<ImageRecognitionOutput> list = new ArrayList<ImageRecognitionOutput>();
 
 		// @formatter:off
-		strategiesList.add(new LineFollowingStrategy(
-				"Strategy1",
+		list.add(new SourceImageOutput("Source"));
+		list.add(new BWBooleanImageOutput("BW (treshold=100)", 100));
+		list.add(new RobotStrategyIROutput("Strategy1", new LineFollowingStrategy(
 				param,
 				new BlurImageModifierModule(),
 				new BWBooleanImageFilterModule(100),
@@ -81,10 +66,10 @@ public class StrategyComparatorPreview {
 						new BasicBorderFinderModule(2, 140, 10, 0.5),
 						new BasicAngularTurnHandlerModule()
 				)
-		));
+		)));
 		// @formatter:on
 
-		strategies = strategiesList.toArray(new RobotStrategy[0]);
+		irOutputs = list.toArray(new ImageRecognitionOutput[0]);
 	}
 
 	private static void createFrame() {
@@ -99,7 +84,7 @@ public class StrategyComparatorPreview {
 		previewFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		previewFrame.setBounds(100, 100, 900, 420);
 
-		strategyComparatorPanel = new StrategyComparatorPanel(strategies);
+		strategyComparatorPanel = new StrategyComparatorPanel(irOutputs);
 		previewFrame.setContentPane(strategyComparatorPanel);
 
 		/*-robot.setWebcamImageSupplier(() -> lastImage);
@@ -131,5 +116,9 @@ public class StrategyComparatorPreview {
 	
 		return paintInstructionOnImage(lastImage, robot.lastInstruction);
 	}*/
+
+	public void shot() {
+
+	}
 
 }

@@ -20,11 +20,11 @@ public class LineFollowingStrategy extends RobotStrategy {
 	ModuleSupplier<DirectionManagerModule> msDirectionManager;
 	LineFinderModule mLineFinder;
 
-	public LineFollowingStrategy(String name, Parameters param, ImageModifierModule mImageModifier,
+	public LineFollowingStrategy(Parameters param, ImageModifierModule mImageModifier,
 			BooleanImageFilterModule mBooleanImageFilter, LineStartFinderModule mLineStartFinder,
 			ModuleSupplier<TrailBordersMonitorModule> msTrailBordersMonitor,
 			ModuleSupplier<DirectionManagerModule> msDirectionManager, LineFinderModule mLineFinder) {
-		super(name, param);
+		super(param);
 		this.mImageModifier = mImageModifier;
 		this.mBooleanImageFilter = mBooleanImageFilter;
 		this.mLineStartFinder = mLineStartFinder;
