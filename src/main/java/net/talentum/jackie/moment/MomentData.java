@@ -20,6 +20,7 @@ public class MomentData {
 	public List<Point> line = new ArrayList<Point>();
 	public List<Point> bordersL = new ArrayList<Point>();
 	public List<Point> bordersR = new ArrayList<Point>();
+	public List<Double> directionList = new ArrayList<Double>();
 	public List<Point> notFound = new ArrayList<Point>();
 	public List<Point> highlight = new ArrayList<Point>();
 

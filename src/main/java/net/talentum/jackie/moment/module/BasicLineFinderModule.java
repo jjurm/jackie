@@ -83,6 +83,7 @@ public class BasicLineFinderModule implements LineFinderModule {
 			d.bordersR.add(borders.getRight());
 			d.mTrailBordersMonitor.registerBorders(borders.getLeft(), borders.getRight());
 			d.line.add(next);
+			d.directionList.add(direction);
 			d.mDirectionManager.addLinePoint(next);
 
 			return !ret;

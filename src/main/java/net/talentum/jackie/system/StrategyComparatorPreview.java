@@ -1,6 +1,8 @@
 package net.talentum.jackie.system;
 
 import java.awt.EventQueue;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +59,7 @@ public class StrategyComparatorPreview {
 		list.add(new BlurImageModifierModule("Blur"));
 		list.add(new BWBooleanImageOutput("BW(100)", 100));
 		list.add(new BlurredBWBooleanImageOutput("Blur + BW(100)", 100));
-		list.add(new RobotStrategyIROutput("Strategy1", new LineFollowingStrategy(
+		list.add(new RobotStrategyIROutput("ORIG", new LineFollowingStrategy(
 				param,
 				new BlurImageModifierModule(),
 				new BWBooleanImageFilterModule(100),
@@ -66,7 +68,7 @@ public class StrategyComparatorPreview {
 				(d) -> new VectorDirectionManagerModule(8, 3),
 				new BasicLineFinderModule(
 						20.0 * (Math.PI / 180),
-						new BasicBorderFinderModule(2, 140, 10, 0.5),
+						new BasicBorderFinderModule(2, 140, 10),
 						new BasicAngularTurnHandlerModule()
 				)
 		)));
@@ -84,8 +86,15 @@ public class StrategyComparatorPreview {
 		}
 
 		previewFrame = new JFrame("StrategyComparatorPreview");
-		previewFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		previewFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		previewFrame.setBounds(100, 100, 900, 700);
+		previewFrame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				strategyComparatorPanel.stop();
+				System.exit(0);
+			}
+		});
 
 		strategyComparatorPanel = new StrategyComparatorPanel(irOutputs);
 		previewFrame.setContentPane(strategyComparatorPanel);

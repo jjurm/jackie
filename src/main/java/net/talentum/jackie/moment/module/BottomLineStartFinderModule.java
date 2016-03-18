@@ -11,7 +11,7 @@ public class BottomLineStartFinderModule implements LineStartFinderModule {
 	public Situation findLineStart(MomentData d) {
 
 		Point p = d.findLinearlyNearestPoint(new Point(d.image.getWidth() / 2, d.image.getHeight() - 1), 0, true,
-				d.param.movedst, d.image.getWidth());
+				d.param.movedst, d.image.getWidth() / 2);
 		if (p == null)
 			return null;
 

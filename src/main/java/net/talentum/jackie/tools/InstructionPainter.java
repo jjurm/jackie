@@ -44,6 +44,8 @@ public class InstructionPainter {
 	}
 
 	private static void drawPolyline(Graphics g, List<Point> points, Color color, int width) {
+		if (points.size() == 0)
+			return;
 		g.setColor(color);
 		Point a, b;
 		b = points.get(0);

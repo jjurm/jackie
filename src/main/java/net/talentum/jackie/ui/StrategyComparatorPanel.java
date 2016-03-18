@@ -8,9 +8,9 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,7 +38,7 @@ public class StrategyComparatorPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private ImageRecognitionOutput[] irOutputs;
-	private ArrayList<IROutputFrame> irOutputPanels = new ArrayList<IROutputFrame>();
+	private CopyOnWriteArrayList<IROutputFrame> irOutputFrames = new CopyOnWriteArrayList<IROutputFrame>();
 	private Webcam lastWebcam;
 	private boolean webcamOpen = false;
 	static ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -112,7 +112,7 @@ public class StrategyComparatorPanel extends JPanel {
 				});
 			} else {
 				// camera open
-				startedContinuous = false;
+				stop();
 
 				executor.submit(() -> {
 					webcamOpen = false;
@@ -154,7 +154,7 @@ public class StrategyComparatorPanel extends JPanel {
 			// create new strategy panel
 			ImageRecognitionOutput irOutput = (ImageRecognitionOutput) irOutputSelection.getSelectedItem();
 			IROutputFrame frame = new IROutputFrame(irOutput);
-			irOutputPanels.add(frame);
+			irOutputFrames.add(frame);
 			desktopPane.add(frame);
 			try {
 				frame.setSelected(true);
@@ -203,7 +203,7 @@ public class StrategyComparatorPanel extends JPanel {
 		btnStop = new JButton("Stop");
 		btnStop.setEnabled(false);
 		btnStop.addActionListener(e -> {
-			startedContinuous = false;
+			stop();
 		});
 		menu2.add(btnStop);
 
@@ -253,7 +253,7 @@ public class StrategyComparatorPanel extends JPanel {
 
 	private void scaledViewSizeChanged() {
 		Dimension scaled = getScaledViewSize();
-		irOutputPanels.stream().forEach(panel -> {
+		irOutputFrames.stream().forEach(panel -> {
 			panel.viewSizeChanged(scaled);
 		});
 
@@ -263,14 +263,14 @@ public class StrategyComparatorPanel extends JPanel {
 
 	private void shot() {
 		try {
-			// contruct Moment
+			// construct Moment
 			Webcam webcam = webcamSelection.getSelectedWebcam();
 			BufferedImage image = webcam.getImage();
 			SensorData sensorData = SensorData.collect();
 			Moment moment = new Moment(image, sensorData);
 
 			// arrange for processing
-			for (IROutputFrame p : irOutputPanels) {
+			for (IROutputFrame p : irOutputFrames) {
 				p.receive(moment);
 			}
 		} catch (Exception e) {
@@ -282,6 +282,10 @@ public class StrategyComparatorPanel extends JPanel {
 		for (JComponent component : components) {
 			component.setEnabled(enabled);
 		}
+	}
+	
+	public void stop() {
+		startedContinuous = false;
 	}
 
 	/**
@@ -305,7 +309,7 @@ public class StrategyComparatorPanel extends JPanel {
 			setLocation(xOffset * openFrameCount, yOffset * openFrameCount);
 			setLayout(new BorderLayout(0, 0));
 			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			addInternalFrameListener(new IROutputPanelListener());
+			addInternalFrameListener(new IROutputFrameListener());
 
 			imagePanel = new ImagePanel();
 			imagePanel.setPreferredSize(getScaledViewSize());
@@ -339,15 +343,15 @@ public class StrategyComparatorPanel extends JPanel {
 			imagePanel.repaint();
 		}
 
-		class IROutputPanelListener extends InternalFrameAdapter {
+		class IROutputFrameListener extends InternalFrameAdapter {
 
 			@Override
 			public void internalFrameClosing(InternalFrameEvent e) {
 				openFrameCount--;
 
-				JInternalFrame frame = e.getInternalFrame();
+				IROutputFrame frame = (IROutputFrame) e.getInternalFrame();
 				desktopPane.remove(frame);
-				irOutputPanels.remove(frame);
+				irOutputFrames.remove(frame);
 
 				desktopPane.revalidate();
 				desktopPane.repaint();
