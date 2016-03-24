@@ -51,12 +51,13 @@ public class StrategyComparatorPanel extends JPanel {
 	private JButton btnOpenClose;
 	private JPanel menu2;
 	private JComboBox<ImageRecognitionOutput> irOutputSelection;
-	private JButton btnAddStrategy;
+	private JButton btnAddOutput;
 	private Component horizontalStrut;
 	private JPanel centerPanel;
 	private JButton btnShot;
 	private JButton btnStart;
 	private JButton btnStop;
+	private JLabel lblFps;
 	private Component horizontalStrut_1;
 	private JLabel lblScale;
 	private JComboBox<Double> scaleSelection;
@@ -145,12 +146,13 @@ public class StrategyComparatorPanel extends JPanel {
 		menuPanel.add(menu2);
 
 		irOutputSelection = new JComboBox<ImageRecognitionOutput>();
-		irOutputSelection.setPreferredSize(new Dimension(100, 20));
+		irOutputSelection.setPreferredSize(new Dimension(200, 20));
 		irOutputSelection.setModel(new DefaultComboBoxModel<ImageRecognitionOutput>(irOutputs));
+		irOutputSelection.setMaximumRowCount(20);
 		menu2.add(irOutputSelection);
 
-		btnAddStrategy = new JButton("Add output");
-		btnAddStrategy.addActionListener(e -> {
+		btnAddOutput = new JButton("Add output");
+		btnAddOutput.addActionListener(e -> {
 			// create new strategy panel
 			ImageRecognitionOutput irOutput = (ImageRecognitionOutput) irOutputSelection.getSelectedItem();
 			IROutputFrame frame = new IROutputFrame(irOutput);
@@ -164,7 +166,7 @@ public class StrategyComparatorPanel extends JPanel {
 			desktopPane.revalidate();
 			desktopPane.repaint();
 		});
-		menu2.add(btnAddStrategy);
+		menu2.add(btnAddOutput);
 
 		horizontalStrut = Box.createHorizontalStrut(20);
 		menu2.add(horizontalStrut);
@@ -206,6 +208,9 @@ public class StrategyComparatorPanel extends JPanel {
 			stop();
 		});
 		menu2.add(btnStop);
+		
+		lblFps = new JLabel("");
+		menu2.add(lblFps);
 
 		centerPanel = new JPanel();
 		add(centerPanel, BorderLayout.CENTER);
@@ -262,6 +267,7 @@ public class StrategyComparatorPanel extends JPanel {
 	}
 
 	private void shot() {
+		long t = System.currentTimeMillis();
 		try {
 			// construct Moment
 			Webcam webcam = webcamSelection.getSelectedWebcam();
@@ -276,6 +282,7 @@ public class StrategyComparatorPanel extends JPanel {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		lblFps.setText("FPS: "+1000/(System.currentTimeMillis() - t));
 	}
 
 	public void setEnabledFor(boolean enabled, JComponent... components) {

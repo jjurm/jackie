@@ -56,5 +56,21 @@ public class InstructionPainter {
 			b = a;
 		}
 	}
+	
+	public static BufferedImage getBooleanImage(boolean[][] filtered) {
+		int width = filtered.length, height = filtered[0].length;
+		BufferedImage target = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_RGB);
+		Graphics g = target.getGraphics();
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				g.setColor(filtered[x][y] ? Color.BLACK : Color.WHITE);
+				g.fillRect(x, y, 1, 1);
+			}
+		}
+
+		return target;
+	}
 
 }

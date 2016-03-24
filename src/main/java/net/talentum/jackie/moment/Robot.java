@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.function.Supplier;
 
 import net.talentum.jackie.moment.module.AveragingTrailWidthDeterminerModule;
-import net.talentum.jackie.moment.module.BWBooleanImageFilterModule;
+import net.talentum.jackie.moment.module.UnivBooleanImageFilterModule;
 import net.talentum.jackie.moment.module.BasicAngularTurnHandlerModule;
 import net.talentum.jackie.moment.module.BasicBorderFinderModule;
 import net.talentum.jackie.moment.module.BasicLineFinderModule;
@@ -35,7 +35,7 @@ public class Robot {
 		lineFollowingStrategy = new LineFollowingStrategy(
 				param,
 				new BlurImageModifierModule(),
-				new BWBooleanImageFilterModule(100),
+				new UnivBooleanImageFilterModule(100),
 				new BottomLineStartFinderModule(),
 				(d) -> new AveragingTrailWidthDeterminerModule(d, 3),
 				(d) -> new VectorDirectionManagerModule(8, 3),
