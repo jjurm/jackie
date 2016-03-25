@@ -13,19 +13,18 @@ public class Main {
 
 	public static Robot robot;
 	public static Webcam webcam;
-	
+
 	public static void main(String[] args) {
-		
+
 		run(args);
-		
+
 	}
-	
+
 	public static void run(String[] args) {
 		Parameters param = new Parameters();
-		
-		
+
 		robot = new Robot(param);
-		
+
 		try {
 			webcam = Webcam.getDefault(5, TimeUnit.SECONDS);
 		} catch (WebcamException | TimeoutException e) {
@@ -34,9 +33,9 @@ public class Main {
 		}
 		webcam.open();
 		robot.setWebcamImageSupplier(() -> webcam.getImage());
-		
+
 		robot.run();
-		
+
 	}
-	
+
 }
