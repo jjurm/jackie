@@ -44,13 +44,17 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		int x = d.image.getWidth() / 2;
 		int y = d.image.getHeight() / 2;
 
-		checkLine(new Point(x, y), -Math.PI / 2);
+		checkLine(new Point(x, y - y / 2), -Math.PI / 2);
+		Point destination = new Point(checkLine(new Point(x, y), -Math.PI / 2));
+		checkLine(new Point(x, y + y / 2), -Math.PI / 2);
 
-		RobotInstruction instruction = new RobotInstruction(d.m, d);
+		destination.translate(-x, 0);
+
+		RobotInstruction instruction = new RobotInstruction(d.m, d, destination);
 		return instruction;
 	}
 
-	public void checkLine(Point p, double direction) {
+	public Point checkLine(Point p, double direction) {
 		Point trail = d.findLinearlyNearestPoint(p, direction + Math.PI / 2, true, param.movedst, Integer.MAX_VALUE);
 
 		if (trail != null) {
@@ -61,10 +65,14 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 				d.bordersL.add(borders.left);
 				d.bordersR.add(borders.right);
 
-				Point l1 = d.avg(borders.getLeft(), borders.getRight());
-				d.line.add(l1);
+				Point l = d.avg(borders.getLeft(), borders.getRight());
+				d.line.add(l);
+
+				return l;
 			}
 		}
+
+		return null;
 	}
 
 	public static class ImageOutput extends ImageRecognitionOutput {
@@ -87,7 +95,9 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 
 			int y = d.image.getHeight() / 2;
 			g.setColor(Color.BLUE);
+			g.drawLine(0, y / 2, d.image.getWidth(), y / 2);
 			g.drawLine(0, y, d.image.getWidth(), y);
+			g.drawLine(0, y * 3 / 2, d.image.getWidth(), y * 3 / 2);
 
 			g.setColor(Color.RED);
 			d.line.stream().forEach(p -> g.fillRect(p.x - 2, p.y - 2, 4, 4));

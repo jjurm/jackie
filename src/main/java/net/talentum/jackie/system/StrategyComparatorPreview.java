@@ -24,7 +24,6 @@ import net.talentum.jackie.moment.module.BasicBorderFinderModule;
 import net.talentum.jackie.moment.module.BasicLineFinderModule;
 import net.talentum.jackie.moment.module.BlurImageModifierModule;
 import net.talentum.jackie.moment.module.BottomLineStartFinderModule;
-import net.talentum.jackie.moment.module.DivergenceLimitBorderFinderModule;
 import net.talentum.jackie.moment.module.UnivBooleanImageFilterModule;
 import net.talentum.jackie.moment.module.VectorDirectionManagerModule;
 import net.talentum.jackie.moment.strategy.HorizontalLevelObservingStrategy;
@@ -93,15 +92,6 @@ public class StrategyComparatorPreview {
 				new BlurImageModifierModule(),
 				new UnivBooleanImageFilterModule(100),
 				new BasicBorderFinderModule(2, 600, 3)
-		)));
-				new BottomLineStartFinderModule(),
-				(d) -> new AveragingTrailWidthDeterminerModule(d, 3),
-				(d) -> new VectorDirectionManagerModule(8, 3),
-				new BasicLineFinderModule(
-						20.0 * (Math.PI / 180),
-						new BasicBorderFinderModule(2, 140, 10),
-						new BasicAngularTurnHandlerModule()
-				)
 		)));
 		// @formatter:on
 

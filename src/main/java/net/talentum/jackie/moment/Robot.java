@@ -1,5 +1,6 @@
 package net.talentum.jackie.moment;
 
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -19,9 +20,9 @@ import net.talentum.jackie.moment.strategy.RobotStrategy;
 public class Robot {
 
 	Parameters param;
-	
+
 	Supplier<BufferedImage> webcamImageSupplier;
-	
+
 	public Deque<Moment> moments = new LinkedList<Moment>();
 	public RobotInstruction lastInstruction;
 
@@ -69,9 +70,34 @@ public class Robot {
 	public final synchronized RobotInstruction process(Moment moment) {
 		strategy.prepare(moment);
 		RobotInstruction instruction = strategy.evaluate();
-		
+
 		lastInstruction = instruction;
 		return instruction;
+	}
+
+	public void run() {
+		while (true) {
+
+			// obtain moment
+			Moment moment = constructMoment();
+
+			// process
+			RobotInstruction instruction = process(moment);
+
+			// set motors
+			setMotors(instruction.destination);
+
+		}
+	}
+
+	public void setMotors(Point destination) {
+
+		if (destination == null || destination.equals(new Point(0, 0))) {
+			return;
+		}
+
+		double direction = Math.atan2(destination.y, destination.x);
+
 	}
 
 }
