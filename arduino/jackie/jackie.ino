@@ -9,6 +9,7 @@ class ServoController{
 public:
   Servo l;
   Servo r;
+  
   ServoController() {
     l.attach(pin_l);
     r.attach(pin_r);
@@ -29,28 +30,53 @@ public:
   }
 };
 
-ServoController servoController;
+ServoController *servoController = new ServoController();
 
-void execute(String cmd){
-  int space = cmd.indexOf(" ");
-  String first = cmd.substring(0, space);
+class SerialCommander{
+public:
+	String stack = "";
+	int index = 0;
+	String cmd = "";
+	
+	void addToStack(){
+		stack.concat(Serial.readString());
+	}
+	
+	void executeStack(){
+		while(true){
+		    index = stack.indexOf(";")+1;
+		    cmd = stack.substring(0, index);
+		    stack = stack.substring(index);
+		    if(cmd != "") execute(cmd);
+		    if(stack == ""){
+		      break;
+		    }
+		  }
+	}
+	
+	void execute(String cmd){
+	  int space = cmd.indexOf(" ");
+	  String first = cmd.substring(0, space);
 
-  cmd = cmd.substring(space+1);
-  
-  switch(first.toInt()){
-  case 1:
-    space = cmd.indexOf(" ");
-    int angle = cmd.substring(0, space).toInt();
-    cmd = cmd.substring(space+1);
-    String side = cmd.substring(0, 1);
-    if(side == "l"){
-      servoController.movel(angle);
-    } else if(side == "r"){
-      servoController.mover(angle);
-    }
-    break;
-  }
-}
+	  cmd = cmd.substring(space+1);
+	  
+	  switch(first.toInt()){
+	  case 1:
+	    space = cmd.indexOf(" ");
+	    int angle = cmd.substring(0, space).toInt();
+	    cmd = cmd.substring(space+1);
+	    String side = cmd.substring(0, 1);
+	    if(side == "l"){
+	      servoController->movel(angle);
+	    } else if(side == "r"){
+	      servoController->mover(angle);
+	    }
+	    break;
+	  }
+	}
+};
+
+SerialCommander *serialCommander = new SerialCommander();
 
 void setup() {
   Serial.begin(115200);
@@ -59,21 +85,11 @@ void setup() {
 
 
 void loop() {
-  String stack = "";
-  int index = 0;
-  String cmd = "";
-  if(Serial.available()){
-    stack.concat(Serial.readString());
-  }
-  while(true){
-    index = stack.indexOf(";")+1;
-    cmd = stack.substring(0, index);
-    stack = stack.substring(index);
-    if(cmd != "") execute(cmd);
-    if(stack == ""){
-      break;
-    }
-  }
+	if(Serial.available()){
+		serialCommander->addToStack();
+	}
+	serialCommander->executeStack();
+  
 }
 
 
