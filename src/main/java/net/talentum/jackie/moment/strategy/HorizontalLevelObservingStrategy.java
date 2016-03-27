@@ -7,7 +7,6 @@ import java.awt.image.BufferedImage;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
-import net.talentum.jackie.ir.ImageRecognitionOutput;
 import net.talentum.jackie.moment.Moment;
 import net.talentum.jackie.moment.MomentData;
 import net.talentum.jackie.moment.Parameters;
@@ -17,6 +16,14 @@ import net.talentum.jackie.moment.module.BorderFinderModule;
 import net.talentum.jackie.moment.module.ImageModifierModule;
 import net.talentum.jackie.tools.InstructionPainter;
 
+/**
+ * Very simple and fast strategy that works similarly to a reflectance sensor
+ * array (line detection sensor). It simply looks at pre-defined straight lines
+ * across the image. The main line, which simulates the reflectance sensor
+ * array, is positioned horizontally across the image.
+ * 
+ * @author JJurM
+ */
 public class HorizontalLevelObservingStrategy extends RobotStrategy {
 
 	ImageModifierModule mImageModifier;
@@ -54,6 +61,14 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		return instruction;
 	}
 
+	/**
+	 * Checks trail on the given straight line, which is specified by a point
+	 * and a direction.
+	 * 
+	 * @param p
+	 * @param direction
+	 * @return
+	 */
 	public Point checkLine(Point p, double direction) {
 		Point trail = d.findLinearlyNearestPoint(p, direction + Math.PI / 2, true, param.movedst, Integer.MAX_VALUE);
 
@@ -75,7 +90,13 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		return null;
 	}
 
-	public static class ImageOutput extends ImageRecognitionOutput {
+	/**
+	 * Image output whose purpose is drawing image from {@link RobotInstruction}
+	 * that originates in the {@link HorizontalLevelObservingStrategy}.
+	 * 
+	 * @author JJurM
+	 */
+	public static class ImageOutput extends net.talentum.jackie.ir.ImageOutput {
 
 		HorizontalLevelObservingStrategy strategy;
 

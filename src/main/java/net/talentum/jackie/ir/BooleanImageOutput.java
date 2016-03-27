@@ -8,7 +8,7 @@ import net.talentum.jackie.moment.Moment;
 import net.talentum.jackie.moment.module.UnivBooleanImageFilterModule;
 import net.talentum.jackie.tools.InstructionPainter;
 
-public class BooleanImageOutput extends ImageRecognitionOutput {
+public class BooleanImageOutput extends ImageOutput {
 
 	private UnivBooleanImageFilterModule filter;
 

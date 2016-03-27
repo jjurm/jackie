@@ -6,10 +6,10 @@ import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 
-import net.talentum.jackie.ir.ImageRecognitionOutput;
+import net.talentum.jackie.ir.ImageOutput;
 import net.talentum.jackie.moment.Moment;
 
-public class BlurImageModifierModule extends ImageRecognitionOutput implements ImageModifierModule {
+public class BlurImageModifierModule extends ImageOutput implements ImageModifierModule {
 
 	public BlurImageModifierModule(String name) {
 		super(name);

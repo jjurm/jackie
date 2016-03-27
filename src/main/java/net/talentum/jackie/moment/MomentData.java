@@ -8,6 +8,14 @@ import java.util.List;
 import net.talentum.jackie.moment.module.DirectionManagerModule;
 import net.talentum.jackie.moment.module.TrailBordersMonitorModule;
 
+/**
+ * This object is bonded to {@link Moment}. Contains data, some may be only
+ * temporary, used for evaluation by strategies. Each strategy can use the
+ * variables in a different way. MomentData is created by strategies, just
+ * before the moment processing.
+ * 
+ * @author JJurM
+ */
 public class MomentData {
 
 	public Moment m;
@@ -39,30 +47,80 @@ public class MomentData {
 
 	// ===== helper functions =====
 
+	/**
+	 * Checks if the given point is in bounds of the image.
+	 * 
+	 * @param point
+	 * @return {@code true}, if the point is in bounds
+	 */
 	public boolean inBounds(Point point) {
 		return point.x >= 0 && point.y >= 0 && point.x < image.getWidth() && point.y < image.getHeight();
 	}
 
+	/**
+	 * Checks if the given point is "black", i.e. if it was determined as a
+	 * trail point.
+	 * 
+	 * @param p
+	 * @return
+	 */
 	public boolean isTrailPoint(Point p) {
 		return bw[p.x][p.y];
 	}
 
+	/**
+	 * Calculates distance between the two points.
+	 * 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
 	public double dst(Point a, Point b) {
 		// return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 		return a.distance(b);
 	}
 
+	/**
+	 * Moves the given base point in a specified angle, by a specified distance.
+	 * 
+	 * @param base
+	 *            where to start
+	 * @param angle
+	 *            direction to move the point
+	 * @param distance
+	 *            distance to move the point
+	 * @return the new point
+	 */
 	public Point move(Point base, double angle, double distance) {
 		return new Point((int) Math.round(base.x + Math.cos(angle) * distance),
 				(int) Math.round(base.y + Math.sin(angle) * distance));
 	}
 
+	/**
+	 * Rotates one point about another.
+	 * 
+	 * @param p
+	 *            the point to be rotated
+	 * @param center
+	 *            the center of the rotation
+	 * @param angle
+	 *            the angle by which to rotate
+	 * @return the new point
+	 */
 	public Point rotate(Point p, Point center, double angle) {
 		return new Point(
 				(int) Math.round(center.x + (p.x - center.x) * Math.cos(angle) - (p.y - center.y) * Math.sin(angle)),
 				(int) Math.round(center.y + (p.x - center.x) * Math.sin(angle) + (p.y - center.y) * Math.cos(angle)));
 	}
 
+	/**
+	 * Computes arithmetic average of the given points. Each has the same
+	 * weight.
+	 * 
+	 * @param points
+	 *            list of points
+	 * @return the average point
+	 */
 	public Point avg(Point... points) {
 		int sx = 0, sy = 0;
 		for (Point p : points) {
@@ -72,14 +130,36 @@ public class MomentData {
 		return new Point(sx / points.length, sy / points.length);
 	}
 
+	/**
+	 * Returns an angle that is perpendicular to the given angle.
+	 * 
+	 * @param angle
+	 * @return new angle
+	 */
 	public double perpendicularAngle(double angle) {
-		double perpAngle = angle + Math.PI / 2;
-		/*
-		 * if (perpAngle < -Math.PI) perpAngle += 2 * Math.PI;
-		 */
-		return perpAngle;
+		return angle + Math.PI / 2;
 	}
 
+	/**
+	 * Finds point, on a straight line, that is specified by being or not being
+	 * a trail point and is the nearest such point to the specified {@code base}
+	 * point.
+	 * 
+	 * @param base
+	 *            base point, from which the distance is calculated and compared
+	 * @param angle
+	 *            angle determining the line, across which to find the point
+	 * @param findTrail
+	 *            whether the wanted point is or isn't trail point
+	 * @param dst
+	 *            distance interval between adjacent points to be checked
+	 *            (greater interval causes the algorithm to search faster, but
+	 *            the inaccuracy of the returned point is also greater)
+	 * @param maxdst
+	 *            maximum distance to search for; {@code null} is returned if no
+	 *            such point is found in the specified distance
+	 * @return
+	 */
 	public Point findLinearlyNearestPoint(Point base, double angle, boolean findTrail, int dst, int maxdst) {
 		// returns Point or null
 		boolean wasInBounds = true;
@@ -104,6 +184,9 @@ public class MomentData {
 	}
 
 	/**
+	 * Finds border of the trail, provided that the {@code base} point lies on
+	 * the trail.
+	 * 
 	 * @param base
 	 *            where to start
 	 * @param direction
@@ -112,7 +195,8 @@ public class MomentData {
 	 *            moving distance (step)
 	 * @param orientation
 	 *            either {@code 1} or {@code -1}
-	 * @return
+	 * @return last point that was determined as a trail point; {@code base} can
+	 *         also be returned, if no further trail point was found
 	 */
 	public Point findBorder(Point base, double direction, int dst, int orientation) {
 		Point p = base;

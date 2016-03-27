@@ -8,7 +8,7 @@ import net.talentum.jackie.moment.RobotInstructionRegister;
 import net.talentum.jackie.moment.strategy.RobotStrategy;
 import net.talentum.jackie.tools.InstructionPainter;
 
-public class RobotStrategyIROutput extends ImageRecognitionOutput {
+public class RobotStrategyIROutput extends ImageOutput {
 
 	RobotStrategy strategy;
 	RobotInstructionRegister register;

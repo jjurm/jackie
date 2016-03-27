@@ -12,21 +12,63 @@ import com.pi4j.io.serial.SerialDataEvent;
 import com.pi4j.io.serial.SerialDataEventListener;
 import com.pi4j.io.serial.SerialFactory;
 
+/**
+ * Class responsible for serial communication. Receives and processes input
+ * commands and is capable of writing into the output stream.
+ * 
+ * <p>
+ * <b>Command syntax</b><br/>
+ * Each command consists of integers separated by spaces. Commands are
+ * terminated by end of line, i.e. the {@code "\n"} character. The command is
+ * specified by the first integers, the following are arguments.
+ * </p>
+ * 
+ * <p>
+ * <b>List of commands</b><br/>
+ * </p>
+ * <table border="1" cellspacing="0">
+ * <tr>
+ * <th>Command #</th>
+ * <th>Description</th>
+ * <th>List of arguments</th>
+ * <th>Examples</th>
+ * </tr>
+ * <tr>
+ * <td><b>1</b></td>
+ * <td>Set motor speed</td>
+ * <td>
+ * <ul>
+ * <li>left motor</li>
+ * <li>right motor</li>
+ * </ul>
+ * </td>
+ * <td>{@code 1 100 80}</td>
+ * </tr>
+ * </table>
+ * 
+ * @author JJurM
+ */
 public class SerialCommunicator {
 
 	final Serial serial;
-	final StringBuffer buffer = new StringBuffer();
-	Object monitor;
 
+	/**
+	 * A buffer with stored received strings.
+	 */
 	ConcurrentLinkedDeque<String> deque = new ConcurrentLinkedDeque<String>();
 
 	ExecutorService executor = Executors.newSingleThreadExecutor();
 
+	/**
+	 * Basic constructor. Creates and opens serial port.
+	 */
 	public SerialCommunicator() {
 
 		// create serial
 		serial = SerialFactory.createInstance();
 		serial.addListener(new Listener());
+
+		open();
 
 		// run executor
 		executor.submit(() -> {
@@ -35,10 +77,9 @@ public class SerialCommunicator {
 				process(line);
 			}
 		});
-
 	}
 
-	public void open() {
+	private void open() {
 		// open serial
 		try {
 			serial.open(Serial.DEFAULT_COM_PORT, 38400);
@@ -47,10 +88,22 @@ public class SerialCommunicator {
 		}
 	}
 
+	/**
+	 * Handles received command.
+	 * 
+	 * @param line
+	 * @see SerialCommunicator
+	 */
 	public void process(String line) {
 
 	}
 
+	/**
+	 * Writes command into serial.
+	 * 
+	 * @param command
+	 * @see SerialCommunicator
+	 */
 	public void write(Integer... command) {
 		String line = Arrays.stream(command).map(n -> String.valueOf(n)).collect(Collectors.joining(" "));
 		try {
@@ -60,6 +113,11 @@ public class SerialCommunicator {
 		}
 	}
 
+	/**
+	 * Waits until a whole line is available and returns the line.
+	 * 
+	 * @return
+	 */
 	public String readLine() {
 		StringBuffer buffer = new StringBuffer();
 		while (true) {
@@ -85,7 +143,10 @@ public class SerialCommunicator {
 				buffer.append(str);
 			} else {
 				buffer.append(str.substring(0, index));
-				deque.addFirst(str.substring(index));
+
+				String remainder = str.substring(index + 1);
+				if (remainder.length() > 0)
+					deque.addFirst(remainder);
 
 				return buffer.toString();
 			}
@@ -93,6 +154,11 @@ public class SerialCommunicator {
 		}
 	}
 
+	/**
+	 * This class is supplied as a listener for the {@link Serial}.
+	 * 
+	 * @author JJurM
+	 */
 	class Listener implements SerialDataEventListener {
 		@Override
 		public void dataReceived(SerialDataEvent event) {

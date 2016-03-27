@@ -9,7 +9,7 @@ import net.talentum.jackie.moment.module.BlurImageModifierModule;
 import net.talentum.jackie.moment.module.UnivBooleanImageFilterModule;
 import net.talentum.jackie.tools.InstructionPainter;
 
-public class BlurredBooleanImageOutput extends ImageRecognitionOutput {
+public class BlurredBooleanImageOutput extends ImageOutput {
 
 	private BlurImageModifierModule blurModifier;
 	private UnivBooleanImageFilterModule bwFilter;

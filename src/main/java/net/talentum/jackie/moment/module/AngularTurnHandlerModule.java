@@ -5,6 +5,11 @@ import java.awt.Point;
 import net.talentum.jackie.moment.MomentData;
 import net.talentum.jackie.moment.Situation;
 
+/**
+ * Module interface that takes care of angular turns.
+ * 
+ * @author JJurM
+ */
 public interface AngularTurnHandlerModule {
 
 	/**

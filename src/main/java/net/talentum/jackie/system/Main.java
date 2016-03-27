@@ -9,6 +9,15 @@ import com.github.sarxos.webcam.WebcamException;
 import net.talentum.jackie.moment.Parameters;
 import net.talentum.jackie.moment.Robot;
 
+/**
+ * Runnable class.
+ * 
+ * <p>
+ * This class is run normally, when controlling robot.
+ * </p>
+ * 
+ * @author JJurM
+ */
 public class Main {
 
 	public static Robot robot;
@@ -23,8 +32,10 @@ public class Main {
 	public static void run(String[] args) {
 		Parameters param = new Parameters();
 
+		// create robot
 		robot = new Robot(param);
 
+		// create and open webcam
 		try {
 			webcam = Webcam.getDefault(5, TimeUnit.SECONDS);
 		} catch (WebcamException | TimeoutException e) {
@@ -34,6 +45,7 @@ public class Main {
 		webcam.open();
 		robot.setWebcamImageSupplier(() -> webcam.getImage());
 
+		// run the main robot's cycle
 		robot.run();
 
 	}

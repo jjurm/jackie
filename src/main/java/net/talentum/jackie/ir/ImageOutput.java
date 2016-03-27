@@ -4,11 +4,11 @@ import java.awt.image.BufferedImage;
 
 import net.talentum.jackie.moment.Moment;
 
-public abstract class ImageRecognitionOutput {
+public abstract class ImageOutput {
 
 	private String name;
 
-	public ImageRecognitionOutput(String name) {
+	public ImageOutput(String name) {
 		this.name = name;
 	}
 

@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 import net.talentum.jackie.moment.Moment;
 
-public class SourceImageOutput extends ImageRecognitionOutput {
+public class SourceImageOutput extends ImageOutput {
 
 	public SourceImageOutput(String name) {
 		super(name);

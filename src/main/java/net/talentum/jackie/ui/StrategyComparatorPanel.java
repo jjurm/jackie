@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -30,27 +31,70 @@ import javax.swing.event.InternalFrameEvent;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPicker;
 
-import net.talentum.jackie.ir.ImageRecognitionOutput;
+import net.talentum.jackie.ir.ImageOutput;
 import net.talentum.jackie.moment.Moment;
 import net.talentum.jackie.moment.SensorData;
+import net.talentum.jackie.system.StrategyComparatorPreview;
+import net.talentum.jackie.tools.AtomicTools;
 
+/**
+ * An implementation of {@link JPanel} that is put into the frame created by
+ * {@link StrategyComparatorPreview}. Contains a desktop pane, where
+ * {@link ImageOutputFrame}s are created and displayed.
+ * 
+ * <p>
+ * This class is also responsible for handling events and actions invoked by the
+ * GUI. This includes managing {@link ImageOutputFrame}s, taking images,
+ * processing them, redrawing.
+ * </p>
+ * 
+ * @author JJurM
+ */
 public class StrategyComparatorPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
-	private ImageRecognitionOutput[] irOutputs;
-	private CopyOnWriteArrayList<IROutputFrame> irOutputFrames = new CopyOnWriteArrayList<IROutputFrame>();
-	private Webcam lastWebcam;
-	private boolean webcamOpen = false;
-	static ExecutorService executor = Executors.newSingleThreadExecutor();
-	private boolean startedContinuous = false;
+	/**
+	 * list of {@link ImageOutput}s to offer
+	 */
+	private ImageOutput[] imageOutputs;
+
+	/**
+	 * List of opened {@link ImageOutputFrame}s
+	 */
+	private CopyOnWriteArrayList<ImageOutputFrame> imageOutputFrames = new CopyOnWriteArrayList<ImageOutputFrame>();
+
+	/**
+	 * Number of opened {@link ImageOutputFrame}s
+	 */
 	static int openFrameCount = 0;
 
+	/**
+	 * Webcam that was last selected
+	 */
+	private Webcam lastWebcam;
+
+	/**
+	 * Whether webcam is opened
+	 */
+	private AtomicBoolean webcamOpen = new AtomicBoolean(false);
+
+	/**
+	 * This executor handles taking and processing images
+	 */
+	static ExecutorService executor = Executors.newSingleThreadExecutor();
+
+	/**
+	 * Whether the continuous shot mode has been started
+	 */
+	private boolean startedContinuous = false;
+
+	// components
 	private JPanel menu1;
 	private WebcamPicker webcamSelection;
 	private JComboBox<DimensionComboBoxItem> viewSizeSelection;
 	private JButton btnOpenClose;
 	private JPanel menu2;
-	private JComboBox<ImageRecognitionOutput> irOutputSelection;
+	private JComboBox<ImageOutput> imageOutputSelection;
 	private JButton btnAddOutput;
 	private Component horizontalStrut;
 	private JPanel centerPanel;
@@ -63,15 +107,18 @@ public class StrategyComparatorPanel extends JPanel {
 	private JComboBox<Double> scaleSelection;
 	private JDesktopPane desktopPane;
 
-	public StrategyComparatorPanel(ImageRecognitionOutput[] irOutputs) {
-		this.irOutputs = irOutputs;
+	public StrategyComparatorPanel(ImageOutput[] irOutputs) {
+		this.imageOutputs = irOutputs;
 
 		setLayout(new BorderLayout(0, 0));
-		createElements();
+		createComponents();
 		webcamChanged();
 	}
 
-	private void createElements() {
+	/**
+	 * Constructs GUI components inside the panel
+	 */
+	private void createComponents() {
 		List<Webcam> webcams = Webcam.getWebcams();
 
 		JPanel menuPanel = new JPanel();
@@ -97,14 +144,15 @@ public class StrategyComparatorPanel extends JPanel {
 		btnOpenClose = new JButton("Open");
 		btnOpenClose.addActionListener(e -> {
 			btnOpenClose.setEnabled(false);
-			if (!webcamOpen) {
+			if (AtomicTools.getAndNegate(webcamOpen)) {
 				// camera closed
 				setEnabledFor(false, webcamSelection, viewSizeSelection);
 
 				executor.submit(() -> {
+					// open webcam
 					final boolean opened = webcamSelection.getSelectedWebcam().open();
-					webcamOpen = opened;
 
+					// enqueue GUI changes
 					EventQueue.invokeLater(() -> {
 						if (opened)
 							btnOpenClose.setText("Close");
@@ -112,13 +160,14 @@ public class StrategyComparatorPanel extends JPanel {
 					});
 				});
 			} else {
-				// camera open
+				// camera opened
 				stop();
 
 				executor.submit(() -> {
-					webcamOpen = false;
+					// close webcam
 					webcamSelection.getSelectedWebcam().close();
 
+					// enqueue GUI changes
 					EventQueue.invokeLater(() -> {
 						btnOpenClose.setText("Open");
 						setEnabledFor(true, webcamSelection, viewSizeSelection, btnOpenClose);
@@ -145,18 +194,18 @@ public class StrategyComparatorPanel extends JPanel {
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		menuPanel.add(menu2);
 
-		irOutputSelection = new JComboBox<ImageRecognitionOutput>();
-		irOutputSelection.setPreferredSize(new Dimension(200, 20));
-		irOutputSelection.setModel(new DefaultComboBoxModel<ImageRecognitionOutput>(irOutputs));
-		irOutputSelection.setMaximumRowCount(20);
-		menu2.add(irOutputSelection);
+		imageOutputSelection = new JComboBox<ImageOutput>();
+		imageOutputSelection.setPreferredSize(new Dimension(200, 20));
+		imageOutputSelection.setModel(new DefaultComboBoxModel<ImageOutput>(imageOutputs));
+		imageOutputSelection.setMaximumRowCount(20);
+		menu2.add(imageOutputSelection);
 
 		btnAddOutput = new JButton("Add output");
 		btnAddOutput.addActionListener(e -> {
-			// create new strategy panel
-			ImageRecognitionOutput irOutput = (ImageRecognitionOutput) irOutputSelection.getSelectedItem();
-			IROutputFrame frame = new IROutputFrame(irOutput);
-			irOutputFrames.add(frame);
+			// create new image output frame
+			ImageOutput imageOutput = (ImageOutput) imageOutputSelection.getSelectedItem();
+			ImageOutputFrame frame = new ImageOutputFrame(imageOutput);
+			imageOutputFrames.add(frame);
 			desktopPane.add(frame);
 			try {
 				frame.setSelected(true);
@@ -173,7 +222,7 @@ public class StrategyComparatorPanel extends JPanel {
 
 		btnShot = new JButton("Shot");
 		btnShot.addActionListener(e -> {
-			if (!webcamOpen)
+			if (!webcamOpen.get())
 				return;
 			setEnabledFor(false, btnShot, btnStart);
 			executor.submit(() -> {
@@ -185,14 +234,14 @@ public class StrategyComparatorPanel extends JPanel {
 
 		btnStart = new JButton("Start continuous");
 		btnStart.addActionListener(e -> {
-			if (!webcamOpen)
+			if (!webcamOpen.get())
 				return;
 			setEnabledFor(false, btnShot, btnStart);
 			btnStop.setEnabled(true);
 			startedContinuous = true;
 			executor.submit(() -> {
 				while (startedContinuous) {
-					if (!webcamOpen)
+					if (!webcamOpen.get())
 						break;
 					shot();
 				}
@@ -208,7 +257,7 @@ public class StrategyComparatorPanel extends JPanel {
 			stop();
 		});
 		menu2.add(btnStop);
-		
+
 		lblFps = new JLabel("");
 		menu2.add(lblFps);
 
@@ -221,6 +270,9 @@ public class StrategyComparatorPanel extends JPanel {
 		desktopPane.setPreferredSize(new Dimension(500, 500));
 	}
 
+	/**
+	 * Method run when the webcam selection has been changed
+	 */
 	private void webcamChanged() {
 		Webcam webcam = webcamSelection.getSelectedWebcam();
 
@@ -235,20 +287,39 @@ public class StrategyComparatorPanel extends JPanel {
 		viewSizeChanged();
 	}
 
+	/**
+	 * Returns currently selected view size
+	 * 
+	 * @return
+	 */
 	private Dimension getViewSize() {
 		return ((DimensionComboBoxItem) viewSizeSelection.getSelectedItem()).getValue();
 	}
 
+	/**
+	 * Returns currently selected view scale
+	 * 
+	 * @return
+	 */
 	private double getScale() {
 		return (Double) scaleSelection.getSelectedItem();
 	}
 
+	/**
+	 * Returns currently selected view size multiplied by currently selected
+	 * scale.
+	 * 
+	 * @return
+	 */
 	private Dimension getScaledViewSize() {
 		Dimension orig = getViewSize();
 		double scale = getScale();
 		return new Dimension((int) (orig.width * scale), (int) (orig.height * scale));
 	}
 
+	/**
+	 * Method run when the currently selected view size has been changed
+	 */
 	private void viewSizeChanged() {
 		Dimension viewSize = getViewSize();
 		webcamSelection.getSelectedWebcam().setViewSize(viewSize);
@@ -256,9 +327,13 @@ public class StrategyComparatorPanel extends JPanel {
 		scaledViewSizeChanged();
 	}
 
+	/**
+	 * Method run when the currently selected view size or scale has been
+	 * changed
+	 */
 	private void scaledViewSizeChanged() {
 		Dimension scaled = getScaledViewSize();
-		irOutputFrames.stream().forEach(panel -> {
+		imageOutputFrames.stream().forEach(panel -> {
 			panel.viewSizeChanged(scaled);
 		});
 
@@ -266,6 +341,11 @@ public class StrategyComparatorPanel extends JPanel {
 		repaint();
 	}
 
+	/**
+	 * Takes one-time image from webcam and collects sensor data, creates moment
+	 * and lets the moment to be processed by each {@link ImageOutputFrame}.
+	 * Also calculates and
+	 */
 	private void shot() {
 		long t = System.currentTimeMillis();
 		try {
@@ -276,47 +356,70 @@ public class StrategyComparatorPanel extends JPanel {
 			Moment moment = new Moment(image, sensorData);
 
 			// arrange for processing
-			for (IROutputFrame p : irOutputFrames) {
+			for (ImageOutputFrame p : imageOutputFrames) {
 				p.receive(moment);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		lblFps.setText("FPS: "+1000/(System.currentTimeMillis() - t));
+		// calculates the duration of the processing and enqueues the change of
+		// displayed FPS
+		final long duration = System.currentTimeMillis() - t;
+		EventQueue.invokeLater(() -> lblFps.setText("FPS: " + 1000 / duration));
 	}
 
+	/**
+	 * Calls {@link #setEnabled(boolean)} method for given components.
+	 * Convenience method.
+	 * 
+	 * @param enabled
+	 *            Whether the components should be enabled or disabled
+	 * @param components
+	 *            List of components to call {@link #setEnabled(boolean)} on
+	 */
 	public void setEnabledFor(boolean enabled, JComponent... components) {
 		for (JComponent component : components) {
 			component.setEnabled(enabled);
 		}
 	}
-	
+
+	/**
+	 * Stops continuous mode
+	 */
 	public void stop() {
 		startedContinuous = false;
 	}
 
 	/**
-	 * Image recognition output panel (each user-selected IROutput creates its
-	 * own panel)
+	 * Image output frame (child of {@link JInternalFrame}) that is created
+	 * inside the in-app desktop of the {@link StrategyComparatorPanel}. Each
+	 * user-selected {@link ImageOutput} creates its own panel. This panel can
+	 * be freely moved inside the desktop and supports Minimize and Close
+	 * operations (invoked from title bar).
 	 * 
 	 * @author JJurM
 	 */
-	class IROutputFrame extends JInternalFrame {
+	class ImageOutputFrame extends JInternalFrame {
 		private static final long serialVersionUID = 1L;
 		static final int xOffset = 20, yOffset = 20;
 
-		private ImageRecognitionOutput irOutput;
+		private ImageOutput imageOutput;
 		private ImagePanel imagePanel;
 
-		public IROutputFrame(ImageRecognitionOutput irOutput) {
+		/**
+		 * Creates the frame and its components
+		 * 
+		 * @param irOutput
+		 */
+		public ImageOutputFrame(ImageOutput irOutput) {
 			super(irOutput.getName(), false, true, false, true);
-			this.irOutput = irOutput;
+			this.imageOutput = irOutput;
 			openFrameCount++;
 
 			setLocation(xOffset * openFrameCount, yOffset * openFrameCount);
 			setLayout(new BorderLayout(0, 0));
 			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			addInternalFrameListener(new IROutputFrameListener());
+			addInternalFrameListener(new ImageOutputFrameListener());
 
 			imagePanel = new ImagePanel();
 			imagePanel.setPreferredSize(getScaledViewSize());
@@ -327,6 +430,11 @@ public class StrategyComparatorPanel extends JPanel {
 			setVisible(true);
 		}
 
+		/**
+		 * This method is triggered when the frame should update its view size.
+		 * 
+		 * @param d
+		 */
 		private void viewSizeChanged(Dimension d) {
 			imagePanel.setPreferredSize(d);
 			pack();
@@ -336,12 +444,12 @@ public class StrategyComparatorPanel extends JPanel {
 		}
 
 		/**
-		 * Start processing by ImageRecognitionOutput and displays result.
+		 * Evokes processing by ImageRecognitionOutput and displays result.
 		 * 
 		 * @param moment
 		 */
 		void receive(Moment moment) {
-			Image image = irOutput.process(moment);
+			Image image = imageOutput.process(moment);
 
 			Dimension scaled = getScaledViewSize();
 			image = image.getScaledInstance(scaled.width, scaled.height, Image.SCALE_FAST);
@@ -350,15 +458,21 @@ public class StrategyComparatorPanel extends JPanel {
 			imagePanel.repaint();
 		}
 
-		class IROutputFrameListener extends InternalFrameAdapter {
+		/**
+		 * Listener for internal frame events, only used in
+		 * {@link ImageOutputFrame}.
+		 * 
+		 * @author JJurM
+		 */
+		class ImageOutputFrameListener extends InternalFrameAdapter {
 
 			@Override
 			public void internalFrameClosing(InternalFrameEvent e) {
 				openFrameCount--;
 
-				IROutputFrame frame = (IROutputFrame) e.getInternalFrame();
+				ImageOutputFrame frame = (ImageOutputFrame) e.getInternalFrame();
 				desktopPane.remove(frame);
-				irOutputFrames.remove(frame);
+				imageOutputFrames.remove(frame);
 
 				desktopPane.revalidate();
 				desktopPane.repaint();
@@ -369,7 +483,7 @@ public class StrategyComparatorPanel extends JPanel {
 	}
 
 	/**
-	 * Image panel used for drawing images
+	 * Image panel used for drawing images inside the {@link ImageOutputFrame}s
 	 * 
 	 * @author JJurM
 	 */

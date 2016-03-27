@@ -11,6 +11,13 @@ import net.talentum.jackie.moment.module.LineStartFinderModule;
 import net.talentum.jackie.moment.module.ModuleSupplier;
 import net.talentum.jackie.moment.module.TrailBordersMonitorModule;
 
+/**
+ * Intelligent strategy for recognizing line. The output contains every
+ * recognized line point, in form of a polyline. This strategy is capable of
+ * handling also spaced lines and angular turns.
+ * 
+ * @author JJurM
+ */
 public class LineFollowingStrategy extends RobotStrategy {
 
 	ImageModifierModule mImageModifier;

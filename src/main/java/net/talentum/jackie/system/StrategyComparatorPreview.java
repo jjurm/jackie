@@ -14,7 +14,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import net.talentum.jackie.ir.BlurredBooleanImageOutput;
 import net.talentum.jackie.ir.BooleanImageOutput;
-import net.talentum.jackie.ir.ImageRecognitionOutput;
+import net.talentum.jackie.ir.ImageOutput;
 import net.talentum.jackie.ir.RobotStrategyIROutput;
 import net.talentum.jackie.ir.SourceImageOutput;
 import net.talentum.jackie.moment.Parameters;
@@ -30,10 +30,21 @@ import net.talentum.jackie.moment.strategy.HorizontalLevelObservingStrategy;
 import net.talentum.jackie.moment.strategy.LineFollowingStrategy;
 import net.talentum.jackie.ui.StrategyComparatorPanel;
 
+/**
+ * Runnable class.
+ * 
+ * <p>
+ * Opens windows allowing user to compare different strategies or
+ * {@link ImageOutput}s. Those are defined in method
+ * {@link #createImageOutputs()}.
+ * </p>
+ * 
+ * @author JJurM
+ */
 public class StrategyComparatorPreview {
 
 	static Parameters param;
-	static ImageRecognitionOutput[] irOutputs;
+	static ImageOutput[] imageOutputs;
 
 	static JFrame previewFrame;
 	static StrategyComparatorPanel strategyComparatorPanel;
@@ -47,15 +58,18 @@ public class StrategyComparatorPreview {
 	public static void run(String[] args) {
 		param = new Parameters();
 
-		createStrategies();
+		createImageOutputs();
 
 		EventQueue.invokeLater(() -> {
 			createFrame();
 		});
 	}
 
-	private static void createStrategies() {
-		List<ImageRecognitionOutput> list = new ArrayList<ImageRecognitionOutput>();
+	/**
+	 * Here are defined {@link ImageOutput}s to offer in GUI.
+	 */
+	private static void createImageOutputs() {
+		List<ImageOutput> list = new ArrayList<ImageOutput>();
 
 		// @formatter:off
 		list.add(new SourceImageOutput("Source"));
@@ -95,7 +109,7 @@ public class StrategyComparatorPreview {
 		)));
 		// @formatter:on
 
-		irOutputs = list.toArray(new ImageRecognitionOutput[0]);
+		imageOutputs = list.toArray(new ImageOutput[0]);
 	}
 
 	private static void createFrame() {
@@ -117,7 +131,7 @@ public class StrategyComparatorPreview {
 			}
 		});
 
-		strategyComparatorPanel = new StrategyComparatorPanel(irOutputs);
+		strategyComparatorPanel = new StrategyComparatorPanel(imageOutputs);
 		previewFrame.setContentPane(strategyComparatorPanel);
 
 		previewFrame.setVisible(true);
