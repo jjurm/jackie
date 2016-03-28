@@ -144,7 +144,7 @@ public class StrategyComparatorPanel extends JPanel {
 		btnOpenClose = new JButton("Open");
 		btnOpenClose.addActionListener(e -> {
 			btnOpenClose.setEnabled(false);
-			if (AtomicTools.getAndNegate(webcamOpen)) {
+			if (!AtomicTools.getAndNegate(webcamOpen)) {
 				// camera closed
 				setEnabledFor(false, webcamSelection, viewSizeSelection);
 
