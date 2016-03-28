@@ -123,6 +123,8 @@ public class Robot {
 	 */
 	public void run() {
 		while (true) {
+			
+			System.out.println("Running main robot cycle");
 
 			// obtain moment
 			Moment moment = constructMoment();
