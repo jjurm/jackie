@@ -1,10 +1,8 @@
 package net.talentum.jackie.system;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamException;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.function.Supplier;
 
 import net.talentum.jackie.moment.Parameters;
 import net.talentum.jackie.moment.Robot;
@@ -21,36 +19,36 @@ import net.talentum.jackie.moment.Robot;
 public class Main {
 
 	public static Robot robot;
-	public static Webcam webcam;
 
 	public static void main(String[] args) {
 
 		System.out.println("Starting program");
-		
+
 		run(args);
-		
+
 		System.out.println("Ended");
 
 	}
 
 	public static void run(String[] args) {
-		Parameters param = new Parameters();
-
 		// create robot
 		System.out.println("Creating robot");
+		Parameters param = new Parameters();
 		robot = new Robot(param);
 
-		// create and open webcam
-		System.out.println("Webcam count: " + Webcam.getWebcams().size());
+		// create image supplier
+		if (args.length < 1) {
+			System.out.println("You must supply server name");
+			return;
+		}
+		Supplier<BufferedImage> imageSupplier;
 		try {
-			webcam = Webcam.getDefault(5, TimeUnit.SECONDS);
-		} catch (WebcamException | TimeoutException e) {
+			imageSupplier = new WebcamServerImageSupplier(args[0]);
+		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
-		System.out.println("Opening webcam");
-		webcam.open();
-		robot.setWebcamImageSupplier(() -> webcam.getImage());
+		robot.setWebcamImageSupplier(imageSupplier::get);
 
 		// run the main robot's cycle
 		robot.run();

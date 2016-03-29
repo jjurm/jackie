@@ -8,6 +8,9 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -81,18 +85,26 @@ public class StrategyComparatorPanel extends JPanel {
 	/**
 	 * This executor handles taking and processing images
 	 */
-	static ExecutorService executor = Executors.newSingleThreadExecutor();
+	static ExecutorService executor = Executors.newCachedThreadPool();
 
 	/**
 	 * Whether the continuous shot mode has been started
 	 */
 	private boolean startedContinuous = false;
 
+	/**
+	 * Wherher the server has been started
+	 */
+	private AtomicBoolean startedServer = new AtomicBoolean(false);
+
+	private ServerSocket serverSocket;
+
 	// components
 	private JPanel menu1;
 	private WebcamPicker webcamSelection;
 	private JComboBox<DimensionComboBoxItem> viewSizeSelection;
 	private JButton btnOpenClose;
+	private JButton btnRunServer;
 	private JPanel menu2;
 	private JComboBox<ImageOutput> imageOutputSelection;
 	private JButton btnAddOutput;
@@ -177,6 +189,31 @@ public class StrategyComparatorPanel extends JPanel {
 		});
 		menu1.add(btnOpenClose);
 
+		btnRunServer = new JButton("Run server");
+		btnRunServer.addActionListener(e -> {
+			if (!webcamOpen.get())
+				return;
+
+			if (!AtomicTools.getAndNegate(startedServer)) {
+				// not started
+				executor.submit(() -> runServer());
+				EventQueue.invokeLater(() -> {
+					btnRunServer.setText("Stop server");
+				});
+			} else {
+				// started
+				try {
+					serverSocket.close();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+				EventQueue.invokeLater(() -> {
+					btnRunServer.setText("Run server");
+				});
+			}
+		});
+		menu1.add(btnRunServer);
+
 		horizontalStrut_1 = Box.createHorizontalStrut(20);
 		menu1.add(horizontalStrut_1);
 
@@ -245,8 +282,10 @@ public class StrategyComparatorPanel extends JPanel {
 						break;
 					shot();
 				}
-				setEnabledFor(true, btnShot, btnStart);
-				btnStop.setEnabled(false);
+				EventQueue.invokeLater(() -> {
+					setEnabledFor(true, btnShot, btnStart);
+					btnStop.setEnabled(false);
+				});
 			});
 		});
 		menu2.add(btnStart);
@@ -505,4 +544,40 @@ public class StrategyComparatorPanel extends JPanel {
 		}
 
 	}
+
+	/**
+	 * Continuously runs server (while not stopped by user)
+	 */
+	public void runServer() {
+
+		int portNumber = 4444;
+		try {
+			serverSocket = new ServerSocket(portNumber);
+
+			while (startedServer.get()) {
+				try {
+					Socket client = serverSocket.accept();
+
+					executor.submit(() -> {
+						try {
+							while (true) {
+								BufferedImage image = webcamSelection.getSelectedWebcam().getImage();
+								ImageIO.write(image, "JPG", client.getOutputStream());
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					});
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 }
