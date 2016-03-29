@@ -6,8 +6,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-
 import net.talentum.jackie.libs.PIDController;
 import net.talentum.jackie.moment.module.AveragingTrailWidthDeterminerModule;
 import net.talentum.jackie.moment.module.BasicAngularTurnHandlerModule;
@@ -21,6 +19,10 @@ import net.talentum.jackie.moment.module.VectorDirectionManagerModule;
 import net.talentum.jackie.moment.strategy.LineFollowingStrategy;
 import net.talentum.jackie.moment.strategy.RobotStrategy;
 import net.talentum.jackie.serial.SerialCommunicator;
+import net.talentum.jackie.state.LineFollowingState;
+import net.talentum.jackie.state.State;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 /**
  * One instance of this class represents one robot (there should naturally be at
@@ -48,29 +50,23 @@ public class Robot {
 
 	protected RobotStrategy strategy;
 	protected PIDController pid;
-	protected MotorIntensityFunction mif;
+	
 
+	private State state;
+	
 	public Robot(Parameters param) {
 		this.param = param;
+		
+		
 
 		// open serial communication
 		serial = new SerialCommunicator();
 
 		// create strategy
 		// @formatter:off
-		strategy = new LineFollowingStrategy(
-				param,
-				new BlurImageModifierModule(),
-				new UnivBooleanImageFilterModule(100),
-				new BottomLineStartFinderModule(),
-				(d) -> new AveragingTrailWidthDeterminerModule(d, 3),
-				(d) -> new VectorDirectionManagerModule(8, 3),
-				new BasicLineFinderModule(
-						20.0 * (Math.PI / 180),
-						new BasicBorderFinderModule(2, 140, 10),
-						new BasicAngularTurnHandlerModule()
-				)
-		);
+		
+		state = new LineFollowingState(param, this);
+		
 		// @formatter:on
 
 		// create and setup PIDController
@@ -105,17 +101,28 @@ public class Robot {
 	}
 
 	/**
-	 * Lets the strategy process the moment. Returns {@link RobotInstruction}.
+	 * Sets motors for given destination. The value is first inserted into the
+	 * {@link PIDController} and then evaluated by a
+	 * {@link MotorIntensityFunction}. Finally, obtained values are written to
+	 * serial.
 	 * 
-	 * @param moment
-	 * @return
+	 * @param destination
 	 */
-	public final synchronized RobotInstruction process(Moment moment) {
-		strategy.prepare(moment);
-		RobotInstruction instruction = strategy.evaluate();
+	@Deprecated
+	public void setMotors(Point destination) {
 
-		lastInstruction = instruction;
-		return instruction;
+		// check if the result is valid
+		if (destination == null || destination.equals(new Point(0, 0))) {
+			return;
+		}
+
+		// get direction
+		double direction = Math.PI / 2 - Math.atan2(destination.y, destination.x);
+		//pid.getInput(-direction);
+
+		// compute heading (= control variable of PID controller)
+		//double heading = pid.performPID();
+
 	}
 
 	/**
@@ -126,46 +133,26 @@ public class Robot {
 			
 			System.out.println("Running main robot cycle");
 
-			// obtain moment
-			Moment moment = constructMoment();
+			ImmutablePair<Integer, Integer> motors = state.getMotorInstructions();
 
-			// process
-			RobotInstruction instruction = process(moment);
-
-			// set motors
-			setMotors(instruction.destination);
+			// write to serial
+			serial.write(1, motors.left, motors.right);
 
 		}
 	}
 
 	/**
-	 * Sets motors for given destination. The value is first inserted into the
-	 * {@link PIDController} and then evaluated by a
-	 * {@link MotorIntensityFunction}. Finally, obtained values are written to
-	 * serial.
-	 * 
-	 * @param destination
+	 * Method for setting the Robot's {@link State}
+	 * @param state
 	 */
-	public void setMotors(Point destination) {
-
-		// check if the result is valid
-		if (destination == null || destination.equals(new Point(0, 0))) {
-			return;
-		}
-
-		// get direction
-		double direction = Math.PI / 2 - Math.atan2(destination.y, destination.x);
-		pid.getInput(-direction);
-
-		// compute heading (= control variable of PID controller)
-		double heading = pid.performPID();
-
-		// get angle values to send
-		ImmutablePair<Integer, Integer> motors = mif.getMotors(heading);
-
-		// write to serial
-		serial.write(1, motors.left, motors.right);
-
+	public void setState(State state) {
+		this.state = state;
 	}
+	
+	public State getState(){
+		return this.state;
+	}
+	
+	
 
 }

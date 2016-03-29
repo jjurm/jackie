@@ -38,8 +38,8 @@ public:
         index = stack.indexOf(";")+1;
         cmd = stack.substring(0, index);
         stack = stack.substring(index);
-        if(cmd != "") execute(cmd);
         cmd.trim();
+        if(cmd != "") execute(cmd);
         if(stack == ""){
           break;
         }
