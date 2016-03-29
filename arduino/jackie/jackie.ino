@@ -98,9 +98,9 @@ void setup() {
 
 
 void loop() {
-  if(Serial.available()){
-    serialCommander->addToStack();
-  }
+  Serial.println("Adding to stack...");
+  serialCommander->addToStack();
+  Serial.println("Executing stack...");
   serialCommander->executeStack();
   
 }
