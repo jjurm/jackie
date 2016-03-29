@@ -12,7 +12,7 @@ class ServoController{
 public:
   
   void move(int langle, int rangle) {
-    l.write(langle);
+    l.write(180 - langle);
     r.write(rangle);
     Serial.print("Moving with angles: ");
     Serial.print(langle);
@@ -26,11 +26,12 @@ ServoController *servoController = new ServoController();
 class SerialCommander{
 public:
   String stack = "";
+  int buff[10][10];
   int index = 0;
   String cmd = "";
   
   void addToStack(){
-    stack.concat(Serial.readString());
+    //stack.concat(Serial.readString());
   }
   
   void executeStack(){
@@ -87,6 +88,53 @@ public:
 
 SerialCommander *serialCommander = new SerialCommander();
 
+int dIndex = 0;
+int buff[5];
+int nbuff[5];
+int nIndex = 0;
+
+void processCommand(int arr[]) {
+  switch(arr[0]){
+    case 1:
+      int langle = arr[1];
+      int rangle = arr[2];
+      
+      servoController->move(langle, rangle);
+      break;
+  }
+}
+
+void readCharacter(){
+    int n = Serial.read();
+    if (n == -1) {
+      return;
+    }
+    char c = char(n);
+    if(isDigit(c)){
+      buff[dIndex] = c - '0';
+      dIndex++;
+    } else {
+      int num = 0;
+      for(int i = 0; i < 5;i++){
+        if (buff[i] != -1) {
+          num = num*10 + buff[i];
+          buff[i] = -1;
+        }
+      }
+      dIndex = 0;
+      
+      nbuff[nIndex] = num;
+      nIndex++;
+      if (c == ';') {
+        processCommand(nbuff);
+        for (int i = 0; i < 5; i++) {
+          nbuff[i] = -1;
+        }
+        nIndex = 0;
+      }
+    }
+}
+
 void setup() {
   Serial.begin(115200);
   l.attach(10);
@@ -95,16 +143,8 @@ void setup() {
   r.write(90);
 }
 
-
-
 void loop() {
-  Serial.println("Adding to stack...");
-  serialCommander->addToStack();
-  Serial.println("Executing stack...");
-  serialCommander->executeStack();
-  
+  //if (Serial.available()) {
+    readCharacter();
+  //}
 }
-
-
-
-
