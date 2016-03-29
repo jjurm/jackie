@@ -82,7 +82,7 @@ public class SerialCommunicator {
 	private void open() {
 		// open serial
 		try {
-			serial.open(Serial.DEFAULT_COM_PORT, 38400);
+			serial.open(Serial.DEFAULT_COM_PORT, 115200);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -107,7 +107,7 @@ public class SerialCommunicator {
 	public void write(Integer... command) {
 		String line = Arrays.stream(command).map(n -> String.valueOf(n)).collect(Collectors.joining(" "));
 		try {
-			serial.writeln(line + ";");
+			serial.write(line + ";");
 		} catch (IllegalStateException | IOException e) {
 			e.printStackTrace();
 		}
