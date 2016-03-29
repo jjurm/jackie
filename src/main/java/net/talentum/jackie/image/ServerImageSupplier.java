@@ -1,9 +1,7 @@
 package net.talentum.jackie.image;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import javax.imageio.ImageIO;
 
@@ -19,7 +17,7 @@ public class ServerImageSupplier implements ImageSupplier {
 	protected String serverName;
 	protected int port;
 
-	public ServerImageSupplier(String serverName) throws UnknownHostException, IOException {
+	public ServerImageSupplier(String serverName) {
 		this.serverName = serverName;
 		this.port = 4444;
 	}
