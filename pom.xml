@@ -49,26 +49,48 @@
         <version>2.6</version>
         <executions>
           <execution>
+            <id>jackie</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
+            <configuration>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+              <archive>
+                <manifest>
+                  <addClasspath>true</addClasspath>
+                  <mainClass>net.talentum.jackie.system.Main</mainClass>
+                </manifest>
+              </archive>
+              <finalName>jackie</finalName>
+              <appendAssemblyId>false</appendAssemblyId>
+              <attach>false</attach>
+            </configuration>
+          </execution>
+          <execution>
+            <id>jackie-test</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+              <archive>
+                <manifest>
+                  <addClasspath>true</addClasspath>
+                  <mainClass>net.talentum.jackie.system.TestRun</mainClass>
+                </manifest>
+              </archive>
+              <finalName>jackie-test</finalName>
+              <appendAssemblyId>false</appendAssemblyId>
+              <attach>false</attach>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <mainClass>net.talentum.jackie.system.Main</mainClass>
-            </manifest>
-          </archive>
-          <finalName>jackie</finalName>
-          <appendAssemblyId>false</appendAssemblyId>
-          <attach>false</attach>
-        </configuration>
       </plugin>
     </plugins>
   </build>

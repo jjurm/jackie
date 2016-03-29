@@ -107,7 +107,7 @@ public class SerialCommunicator {
 	public void write(Integer... command) {
 		String line = Arrays.stream(command).map(n -> String.valueOf(n)).collect(Collectors.joining(" "));
 		try {
-			serial.writeln(line);
+			serial.writeln(line + ";");
 		} catch (IllegalStateException | IOException e) {
 			e.printStackTrace();
 		}
