@@ -3,39 +3,21 @@
 #define pin_l 10
 #define pin_r 11
 
+Servo l;
+Servo r;
+
 class ServoController;
 
 class ServoController{
 public:
-  Servo l;
-  Servo r;
-  
-  ServoController() {
-    l.attach(pin_l);
-    r.attach(pin_r);
-  }
   
   void move(int langle, int rangle) {
     l.write(langle);
     r.write(rangle);
-    Serial.print("Moving with angles");  
+    Serial.print("Moving with angles: ");
     Serial.print(langle);
-    Serial.print(" ");
+    Serial.print(", ");
     Serial.println(rangle);
-  }
-  
-  void movel(int angle){
-    l.write(angle);
-    Serial.print("Moving l with angle ");
-    Serial.print(angle);
-    Serial.println();
-  }
-  
-  void mover(int angle){
-    r.write(angle);
-    Serial.print("Moving r with angle ");
-    Serial.print(angle);
-    Serial.println();
   }
 };
 
@@ -79,8 +61,7 @@ public:
       
       int rangle = cmd.substring(0, cmd.indexOf(";")).toInt();
       
-      servoController->movel(langle);
-      servoController->mover(rangle);
+      servoController->move(langle, rangle);
       break;
     }
   }
@@ -108,6 +89,10 @@ SerialCommander *serialCommander = new SerialCommander();
 
 void setup() {
   Serial.begin(115200);
+  l.attach(10);
+  r.attach(11);
+  l.write(90);
+  r.write(90);
 }
 
 
