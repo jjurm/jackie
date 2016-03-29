@@ -15,6 +15,15 @@
   </properties>
 
   <build>
+    <extensions>
+      <!-- Enabling the use of SSH -->
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>2.10</version>
+      </extension>
+    </extensions>
+
     <plugins>
       <!-- Set a JDK compiler level -->
       <plugin>
@@ -25,6 +34,26 @@
           <source>${jdk.version}</source>
           <target>${jdk.version}</target>
         </configuration>
+      </plugin>
+
+      <!-- Read external.properties file -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+            <configuration>
+              <files>
+                <file>external.properties</file>
+              </files>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <!-- Make executable JAR -->
@@ -91,6 +120,53 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Upload assembled JAR on 'deploy' -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>wagon-maven-plugin</artifactId>
+        <version>1.0-beta-3</version>
+        <executions>
+          <execution>
+            <id>upload-jackie</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>upload-single</goal>
+            </goals>
+            <configuration>
+              <serverId>jackie-ssh</serverId>
+              <fromFile>${project.build.directory}/jackie.jar</fromFile>
+              <url>scp://${jackie.hostname}</url>
+              <toDir>/home/pi/jackie</toDir>
+              <toFile>/home/pi/jackie/jackie.jar</toFile>
+            </configuration>
+          </execution>
+          <execution>
+            <id>upload-jackie-test</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>upload-single</goal>
+            </goals>
+            <configuration>
+              <serverId>jackie-ssh</serverId>
+              <fromFile>${project.build.directory}/jackie-test.jar</fromFile>
+              <url>scp://${jackie.hostname}</url>
+              <toDir>/home/pi/jackie</toDir>
+              <toFile>/home/pi/jackie/jackie-test.jar</toFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Don't run maven-deploy-plugin on deploy -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
       </plugin>
     </plugins>
   </build>
