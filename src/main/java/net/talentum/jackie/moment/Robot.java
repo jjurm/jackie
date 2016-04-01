@@ -89,6 +89,10 @@ public class Robot {
 	 */
 	public Moment constructMoment() {
 		BufferedImage image = webcamImageSupplier.get();
+		if (image == null) {
+			System.out.println("Got null image");
+			return null;
+		}
 		SensorData sensorData = SensorData.collect();
 
 		Moment moment = new Moment(image, sensorData);
@@ -136,6 +140,7 @@ public class Robot {
 			ImmutablePair<Integer, Integer> motors = state.getMotorInstructions();
 
 			// write to serial
+			System.out.println(String.format("Writing angles (left=%d, right=%d)", motors.left, motors.right));
 			serial.write(1, motors.left, motors.right);
 
 		}

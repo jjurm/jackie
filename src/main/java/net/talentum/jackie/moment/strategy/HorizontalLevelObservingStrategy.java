@@ -52,10 +52,13 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		int y = d.image.getHeight() / 2;
 
 		checkLine(new Point(x, y - y / 2), -Math.PI / 2);
-		Point destination = new Point(checkLine(new Point(x, y), -Math.PI / 2));
+		Point destination = checkLine(new Point(x, y), -Math.PI / 2);
 		checkLine(new Point(x, y + y / 2), -Math.PI / 2);
 
-		destination.translate(-x, 0);
+		if (destination != null) {
+			destination = new Point(destination);
+			destination.translate(-x, 0);
+		}
 
 		RobotInstruction instruction = new RobotInstruction(d.m, d, destination);
 		return instruction;

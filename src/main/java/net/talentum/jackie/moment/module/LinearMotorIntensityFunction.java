@@ -9,10 +9,12 @@ public class LinearMotorIntensityFunction implements MotorIntensityFunction {
 	public ImmutablePair<Integer, Integer> getMotors(double heading) {
 		int l, r;
 
-		double linearCoefficient = 1.7;
+		double linearCoefficient = 0.3;
 
-		l = (int) Math.round(toRange(0.3 + linearCoefficient * heading, -1, 1) * 90);
-		r = (int) Math.round(toRange(0.3 - linearCoefficient * heading, -1, 1) * 90);
+		double base = 0.2;
+		
+		l = (int) Math.round(toRange(base + linearCoefficient * heading, -1, 1) * 90) + 90;
+		r = (int) Math.round(toRange(base - linearCoefficient * heading, -1, 1) * 90) + 90;
 
 		return new ImmutablePair<Integer, Integer>(l, r);
 

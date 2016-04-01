@@ -16,16 +16,22 @@ import javax.imageio.ImageIO;
 public class WebcamServerImageSupplier implements Supplier<BufferedImage> {
 
 	public static Socket server;
+	
+	protected String serverName;
+	protected int port;
 
 	public WebcamServerImageSupplier(String serverName) throws UnknownHostException, IOException {
-		int port = 4444;
-		server = new Socket(serverName, port);
+		this.serverName = serverName;
+		this.port = 4444;
 	}
 
 	@Override
 	public BufferedImage get() {
 		try {
-			return ImageIO.read(ImageIO.createImageInputStream(server.getInputStream()));
+			server = new Socket(serverName, port);
+			BufferedImage img = ImageIO.read(ImageIO.createImageInputStream(server.getInputStream()));
+			server.close();
+			return img;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

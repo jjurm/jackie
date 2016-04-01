@@ -560,10 +560,9 @@ public class StrategyComparatorPanel extends JPanel {
 
 					executor.submit(() -> {
 						try {
-							while (true) {
-								BufferedImage image = webcamSelection.getSelectedWebcam().getImage();
-								ImageIO.write(image, "JPG", client.getOutputStream());
-							}
+							BufferedImage image = webcamSelection.getSelectedWebcam().getImage();
+							ImageIO.write(image, "JPG", client.getOutputStream());
+							client.close();
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
