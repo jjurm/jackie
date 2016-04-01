@@ -93,21 +93,27 @@ int buff[5];
 int nbuff[5];
 int nIndex = 0;
 
+int clangle = 90;
+int crangle = 90;
+int difference;
+
 void processCommand(int arr[]) {
   switch(arr[0]){
     case 1:
-      int langle = arr[1];
-      int rangle = arr[2];
+    	int langle = arr[1];
+    	int rangle = arr[2];
+    	//int langle = arr[1] + (arr[1] - clangle)/3; //change the speed slowly
+    	//int rangle = arr[1] + (arr[2] - crangle)/3;
       
       servoController->move(langle, rangle);
       break;
   }
 }
 
-void readCharacter(){
+int readCharacter(){
     int n = Serial.read();
     if (n == -1) {
-      return;
+      return 0;
     }
     char c = char(n);
     if(isDigit(c)){
@@ -133,7 +139,12 @@ void readCharacter(){
         nIndex = 0;
       }
     }
+    return 1;
 }
+
+int result;
+unsigned long timediff;
+unsigned long currtime;
 
 void setup() {
   Serial.begin(115200);
@@ -141,10 +152,17 @@ void setup() {
   r.attach(11);
   l.write(90);
   r.write(90);
+  currtime = millis();
 }
 
 void loop() {
-  //if (Serial.available()) {
-    readCharacter();
+  timediff = millis() - currtime;
+  //if (Serial.available())
+  if(readCharacter()){
+    currtime = millis();
+  } else if(timediff > 1000) {//if not getting commands for a second, stop motors
+    l.write(90);
+    r.write(90);
+  }
   //}
 }
