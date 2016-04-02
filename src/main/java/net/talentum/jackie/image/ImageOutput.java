@@ -13,7 +13,7 @@ import net.talentum.jackie.system.StrategyComparatorPreview;
  */
 public abstract class ImageOutput {
 
-	private String name;
+	protected String name;
 
 	public ImageOutput(String name) {
 		this.name = name;

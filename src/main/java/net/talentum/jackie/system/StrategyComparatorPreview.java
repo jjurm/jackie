@@ -26,7 +26,9 @@ import net.talentum.jackie.module.impl.BlurImageModifierModule;
 import net.talentum.jackie.module.impl.BottomLineStartFinderModule;
 import net.talentum.jackie.module.impl.UnivBooleanImageFilterModule;
 import net.talentum.jackie.module.impl.VectorDirectionManagerModule;
+import net.talentum.jackie.moment.module.BufferedImageMatConverterModule;
 import net.talentum.jackie.robot.Parameters;
+import net.talentum.jackie.robot.strategy.BallFinderStrategy;
 import net.talentum.jackie.robot.strategy.HorizontalLevelObservingStrategy;
 import net.talentum.jackie.robot.strategy.LineFollowingStrategy;
 import net.talentum.jackie.tools.MathTools;
@@ -119,6 +121,7 @@ public class StrategyComparatorPreview {
 				new UnivBooleanImageFilterModule(MathTools.parseDefault(p, 100)),
 				new BasicBorderFinderModule(2, 600, 3)
 		)));
+		list.add(p -> new BallFinderStrategy.ImageOutput("*BallFinding", new BufferedImageMatConverterModule()));
 		// @formatter:on
 
 		imageOutputSuppliers = list.toArray(new ImageOutputSupplier[0]);
