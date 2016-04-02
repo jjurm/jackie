@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import net.talentum.jackie.moment.Parameters;
 import net.talentum.jackie.moment.Robot;
+import net.talentum.jackie.moment.RobotRunThread;
 
 /**
  * Runnable class.
@@ -55,8 +56,22 @@ public class Main {
 		}
 		robot.setWebcamImageSupplier(imageSupplier);
 
-		// run the main robot's cycle
-		robot.run();
+		// run the processing threads
+		for (int i = 0; i < RobotRunThread.COUNT; i++) {
+			RobotRunThread thread = new RobotRunThread(robot);
+			thread.start();
+		}
+		
+		// monitor running
+		while (true) {
+			int count = RobotRunThread.runs.getAndSet(0);
+			System.out.println(String.format("Runs: %d, running: %d", count, RobotRunThread.running));
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 
 	}
 

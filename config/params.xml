@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <params>
+    <threads>1</threads>
+    <bwTreshold>60</bwTreshold>
     <lineFollowing>
         <pid>
             <P>0.7</P>
@@ -7,10 +9,14 @@
             <D>0.2</D>
         </pid>
         <motorIntensityFunction>
-            <baseSpeed>0.1</baseSpeed>
-            <coefficient>0.3</coefficient>
-            <positiveMotorExponent>2.0</positiveMotorExponent>
+            <baseSpeed>0.14</baseSpeed>
+            <decelerateExponent>1.5</decelerateExponent>
+            <decelerateCoefficient>0.7</decelerateCoefficient>
+            <internalCoefficient>1.4</internalCoefficient>
+            <coefficient>3</coefficient>
+            <positiveMotorExponent>1.5</positiveMotorExponent>
             <negativeMotorExponent>3.0</negativeMotorExponent>
+            <positiveMotorCoefficient>0.6</positiveMotorCoefficient>
         </motorIntensityFunction>
     </lineFollowing>
 </params>

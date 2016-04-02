@@ -130,6 +130,15 @@ public class MomentData {
 		return new Point(sx / points.length, sy / points.length);
 	}
 
+	public Point weightedAvg(Point a, Point b, double weightA) {
+		int sx = 0, sy = 0;
+		sx += a.x * weightA;
+		sy += a.y * weightA;
+		sx += b.x * (1 - weightA);
+		sy += b.y * (1 - weightA);
+		return new Point(sx, sy);
+	}
+
 	/**
 	 * Returns an angle that is perpendicular to the given angle.
 	 * 

@@ -54,17 +54,17 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		Point top = checkLine(new Point(x, y - y / 2), -Math.PI / 2);
 		Point middle = checkLine(new Point(x, y), -Math.PI / 2);
 		Point bottom = checkLine(new Point(x, y + y / 2), -Math.PI / 2);
-		Point abottom = checkLine(new Point(x, 2*y-1), -Math.PI / 2);
+		Point abottom = checkLine(new Point(x, 2 * y - 1), -Math.PI / 2);
 
-		Point destination = bottom;
-		
-		if (destination != null) {
-			destination = new Point(destination);
-			destination.translate(-x, 0);
-		}
+		if (bottom == null || abottom == null)
+			return new RobotInstruction(d.m, d);
 
-		RobotInstruction instruction = new RobotInstruction(d.m, d, destination);
-		return instruction;
+		Point destination = new Point((int) Math.round(1.5 * bottom.x - 0.5 * abottom.x), bottom.y);
+
+		destination = new Point(destination);
+		destination.translate(-x, 0);
+
+		return new RobotInstruction(d.m, d, destination);
 	}
 
 	/**
@@ -86,7 +86,12 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 				d.bordersL.add(borders.left);
 				d.bordersR.add(borders.right);
 
-				Point l = d.avg(borders.getLeft(), borders.getRight());
+				// Point l = d.avg(borders.getLeft(), borders.getRight());
+				Point center = new Point(d.image.getWidth() / 2, p.y);
+				double dstL = d.dst(center, borders.left);
+				double dstR = d.dst(center, borders.right);
+				Point moreDistanced = (dstL > dstR) ? borders.left : borders.right;
+				Point l = d.weightedAvg(moreDistanced, center, d.dst(center, moreDistanced) / center.x);
 				d.line.add(l);
 
 				return l;
@@ -125,14 +130,14 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 			g.drawLine(0, y / 2, d.image.getWidth(), y / 2);
 			g.drawLine(0, y, d.image.getWidth(), y);
 			g.drawLine(0, y * 3 / 2, d.image.getWidth(), y * 3 / 2);
-			g.drawLine(0, 2*y-1, d.image.getWidth(), 2*y-1);
-
-			g.setColor(Color.RED);
-			d.line.stream().forEach(p -> g.fillRect(p.x - 2, p.y - 2, 4, 4));
+			g.drawLine(0, 2 * y - 1, d.image.getWidth(), 2 * y - 1);
 
 			g.setColor(Color.GREEN);
 			d.bordersL.stream().forEach(p -> g.fillOval(p.x - 6, p.y - 6, 12, 12));
 			d.bordersR.stream().forEach(p -> g.fillOval(p.x - 6, p.y - 6, 12, 12));
+
+			g.setColor(Color.RED);
+			d.line.stream().forEach(p -> g.fillRect(p.x - 2, p.y - 2, 4, 4));
 
 			return img;
 		}

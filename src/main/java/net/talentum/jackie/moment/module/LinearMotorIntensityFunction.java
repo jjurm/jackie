@@ -17,21 +17,26 @@ public class LinearMotorIntensityFunction implements MotorIntensityFunction {
 		int l, r;
 
 		double baseSpeed = config.getDouble(baseString + "baseSpeed");
-
+		double decelerateExponent = config.getDouble(baseString + "decelerateExponent");
+		double decelerateCoefficient = config.getDouble(baseString + "decelerateCoefficient");
+		double internalCoefficient = config.getDouble(baseString + "internalCoefficient");
 		double coefficient = config.getDouble(baseString + "coefficient");
 		double positiveMotorExponent = config.getDouble(baseString + "positiveMotorExponent");
 		double negativeMotorExponent = config.getDouble(baseString + "negativeMotorExponent");
-
+		double positiveMotorCoefficient = config.getDouble(baseString + "positiveMotorCoefficient");
+		
 		Function<Integer, Integer> f = new Function<Integer, Integer>() {
 			@Override
 			public Integer apply(Integer motor) {
 				boolean positiveMotor = MathTools.side(heading) == motor;
 				double exponent = positiveMotor ? positiveMotorExponent : negativeMotorExponent;
 				double value = MathTools.toRange(
-						baseSpeed + motor * coefficient * Math.pow(Math.abs(heading), exponent)
-						* MathTools.side(heading) * (positiveMotor ? 0.7 : 1),
+						baseSpeed
+						- Math.pow(Math.abs(heading * internalCoefficient), decelerateExponent) * decelerateCoefficient
+						+ Math.pow(Math.abs(heading * internalCoefficient), exponent) * motor * coefficient
+						* MathTools.side(heading) * (positiveMotor ? positiveMotorCoefficient : 1),
 						-1, 1);
-				return (int) Math.round(value) * 90 + 90;
+				return (int) (Math.round(value * 90)) + 90;
 			}
 		};
 

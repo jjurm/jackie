@@ -36,7 +36,8 @@ public class LineFollowingState implements State {
 		this.strategy = new HorizontalLevelObservingStrategy(
 				param,
 				new BlurImageModifierModule(),
-				new UnivBooleanImageFilterModule(100),
+				//new UnivBooleanImageFilterModule(100),
+				new UnivBooleanImageFilterModule(() -> ConfigurationManager.getGeneralConfiguration().getInt("params/bwTreshold")),
 				new BasicBorderFinderModule(2, 600, 3)
 		);
 
@@ -77,7 +78,7 @@ public class LineFollowingState implements State {
 
 	@Override
 	public ImmutablePair<Integer, Integer> getMotorInstructions() {
-		double direction = 0.0;
+		double heading = 0.0;
 
 		// obtain moment
 		Moment moment = robot.constructMoment();
@@ -90,13 +91,14 @@ public class LineFollowingState implements State {
 			// check if the result is valid
 			if (instruction.destination != null && !instruction.destination.equals(new Point(0, 0))) {
 				// get direction
-				direction = Math.PI / 2 - Math.atan2(instruction.destination.y, instruction.destination.x);
+				//direction = Math.PI / 2 - Math.atan2(instruction.destination.y, instruction.destination.x);
+				heading = ((double) instruction.destination.x) / instruction.moment.image.getWidth();
 			}
 		}
 
 		// compute heading (= control variable of PID controller)
-		pid.getInput(direction);
-		double heading = pid.performPID();
+		pid.getInput(heading);
+		heading = pid.performPID();
 
 		// get angle values to send
 		ImmutablePair<Integer, Integer> motors = mif.getMotors(heading);

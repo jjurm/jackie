@@ -82,20 +82,26 @@ public class Robot {
 	}
 
 	/**
-	 * Contains the main cycle that is run by the robot.
+	 * Runs {@link #runOnce()} repeatedly in a {@code while(true)} loop.
 	 */
-	public void run() {
+	public void runCycle() {
 		while (true) {
-
-			System.out.println("Running main robot cycle");
-
-			ImmutablePair<Integer, Integer> motors = state.getMotorInstructions();
-
-			// write to serial
-			System.out.println(String.format("Writing angles (left=%d, right=%d)", motors.left, motors.right));
-			serial.write(1, motors.left, motors.right);
-
+			runOnce();
 		}
+
+	}
+
+	/**
+	 * Contains the main cycle that is run by the robot. It is run only once.
+	 */
+	public void runOnce() {
+
+		ImmutablePair<Integer, Integer> motors = state.getMotorInstructions();
+
+		// write to serial
+		System.out.println(String.format("Writing angles (left=%d, right=%d)", motors.left, motors.right));
+		serial.write(1, motors.left, motors.right);
+
 	}
 
 	public void addConfigChangedListener(Runnable listener) {
