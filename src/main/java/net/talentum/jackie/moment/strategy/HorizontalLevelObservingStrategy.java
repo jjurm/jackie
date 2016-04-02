@@ -51,10 +51,13 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		int x = d.image.getWidth() / 2;
 		int y = d.image.getHeight() / 2;
 
-		checkLine(new Point(x, y - y / 2), -Math.PI / 2);
-		Point destination = checkLine(new Point(x, y), -Math.PI / 2);
-		checkLine(new Point(x, y + y / 2), -Math.PI / 2);
+		Point top = checkLine(new Point(x, y - y / 2), -Math.PI / 2);
+		Point middle = checkLine(new Point(x, y), -Math.PI / 2);
+		Point bottom = checkLine(new Point(x, y + y / 2), -Math.PI / 2);
+		Point abottom = checkLine(new Point(x, 2*y-1), -Math.PI / 2);
 
+		Point destination = bottom;
+		
 		if (destination != null) {
 			destination = new Point(destination);
 			destination.translate(-x, 0);
@@ -122,6 +125,7 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 			g.drawLine(0, y / 2, d.image.getWidth(), y / 2);
 			g.drawLine(0, y, d.image.getWidth(), y);
 			g.drawLine(0, y * 3 / 2, d.image.getWidth(), y * 3 / 2);
+			g.drawLine(0, 2*y-1, d.image.getWidth(), 2*y-1);
 
 			g.setColor(Color.RED);
 			d.line.stream().forEach(p -> g.fillRect(p.x - 2, p.y - 2, 4, 4));

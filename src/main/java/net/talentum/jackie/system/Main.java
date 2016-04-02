@@ -48,7 +48,7 @@ public class Main {
 			e.printStackTrace();
 			return;
 		}
-		robot.setWebcamImageSupplier(imageSupplier::get);
+		robot.setWebcamImageSupplier(imageSupplier);
 
 		// run the main robot's cycle
 		robot.run();

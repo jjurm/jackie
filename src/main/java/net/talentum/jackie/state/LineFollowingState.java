@@ -4,6 +4,7 @@ import java.awt.Point;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import net.talentum.jackie.libs.PIDController;
 import net.talentum.jackie.moment.Moment;
 import net.talentum.jackie.moment.Parameters;
 import net.talentum.jackie.moment.Robot;
@@ -20,6 +21,7 @@ public class LineFollowingState implements State {
 
 	private RobotStrategy strategy;
 	private Robot robot;
+	protected PIDController pid;
 	private MotorIntensityFunction mif;
 
 	public LineFollowingState(Parameters param, Robot robot) {
@@ -34,6 +36,13 @@ public class LineFollowingState implements State {
 				new BasicBorderFinderModule(2, 600, 3)
 		);
 		// @formatter:on
+		
+		// create and setup PIDController
+		pid = new PIDController(0.65, 0.15, 0.25);
+		pid.setInputRange(-Math.PI / 2, Math.PI / 2);
+		pid.setOutputRange(-Math.PI / 2, Math.PI / 2);
+		pid.setSetpoint(0);
+		pid.enable();
 	}
 
 	/**
@@ -69,8 +78,12 @@ public class LineFollowingState implements State {
 			}
 		}
 
+		// compute heading (= control variable of PID controller)
+		pid.getInput(direction);
+		double heading = pid.performPID();
+		
 		// get angle values to send
-		ImmutablePair<Integer, Integer> motors = mif.getMotors(-direction);
+		ImmutablePair<Integer, Integer> motors = mif.getMotors(heading);
 
 		return motors;
 
