@@ -2,6 +2,7 @@ package net.talentum.jackie.state;
 
 import java.awt.Point;
 
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import net.talentum.jackie.libs.PIDController;
@@ -16,6 +17,7 @@ import net.talentum.jackie.moment.module.MotorIntensityFunction;
 import net.talentum.jackie.moment.module.UnivBooleanImageFilterModule;
 import net.talentum.jackie.moment.strategy.HorizontalLevelObservingStrategy;
 import net.talentum.jackie.moment.strategy.RobotStrategy;
+import net.talentum.jackie.system.ConfigurationManager;
 
 public class LineFollowingState implements State {
 
@@ -25,6 +27,8 @@ public class LineFollowingState implements State {
 	private MotorIntensityFunction mif;
 
 	public LineFollowingState(Parameters param, Robot robot) {
+		HierarchicalConfiguration config = ConfigurationManager.getGeneralConfiguration();
+
 		this.robot = robot;
 		this.mif = new LinearMotorIntensityFunction();
 
@@ -35,14 +39,26 @@ public class LineFollowingState implements State {
 				new UnivBooleanImageFilterModule(100),
 				new BasicBorderFinderModule(2, 600, 3)
 		);
-		// @formatter:on
-		
+
 		// create and setup PIDController
-		pid = new PIDController(0.65, 0.15, 0.25);
+		pid = new PIDController(
+				config.getDouble("params/lineFollowing/pid/P"),
+				config.getDouble("params/lineFollowing/pid/I"),
+				config.getDouble("params/lineFollowing/pid/D")
+		);
 		pid.setInputRange(-Math.PI / 2, Math.PI / 2);
 		pid.setOutputRange(-Math.PI / 2, Math.PI / 2);
 		pid.setSetpoint(0);
 		pid.enable();
+		
+		robot.addConfigChangedListener(() -> {
+			pid.setPID(
+					config.getDouble("params/lineFollowing/pid/P"),
+					config.getDouble("params/lineFollowing/pid/I"),
+					config.getDouble("params/lineFollowing/pid/D")
+			);
+		});
+		// @formatter:on
 	}
 
 	/**
@@ -81,7 +97,7 @@ public class LineFollowingState implements State {
 		// compute heading (= control variable of PID controller)
 		pid.getInput(direction);
 		double heading = pid.performPID();
-		
+
 		// get angle values to send
 		ImmutablePair<Integer, Integer> motors = mif.getMotors(heading);
 

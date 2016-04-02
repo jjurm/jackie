@@ -56,6 +56,9 @@ public class StrategyComparatorPreview {
 	}
 
 	public static void run(String[] args) {
+		// initialize configuration manager
+		ConfigurationManager.init();
+
 		param = new Parameters();
 
 		createImageOutputs();

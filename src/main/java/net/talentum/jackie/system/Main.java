@@ -31,10 +31,15 @@ public class Main {
 	}
 
 	public static void run(String[] args) {
+		// initialize configuration manager
+		ConfigurationManager.init();
+		
+		
 		// create robot
 		System.out.println("Creating robot");
 		Parameters param = new Parameters();
 		robot = new Robot(param);
+		ConfigurationManager.setReloadedListener(robot::configurationReloaded);
 
 		// create image supplier
 		if (args.length < 1) {

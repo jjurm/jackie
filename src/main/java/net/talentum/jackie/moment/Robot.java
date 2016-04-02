@@ -1,15 +1,14 @@
 package net.talentum.jackie.moment;
 
-import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
-import net.talentum.jackie.libs.PIDController;
-import net.talentum.jackie.moment.module.MotorIntensityFunction;
 import net.talentum.jackie.moment.strategy.RobotStrategy;
 import net.talentum.jackie.serial.SerialCommunicator;
 import net.talentum.jackie.state.LineFollowingState;
@@ -38,6 +37,8 @@ public class Robot {
 	public Deque<Moment> moments = new LinkedList<Moment>();
 	public RobotInstruction lastInstruction;
 	public SerialCommunicator serial;
+
+	protected List<Runnable> configChangedListeners = new ArrayList<Runnable>();
 
 	protected RobotStrategy strategy;
 
@@ -94,6 +95,16 @@ public class Robot {
 			System.out.println(String.format("Writing angles (left=%d, right=%d)", motors.left, motors.right));
 			serial.write(1, motors.left, motors.right);
 
+		}
+	}
+
+	public void addConfigChangedListener(Runnable listener) {
+		configChangedListeners.add(listener);
+	}
+
+	public void configurationReloaded() {
+		for (Runnable listener : configChangedListeners) {
+			listener.run();
 		}
 	}
 

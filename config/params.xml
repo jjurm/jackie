@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params>
+    <lineFollowing>
+        <pid>
+            <P>0.7</P>
+            <I>0.1</I>
+            <D>0.2</D>
+        </pid>
+        <motorIntensityFunction>
+            <baseSpeed>0.1</baseSpeed>
+            <coefficient>0.3</coefficient>
+            <positiveMotorExponent>2.0</positiveMotorExponent>
+            <negativeMotorExponent>3.0</negativeMotorExponent>
+        </motorIntensityFunction>
+    </lineFollowing>
+</params>
