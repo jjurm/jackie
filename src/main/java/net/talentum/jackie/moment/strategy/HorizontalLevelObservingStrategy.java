@@ -15,6 +15,7 @@ import net.talentum.jackie.moment.module.BooleanImageFilterModule;
 import net.talentum.jackie.moment.module.BorderFinderModule;
 import net.talentum.jackie.moment.module.ImageModifierModule;
 import net.talentum.jackie.tools.InstructionPainter;
+import net.talentum.jackie.tools.MathTools;
 
 /**
  * Very simple and fast strategy that works similarly to a reflectance sensor
@@ -56,12 +57,16 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		Point bottom = checkLine(new Point(x, y + y / 2), -Math.PI / 2);
 		Point abottom = checkLine(new Point(x, 2 * y - 1), -Math.PI / 2);
 
-		if (bottom == null || abottom == null)
+		if (bottom == null)
 			return new RobotInstruction(d.m, d);
 
-		Point destination = new Point((int) Math.round(1.5 * bottom.x - 0.5 * abottom.x), bottom.y);
+		Point destination;
+		if (abottom == null) {
+			destination = new Point(bottom);
+		} else {
+			destination = new Point((int) Math.round(1.5 * bottom.x - 0.5 * abottom.x), bottom.y);
+		}
 
-		destination = new Point(destination);
 		destination.translate(-x, 0);
 
 		return new RobotInstruction(d.m, d, destination);
@@ -91,7 +96,10 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 				double dstL = d.dst(center, borders.left);
 				double dstR = d.dst(center, borders.right);
 				Point moreDistanced = (dstL > dstR) ? borders.left : borders.right;
-				Point l = d.weightedAvg(moreDistanced, center, d.dst(center, moreDistanced) / center.x);
+				Point averaged = d.weightedAvg(moreDistanced, center, d.dst(center, moreDistanced) / center.x);
+				Point l = new Point(MathTools.toRange(averaged.x, borders.left.x, borders.right.x),
+						MathTools.toRange(averaged.y, Math.min(borders.left.y, borders.right.y),
+								Math.max(borders.left.y, borders.right.y)));
 				d.line.add(l);
 
 				return l;

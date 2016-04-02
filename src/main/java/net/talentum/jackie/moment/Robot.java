@@ -35,13 +35,14 @@ public class Robot {
 	 * @see #constructMoment()
 	 */
 	public Deque<Moment> moments = new LinkedList<Moment>();
-	public RobotInstruction lastInstruction;
 	public SerialCommunicator serial;
 
 	protected List<Runnable> configChangedListeners = new ArrayList<Runnable>();
 
-	protected RobotStrategy strategy;
-
+	/**
+	 * Actual state, its method {@link State#getMotorInstructions()} is called
+	 * in a loop.
+	 */
 	private State state;
 
 	public Robot(Parameters param) {
@@ -71,6 +72,13 @@ public class Robot {
 			return null;
 		}
 		SensorData sensorData = SensorData.collect();
+
+		/*-Image scaled = image.getScaledInstance(image.getWidth() / 2, image.getHeight() / 2,
+				BufferedImage.SCALE_FAST);
+		image = new BufferedImage(scaled.getWidth(null), scaled.getHeight(null), BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = image.createGraphics();
+		g.drawImage(scaled, 0, 0, null);
+		g.dispose();*/
 
 		Moment moment = new Moment(image, sensorData);
 

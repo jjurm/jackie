@@ -55,6 +55,8 @@ public class Main {
 			return;
 		}
 		robot.setWebcamImageSupplier(imageSupplier);
+		
+		//robot.setWebcamImageSupplier(new LocalWebcamImageSupplier());
 
 		// run the processing threads
 		for (int i = 0; i < RobotRunThread.COUNT; i++) {

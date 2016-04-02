@@ -13,11 +13,11 @@ import com.github.sarxos.webcam.WebcamException;
  * 
  * @author JJurM
  */
-public class WebcamImageSupplier implements Supplier<BufferedImage> {
+public class LocalWebcamImageSupplier implements Supplier<BufferedImage> {
 
 	private Webcam webcam;
 
-	public WebcamImageSupplier() {
+	public LocalWebcamImageSupplier() {
 		try {
 			webcam = Webcam.getDefault(5, TimeUnit.SECONDS);
 		} catch (WebcamException | TimeoutException e) {
