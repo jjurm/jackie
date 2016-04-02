@@ -46,5 +46,13 @@ public class MathTools {
 			return -1;
 		return 0;
 	}
+	
+	public static int parseDefault(String val, int defaultVal) {
+		try {
+			return Integer.parseInt(val);
+		} catch (NumberFormatException e) {
+			return defaultVal;
+		}
+	}
 
 }

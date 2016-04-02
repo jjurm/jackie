@@ -29,6 +29,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
@@ -36,6 +37,7 @@ import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPicker;
 
 import net.talentum.jackie.ir.ImageOutput;
+import net.talentum.jackie.ir.ImageOutputSupplier;
 import net.talentum.jackie.moment.Moment;
 import net.talentum.jackie.moment.SensorData;
 import net.talentum.jackie.system.StrategyComparatorPreview;
@@ -60,7 +62,7 @@ public class StrategyComparatorPanel extends JPanel {
 	/**
 	 * list of {@link ImageOutput}s to offer
 	 */
-	private ImageOutput[] imageOutputs;
+	private ImageOutputSupplier[] imageOutputSuppliers;
 
 	/**
 	 * List of opened {@link ImageOutputFrame}s
@@ -106,7 +108,7 @@ public class StrategyComparatorPanel extends JPanel {
 	private JButton btnOpenClose;
 	private JButton btnRunServer;
 	private JPanel menu2;
-	private JComboBox<ImageOutput> imageOutputSelection;
+	private JComboBox<ImageOutputSupplier.ComboBoxItem> imageOutputSelection;
 	private JButton btnAddOutput;
 	private Component horizontalStrut;
 	private JPanel centerPanel;
@@ -118,9 +120,10 @@ public class StrategyComparatorPanel extends JPanel {
 	private JLabel lblScale;
 	private JComboBox<Double> scaleSelection;
 	private JDesktopPane desktopPane;
+	private JTextField imageOutputParameter;
 
-	public StrategyComparatorPanel(ImageOutput[] irOutputs) {
-		this.imageOutputs = irOutputs;
+	public StrategyComparatorPanel(ImageOutputSupplier[] imageOutputSuppliers) {
+		this.imageOutputSuppliers = imageOutputSuppliers;
 
 		setLayout(new BorderLayout(0, 0));
 		createComponents();
@@ -231,16 +234,23 @@ public class StrategyComparatorPanel extends JPanel {
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		menuPanel.add(menu2);
 
-		imageOutputSelection = new JComboBox<ImageOutput>();
+		imageOutputSelection = new JComboBox<ImageOutputSupplier.ComboBoxItem>();
 		imageOutputSelection.setPreferredSize(new Dimension(200, 20));
-		imageOutputSelection.setModel(new DefaultComboBoxModel<ImageOutput>(imageOutputs));
+		imageOutputSelection.setModel(new DefaultComboBoxModel<ImageOutputSupplier.ComboBoxItem>(
+				Arrays.stream(imageOutputSuppliers).map(s -> new ImageOutputSupplier.ComboBoxItem(s)).toArray(s -> new ImageOutputSupplier.ComboBoxItem[s])
+		));
 		imageOutputSelection.setMaximumRowCount(20);
 		menu2.add(imageOutputSelection);
 
+		imageOutputParameter = new JTextField();
+		imageOutputParameter.setColumns(10);
+		menu2.add(imageOutputParameter);
+		
 		btnAddOutput = new JButton("Add output");
 		btnAddOutput.addActionListener(e -> {
 			// create new image output frame
-			ImageOutput imageOutput = (ImageOutput) imageOutputSelection.getSelectedItem();
+			ImageOutputSupplier imageOutputSupplier = ((ImageOutputSupplier.ComboBoxItem) imageOutputSelection.getSelectedItem()).getValue();
+			ImageOutput imageOutput = imageOutputSupplier.get(imageOutputParameter.getText());
 			ImageOutputFrame frame = new ImageOutputFrame(imageOutput);
 			imageOutputFrames.add(frame);
 			desktopPane.add(frame);
@@ -578,5 +588,4 @@ public class StrategyComparatorPanel extends JPanel {
 		}
 
 	}
-
 }

@@ -15,6 +15,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import net.talentum.jackie.ir.BlurredBooleanImageOutput;
 import net.talentum.jackie.ir.BooleanImageOutput;
 import net.talentum.jackie.ir.ImageOutput;
+import net.talentum.jackie.ir.ImageOutputSupplier;
 import net.talentum.jackie.ir.RobotStrategyIROutput;
 import net.talentum.jackie.ir.SourceImageOutput;
 import net.talentum.jackie.moment.Parameters;
@@ -28,6 +29,7 @@ import net.talentum.jackie.moment.module.UnivBooleanImageFilterModule;
 import net.talentum.jackie.moment.module.VectorDirectionManagerModule;
 import net.talentum.jackie.moment.strategy.HorizontalLevelObservingStrategy;
 import net.talentum.jackie.moment.strategy.LineFollowingStrategy;
+import net.talentum.jackie.tools.MathTools;
 import net.talentum.jackie.ui.StrategyComparatorPanel;
 
 /**
@@ -44,7 +46,7 @@ import net.talentum.jackie.ui.StrategyComparatorPanel;
 public class StrategyComparatorPreview {
 
 	static Parameters param;
-	static ImageOutput[] imageOutputs;
+	static ImageOutputSupplier[] imageOutputSuppliers;
 
 	static JFrame previewFrame;
 	static StrategyComparatorPanel strategyComparatorPanel;
@@ -72,26 +74,27 @@ public class StrategyComparatorPreview {
 	 * Here are defined {@link ImageOutput}s to offer in GUI.
 	 */
 	private static void createImageOutputs() {
-		List<ImageOutput> list = new ArrayList<ImageOutput>();
+		List<ImageOutputSupplier> list = new ArrayList<ImageOutputSupplier>();
 
 		// @formatter:off
-		list.add(new SourceImageOutput("Source"));
-		list.add(new BlurImageModifierModule("Blur"));
-		list.add(new BooleanImageOutput("BW(100)", 100));
-		list.add(new BooleanImageOutput("Green", new Function<Color, Boolean>() {
+		list.add(p -> new SourceImageOutput("Source"));
+		list.add(p -> new BlurredBooleanImageOutput("Blur + BW(100)", 100));
+		list.add(p -> new BlurredBooleanImageOutput(String.format("Blur + BW(%s)", p), MathTools.parseDefault(p, 0)));
+		list.add(p -> new BlurImageModifierModule("Blur"));
+		list.add(p -> new BooleanImageOutput("BW(100)", 100));
+		list.add(p -> new BooleanImageOutput("Green", new Function<Color, Boolean>() {
 			@Override
 			public Boolean apply(Color c) {
 				return ((double) c.getGreen()) / (c.getBlue() + c.getRed() + 1) > 0.64;
 			}
 		}));
-		list.add(new BlurredBooleanImageOutput("Green + blur", new Function<Color, Boolean>() {
+		list.add(p -> new BlurredBooleanImageOutput("Green + blur", new Function<Color, Boolean>() {
 			@Override
 			public Boolean apply(Color c) {
 				return ((double) c.getGreen()) / (c.getBlue() + c.getRed() + 1) > 0.64;
 			}
 		}));
-		list.add(new BlurredBooleanImageOutput("Blur + BW(100)", 100));
-		list.add(new RobotStrategyIROutput("*LineFollowing", new LineFollowingStrategy(
+		list.add(p -> new RobotStrategyIROutput("*LineFollowing", new LineFollowingStrategy(
 				param,
 				new BlurImageModifierModule(),
 				new UnivBooleanImageFilterModule(100),
@@ -104,15 +107,21 @@ public class StrategyComparatorPreview {
 						new BasicAngularTurnHandlerModule()
 				)
 		)));
-		list.add(new HorizontalLevelObservingStrategy.ImageOutput("*HorizontalLevelObserving", new HorizontalLevelObservingStrategy(
+		list.add(p -> new HorizontalLevelObservingStrategy.ImageOutput("*HorizontalLevelObserving (100)", new HorizontalLevelObservingStrategy(
 				param,
 				new BlurImageModifierModule(),
 				new UnivBooleanImageFilterModule(100),
 				new BasicBorderFinderModule(2, 600, 3)
 		)));
+		list.add(p -> new HorizontalLevelObservingStrategy.ImageOutput(String.format("*HorizontalLevelObserving (%s)", p), new HorizontalLevelObservingStrategy(
+				param,
+				new BlurImageModifierModule(),
+				new UnivBooleanImageFilterModule(MathTools.parseDefault(p, 100)),
+				new BasicBorderFinderModule(2, 600, 3)
+		)));
 		// @formatter:on
 
-		imageOutputs = list.toArray(new ImageOutput[0]);
+		imageOutputSuppliers = list.toArray(new ImageOutputSupplier[0]);
 	}
 
 	private static void createFrame() {
@@ -134,7 +143,7 @@ public class StrategyComparatorPreview {
 			}
 		});
 
-		strategyComparatorPanel = new StrategyComparatorPanel(imageOutputs);
+		strategyComparatorPanel = new StrategyComparatorPanel(imageOutputSuppliers);
 		previewFrame.setContentPane(strategyComparatorPanel);
 
 		previewFrame.setVisible(true);
