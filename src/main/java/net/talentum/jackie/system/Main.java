@@ -21,21 +21,10 @@ public class Main {
 
 	public static Robot robot;
 
-	public static void main(String[] args) {
-
-		System.out.println("Starting program");
-
-		run(args);
-
-		System.out.println("Ended");
-
-	}
-
 	public static void run(String[] args) {
 		// initialize configuration manager
 		ConfigurationManager.init();
-		
-		
+
 		// create robot
 		System.out.println("Creating robot");
 		Parameters param = new Parameters();
@@ -55,15 +44,15 @@ public class Main {
 			return;
 		}
 		robot.setWebcamImageSupplier(imageSupplier);
-		
-		//robot.setWebcamImageSupplier(new LocalWebcamImageSupplier());
+
+		// robot.setWebcamImageSupplier(new LocalWebcamImageSupplier());
 
 		// run the processing threads
 		for (int i = 0; i < RobotRunThread.COUNT; i++) {
 			RobotRunThread thread = new RobotRunThread(robot);
 			thread.start();
 		}
-		
+
 		// monitor running
 		while (true) {
 			int count = RobotRunThread.runs.getAndSet(0);
