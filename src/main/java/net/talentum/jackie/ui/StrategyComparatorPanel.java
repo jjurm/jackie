@@ -36,10 +36,10 @@ import javax.swing.event.InternalFrameEvent;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPicker;
 
-import net.talentum.jackie.ir.ImageOutput;
-import net.talentum.jackie.ir.ImageOutputSupplier;
-import net.talentum.jackie.moment.Moment;
-import net.talentum.jackie.moment.SensorData;
+import net.talentum.jackie.image.ImageOutput;
+import net.talentum.jackie.image.ImageOutputSupplier;
+import net.talentum.jackie.robot.Moment;
+import net.talentum.jackie.robot.SensorData;
 import net.talentum.jackie.system.StrategyComparatorPreview;
 import net.talentum.jackie.tools.AtomicTools;
 

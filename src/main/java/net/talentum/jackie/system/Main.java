@@ -1,12 +1,12 @@
 package net.talentum.jackie.system;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.function.Supplier;
 
-import net.talentum.jackie.moment.Parameters;
-import net.talentum.jackie.moment.Robot;
-import net.talentum.jackie.moment.RobotRunThread;
+import net.talentum.jackie.image.ImageSupplier;
+import net.talentum.jackie.image.ServerImageSupplier;
+import net.talentum.jackie.robot.Parameters;
+import net.talentum.jackie.robot.Robot;
+import net.talentum.jackie.robot.RobotRunThread;
 
 /**
  * Runnable class.
@@ -36,14 +36,14 @@ public class Main {
 			System.out.println("You must supply server name");
 			return;
 		}
-		Supplier<BufferedImage> imageSupplier;
+		ImageSupplier imageSupplier;
 		try {
-			imageSupplier = new WebcamServerImageSupplier(args[0]);
+			imageSupplier = new ServerImageSupplier(args[0]);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
-		robot.setWebcamImageSupplier(imageSupplier);
+		robot.setImageSupplier(imageSupplier);
 
 		// robot.setWebcamImageSupplier(new LocalWebcamImageSupplier());
 

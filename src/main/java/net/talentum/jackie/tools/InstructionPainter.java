@@ -6,7 +6,7 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import net.talentum.jackie.moment.RobotInstruction;
+import net.talentum.jackie.robot.RobotInstruction;
 
 public class InstructionPainter {
 

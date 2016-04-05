@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import net.talentum.jackie.serial.SerialCommunicator;
+import net.talentum.jackie.comm.SerialCommunicator;
 import net.talentum.jackie.tools.MathTools;
 
 public class Run {
