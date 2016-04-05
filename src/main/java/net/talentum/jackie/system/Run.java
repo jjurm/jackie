@@ -4,13 +4,14 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.SerialCommunicator;
 import net.talentum.jackie.tools.MathTools;
 
 public class Run {
 
 	static ExecutorService executor = Executors.newSingleThreadExecutor();
-	
+
 	public static void main(String[] args) {
 
 		run(args);
@@ -19,12 +20,14 @@ public class Run {
 
 	public static void run(String[] args) {
 
+		String task;
 		if (args.length == 0) {
-			System.out.println("Possible arguments are: run, serial");
+			task = "";
 		} else {
-			System.out.println("Running program: " + args[0]);
+			task = args[0].toLowerCase();
+			System.out.println("Running program: " + task);
 			String[] args2 = Arrays.copyOfRange(args, 1, args.length);
-			switch (args[0]) {
+			switch (task) {
 			case "run":
 				Main.run(args2);
 				break;
@@ -33,6 +36,13 @@ public class Run {
 				break;
 			case "i2c":
 				testI2C();
+				break;
+			default:
+				if (!"".equals(task)) {
+					System.out.println(String.format("'%s' is not a task.", args[0]));
+				}
+				System.out.println("Possible arguments are: run, serial, i2c");
+				break;
 			}
 		}
 
@@ -57,11 +67,17 @@ public class Run {
 		}
 
 	}
-	
+
 	public static void testI2C() {
-		
-		// todo
-		
+
+		I2CCommunicator i2c = new I2CCommunicator();
+
+		while (true) {
+			int n = MathTools.randomRange(0, 255);
+			int res = i2c.cTest(i2c.arduino, n);
+			System.out.println(String.format("sent: %d, received: %d", n, res));
+		}
+
 	}
 
 }
