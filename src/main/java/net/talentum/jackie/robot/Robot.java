@@ -6,8 +6,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-
 import net.talentum.jackie.comm.SerialCommunicator;
 import net.talentum.jackie.image.ImageSupplier;
 import net.talentum.jackie.robot.state.LineFollowingState;
@@ -93,32 +91,30 @@ public class Robot {
 	 */
 	public void runCycle() {
 		while (true) {
-			runOnce();
+			state.run();
 		}
 
 	}
 
 	/**
-	 * Contains the main cycle that is run by the robot. It is run only once.
+	 * Method called on the robot by a superior class when the configuration has
+	 * been changed.
 	 */
-	public void runOnce() {
-
-		ImmutablePair<Integer, Integer> motors = state.getMotorInstructions();
-
-		// write to serial
-		System.out.println(String.format("Writing angles (left=%d, right=%d)", motors.left, motors.right));
-		serial.write(1, motors.left, motors.right);
-
-	}
-
-	public void addConfigChangedListener(Runnable listener) {
-		configChangedListeners.add(listener);
-	}
-
 	public void configurationReloaded() {
 		for (Runnable listener : configChangedListeners) {
 			listener.run();
 		}
+	}
+
+	/**
+	 * Adds listener that is called when Robot has detected a change in the
+	 * configuration. Values from the configuration should be reloaded.
+	 * 
+	 * @param listener
+	 *            a runnable
+	 */
+	public void addConfigChangedListener(Runnable listener) {
+		configChangedListeners.add(listener);
 	}
 
 	/**
@@ -127,11 +123,21 @@ public class Robot {
 	 * @param state
 	 */
 	public void setState(State state) {
+		System.out.println("State changed to " + state.getClass().getName());
 		this.state = state;
 	}
 
-	public State getState() {
-		return this.state;
+	/**
+	 * Writes speed values to main propulsion motors.
+	 * 
+	 * @param left
+	 *            left motor
+	 * @param right
+	 *            right motor
+	 */
+	public void writeMotors(int left, int right) {
+		System.out.println(String.format("Writing angles (left=%d, right=%d)", left, right));
+		serial.write(1, left, right);
 	}
 
 }

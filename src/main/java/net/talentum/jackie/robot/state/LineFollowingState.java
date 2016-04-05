@@ -75,7 +75,7 @@ public class LineFollowingState implements State {
 	}
 
 	@Override
-	public ImmutablePair<Integer, Integer> getMotorInstructions() {
+	public void run() {
 		double heading = 0.0;
 
 		// obtain moment
@@ -103,7 +103,8 @@ public class LineFollowingState implements State {
 		// get angle values to send
 		ImmutablePair<Integer, Integer> motors = mif.getMotors(heading);
 
-		return motors;
+		// finally write motors
+		robot.writeMotors(motors.left, motors.right);
 
 	}
 

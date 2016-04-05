@@ -39,6 +39,7 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		this.mBorderFinder = mBorderFinder;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public RobotInstruction evaluate() {
 		// process image

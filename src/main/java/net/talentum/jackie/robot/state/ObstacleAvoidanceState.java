@@ -1,29 +1,27 @@
 package net.talentum.jackie.robot.state;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-
-import net.talentum.jackie.tools.MathTools;
+import net.talentum.jackie.robot.Robot;
+import net.talentum.jackie.tools.TimeTools;
 
 public class ObstacleAvoidanceState implements State {
 
-	long start;
+	Robot robot;
 
-	public ObstacleAvoidanceState() {
-		start = System.currentTimeMillis();
+	public ObstacleAvoidanceState(Robot robot) {
+		this.robot = robot;
 	}
 
 	@Override
-	public ImmutablePair<Integer, Integer> getMotorInstructions() {
+	public void run() {
 
-		long passed = System.currentTimeMillis() - start;
+		robot.writeMotors(100, 100);
 
-		// just an example
-		if (MathTools.isBetween(passed, 0, 100)) {
-			return new ImmutablePair<Integer, Integer>(100, 100);
-		} else {
-			return new ImmutablePair<Integer, Integer>(90, 110);
-		}
-
+		TimeTools.sleep(5000);
+		
+		robot.writeMotors(90, 110);
+		
+		robot.setState(new NullState());
+		
 	}
 
 }

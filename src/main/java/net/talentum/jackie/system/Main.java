@@ -1,12 +1,15 @@
 package net.talentum.jackie.system;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.talentum.jackie.image.ImageSupplier;
 import net.talentum.jackie.image.ServerImageSupplier;
 import net.talentum.jackie.robot.Parameters;
 import net.talentum.jackie.robot.Robot;
-import net.talentum.jackie.robot.RobotRunThread;
+import net.talentum.jackie.robot.state.State;
 
 /**
  * Runnable class.
@@ -19,7 +22,13 @@ import net.talentum.jackie.robot.RobotRunThread;
  */
 public class Main {
 
-	public static Robot robot;
+	private static ExecutorService executor = Executors.newCachedThreadPool();
+	private static Robot robot;
+
+	/**
+	 * Number of {@link State#run()} method runs
+	 */
+	public static AtomicInteger runs = new AtomicInteger(0);
 
 	public static void run(String[] args) {
 		// initialize configuration manager
@@ -47,22 +56,20 @@ public class Main {
 
 		// robot.setWebcamImageSupplier(new LocalWebcamImageSupplier());
 
-		// run the processing threads
-		for (int i = 0; i < RobotRunThread.COUNT; i++) {
-			RobotRunThread thread = new RobotRunThread(robot);
-			thread.start();
-		}
+		robot.runCycle();
 
 		// monitor running
-		while (true) {
-			int count = RobotRunThread.runs.getAndSet(0);
-			System.out.println(String.format("Runs: %d, running: %d", count, RobotRunThread.running));
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		executor.submit(() -> {
+			while (true) {
+				int count = runs.getAndSet(0);
+				System.out.println(String.format("Runs: %d", count));
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
-		}
+		});
 
 	}
 
