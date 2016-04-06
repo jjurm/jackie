@@ -71,10 +71,13 @@ public class SerialCommunicator {
 		open();
 
 		// run executor
-		executor.submit(() -> {
-			while (true) {
-				String line = readLine();
-				process(line);
+		executor.submit(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					String line = readLine();
+					process(line);
+				}
 			}
 		});
 	}

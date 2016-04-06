@@ -48,14 +48,17 @@ public class Main {
 		// robot.setWebcamImageSupplier(new LocalWebcamImageSupplier());
 
 		// monitor running
-		executor.submit(() -> {
-			while (true) {
-				int count = runs.getAndSet(0);
-				System.out.println(String.format("Runs: %d", count));
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+		executor.submit(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					int count = runs.getAndSet(0);
+					System.out.println(String.format("Runs: %d", count));
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});

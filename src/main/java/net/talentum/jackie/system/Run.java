@@ -12,6 +12,7 @@ import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.SerialCommunicator;
 import net.talentum.jackie.image.LocalWebcamImageSupplier;
 import net.talentum.jackie.tools.MathTools;
+import net.talentum.jackie.tools.TimeTools;
 
 public class Run {
 
@@ -42,14 +43,14 @@ public class Run {
 			case "i2c":
 				testI2C();
 				break;
-			case "camera":
-				testCamera(args2);
+			case "webcam":
+				testWebcam(args2);
 				break;
 			default:
 				if (!"".equals(task)) {
 					System.out.println(String.format("'%s' is not a task.", args[0]));
 				}
-				System.out.println("Possible arguments are: run, serial, i2c");
+				System.out.println("Possible arguments are: run, serial, i2c, webcam");
 				break;
 			}
 		}
@@ -59,19 +60,19 @@ public class Run {
 	public static void testSerial() {
 
 		SerialCommunicator sc = new SerialCommunicator();
-		executor.submit(() -> {
-			while (true) {
-				String line = sc.readLine();
-				System.out.println(line);
+		executor.submit(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					String line = sc.readLine();
+					System.out.println(line);
+				}
 			}
 		});
-		try {
-			while (true) {
-				sc.write(1, MathTools.randomRange(0, 180), MathTools.randomRange(0, 180));
-				Thread.sleep(2000);
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+
+		while (true) {
+			sc.write(1, MathTools.randomRange(0, 180), MathTools.randomRange(0, 180));
+			TimeTools.sleep(2000);
 		}
 
 	}
@@ -84,11 +85,12 @@ public class Run {
 			int n = MathTools.randomRange(0, 255);
 			int res = i2c.cTest(i2c.arduino, n);
 			System.out.println(String.format("sent: %d, received: %d", n, res));
+			TimeTools.sleep(700);
 		}
 
 	}
 
-	public static void testCamera(String[] args) {
+	public static void testWebcam(String[] args) {
 
 		System.out.println("Testing connected webcams");
 
@@ -104,6 +106,11 @@ public class Run {
 		System.out.print("Number of recognized webcams: ");
 		List<Webcam> webcams = Webcam.getWebcams();
 		System.out.println(webcams.size());
+
+		if (webcams.size() == 0) {
+			System.out.println("No recognized webcam, exiting.");
+			return;
+		}
 
 		System.out.println("List of webcams:");
 		for (Webcam webcam : webcams) {
@@ -123,9 +130,10 @@ public class Run {
 
 		if (img == null) {
 			System.out.println("Returned image is null :(");
-		} else {
-			System.out.println("Returned image is an object :)");
+			return;
 		}
+
+		System.out.println("Returned image is an object :)");
 
 	}
 
