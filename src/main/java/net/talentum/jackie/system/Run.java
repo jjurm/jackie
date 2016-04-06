@@ -1,11 +1,16 @@
 package net.talentum.jackie.system;
 
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.github.sarxos.webcam.Webcam;
+
 import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.SerialCommunicator;
+import net.talentum.jackie.image.LocalWebcamImageSupplier;
 import net.talentum.jackie.tools.MathTools;
 
 public class Run {
@@ -36,6 +41,9 @@ public class Run {
 				break;
 			case "i2c":
 				testI2C();
+				break;
+			case "camera":
+				testCamera(args2);
 				break;
 			default:
 				if (!"".equals(task)) {
@@ -76,6 +84,47 @@ public class Run {
 			int n = MathTools.randomRange(0, 255);
 			int res = i2c.cTest(i2c.arduino, n);
 			System.out.println(String.format("sent: %d, received: %d", n, res));
+		}
+
+	}
+
+	public static void testCamera(String[] args) {
+
+		System.out.println("Testing connected webcams");
+
+		if (args.length > 0 && args[0].equalsIgnoreCase("1")) {
+			System.out.println("Setting V4l4j driver");
+			LocalWebcamImageSupplier.setV4l4jDriver();
+		}
+
+		System.out.println("Trying to establish a connection with the webcam library...");
+		Webcam.getDefault();
+		System.out.println("Success! Library is responding.");
+
+		System.out.print("Number of recognized webcams: ");
+		List<Webcam> webcams = Webcam.getWebcams();
+		System.out.println(webcams.size());
+
+		System.out.println("List of webcams:");
+		for (Webcam webcam : webcams) {
+			System.out.println("    " + webcam.getName());
+		}
+
+		Webcam def = Webcam.getDefault();
+		System.out.println("Using default webcam: " + def.getName());
+
+		System.out.println("Opening webcam...");
+		def.open();
+		System.out.println("Opened!");
+
+		System.out.print("Taking image... ");
+		BufferedImage img = def.getImage();
+		System.out.println("done!");
+
+		if (img == null) {
+			System.out.println("Returned image is null :(");
+		} else {
+			System.out.println("Returned image is an object :)");
 		}
 
 	}

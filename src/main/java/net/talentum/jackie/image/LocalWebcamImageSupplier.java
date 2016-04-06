@@ -19,9 +19,6 @@ public class LocalWebcamImageSupplier implements ImageSupplier {
 
 	public LocalWebcamImageSupplier() {
 
-		// set Webcam driver
-		Webcam.setDriver(new V4l4jDriver());
-
 		try {
 			webcam = Webcam.getDefault(5, TimeUnit.SECONDS);
 		} catch (WebcamException | TimeoutException e) {
@@ -31,6 +28,11 @@ public class LocalWebcamImageSupplier implements ImageSupplier {
 		webcam.open();
 	}
 
+	public static void setV4l4jDriver() {
+		// set Webcam driver
+		Webcam.setDriver(new V4l4jDriver());
+	}
+	
 	@Override
 	public BufferedImage getImage() {
 		return webcam.getImage();
