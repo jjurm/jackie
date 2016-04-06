@@ -56,6 +56,16 @@
         </executions>
       </plugin>
 
+      <!-- Disable DocLint in Java 8 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.3</version>
+        <configuration>
+          <additionalparam>-Xdoclint:none</additionalparam>
+        </configuration>
+      </plugin>
+
       <!-- Make executable JAR -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -65,7 +75,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>net.talentum.jackie.system.Main</mainClass>
+              <mainClass>net.talentum.jackie.system.Run</mainClass>
             </manifest>
           </archive>
         </configuration>
