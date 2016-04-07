@@ -12,8 +12,6 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import org.opencv.core.Core;
-
 import net.talentum.jackie.image.BlurredBooleanImageOutput;
 import net.talentum.jackie.image.BooleanImageOutput;
 import net.talentum.jackie.image.ImageOutput;
@@ -55,11 +53,6 @@ public class StrategyComparatorPreview {
 	static JFrame previewFrame;
 	static StrategyComparatorPanel strategyComparatorPanel;
 
-	static {
-		//Loading OpenCV
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-	}
-	
 	public static void main(String[] args) {
 
 		run(args);
@@ -69,6 +62,9 @@ public class StrategyComparatorPreview {
 	public static void run(String[] args) {
 		// initialize configuration manager
 		ConfigurationManager.init();
+
+		// load OpenCV library
+		Run.loadOpenCV();
 
 		param = new Parameters();
 

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.opencv.core.Core;
+
 import com.github.sarxos.webcam.Webcam;
 
 import net.talentum.jackie.comm.I2CCommunicator;
@@ -22,6 +24,10 @@ public class Run {
 
 		run(args);
 
+	}
+
+	public static void loadOpenCV() {
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
 
 	public static void run(String[] args) {
