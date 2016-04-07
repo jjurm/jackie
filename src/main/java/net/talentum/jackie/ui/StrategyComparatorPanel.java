@@ -95,7 +95,7 @@ public class StrategyComparatorPanel extends JPanel {
 	private boolean startedContinuous = false;
 
 	/**
-	 * Wherher the server has been started
+	 * Whether the server has been started
 	 */
 	private AtomicBoolean startedServer = new AtomicBoolean(false);
 
