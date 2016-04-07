@@ -1,4 +1,4 @@
-package net.talentum.jackie.moment.module;
+package net.talentum.jackie.module.impl;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;

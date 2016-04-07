@@ -2,17 +2,17 @@ package net.talentum.jackie.robot.strategy;
 
 import java.awt.image.BufferedImage;
 
+import net.talentum.jackie.module.impl.BufferedImageMatConverterModule;
+import net.talentum.jackie.robot.Moment;
+import net.talentum.jackie.robot.Parameters;
+import net.talentum.jackie.robot.RobotInstruction;
+
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-
-import net.talentum.jackie.moment.module.BufferedImageMatConverterModule;
-import net.talentum.jackie.robot.Moment;
-import net.talentum.jackie.robot.Parameters;
-import net.talentum.jackie.robot.RobotInstruction;
 
 public class BallFinderStrategy extends RobotStrategy {
 
@@ -53,10 +53,10 @@ public class BallFinderStrategy extends RobotStrategy {
 	        Core.bitwise_or(thresholded, thresholded2, thresholded);
 	        
 			Mat canny = new Mat();
-			Imgproc.Canny(frame, canny, 200, 20);
+			Imgproc.Canny(frame, canny, 100, 120);
 			
 			Mat circles = new Mat();
-	        Imgproc.HoughCircles(canny, circles, Imgproc.CV_HOUGH_GRADIENT, 2, thresholded.height()/4, 500, 50, 0, 0); 
+	        Imgproc.HoughCircles(thresholded, circles, Imgproc.CV_HOUGH_GRADIENT, 2, thresholded.height()/4, 500, 50, 0, 0); 
 	        
            int rows = circles.rows();  
            int elemSize = (int)circles.elemSize(); //Returns 12 (3 * 4bytes in a float)  
