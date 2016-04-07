@@ -155,6 +155,10 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
+    <repository>
+      <id>jjurm</id>
+      <url>http://jjurm.com/maven2</url>
+    </repository>
   </repositories>
 
   <dependencies>
@@ -212,6 +216,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <version>1.7.19</version>
+    </dependency>
+    <dependency>
+      <groupId>com.jjurm.libs</groupId>
+      <artifactId>opencv</artifactId>
+      <version>3.1.0</version>
     </dependency>
   </dependencies>
 
