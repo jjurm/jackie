@@ -12,6 +12,13 @@ import javax.imageio.ImageIO;
 
 import net.talentum.jackie.image.ImageSupplier;
 
+/**
+ * Class providing network access to the given {@link ImageSupplier}. Method
+ * {@link #start()} will start the server on a separate thread. Stop it with the
+ * {@link #stop()} method.
+ * 
+ * @author padr31
+ */
 public class ImageServer implements Runnable {
 
 	private ExecutorService executor = Executors.newCachedThreadPool();
@@ -44,16 +51,17 @@ public class ImageServer implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
+	@Override
 	public void run() {
 		try {
 			serverSocket = new ServerSocket(portNumber);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		while (startedServer.get()) {
 			try {
 				Socket client = serverSocket.accept();
@@ -69,8 +77,8 @@ public class ImageServer implements Runnable {
 				});
 
 			} catch (IOException e) {
-				if(startedServer.get()){
-					e.printStackTrace();	
+				if (startedServer.get()) {
+					e.printStackTrace();
 				}
 			}
 		}
