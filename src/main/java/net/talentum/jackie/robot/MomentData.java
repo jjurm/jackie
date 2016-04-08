@@ -7,6 +7,7 @@ import java.util.List;
 
 import net.talentum.jackie.module.DirectionManagerModule;
 import net.talentum.jackie.module.TrailBordersMonitorModule;
+import net.talentum.jackie.system.Config;
 
 /**
  * This object is bonded to {@link Moment}. Contains data, some may be only
@@ -21,7 +22,6 @@ public class MomentData {
 	public Moment m;
 	public BufferedImage image;
 	public SensorData sensorData;
-	public Parameters param;
 
 	public boolean[][] bw;
 
@@ -38,11 +38,10 @@ public class MomentData {
 	public DirectionManagerModule mDirectionManager;
 	public TrailBordersMonitorModule mTrailBordersMonitor;
 
-	public MomentData(Moment moment, Parameters param) {
+	public MomentData(Moment moment) {
 		this.m = moment;
 		this.image = moment.image;
 		this.sensorData = moment.sensorData;
-		this.param = param;
 	}
 
 	// ===== helper functions =====
@@ -212,7 +211,7 @@ public class MomentData {
 		Point last = base;
 		for (int i = 1; inBounds(p) && isTrailPoint(p); i++) {
 			last = p;
-			p = move(base, direction, param.movedst * i * orientation);
+			p = move(base, direction, Config.movedst * i * orientation);
 		}
 		return last;
 	}

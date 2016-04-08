@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 import net.talentum.jackie.module.TrailBordersMonitorModule;
 import net.talentum.jackie.robot.MomentData;
+import net.talentum.jackie.system.Config;
 
 public class AveragingTrailWidthDeterminerModule implements TrailBordersMonitorModule {
 
@@ -44,7 +45,7 @@ public class AveragingTrailWidthDeterminerModule implements TrailBordersMonitorM
 	protected Point getBorder(Point sum) {
 		if (actualCount == 0) return null;
 		Point avg = new Point(sum.x / actualCount, sum.y / actualCount);
-		return d.move(avg, d.mDirectionManager.getDirection(), ((double) recentCount - 1) / 2 * d.param.movedst);
+		return d.move(avg, d.mDirectionManager.getDirection(), ((double) recentCount - 1) / 2 * Config.movedst);
 	}
 
 	@Override

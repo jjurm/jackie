@@ -12,8 +12,8 @@ import net.talentum.jackie.module.BorderFinderModule;
 import net.talentum.jackie.module.ImageModifierModule;
 import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.MomentData;
-import net.talentum.jackie.robot.Parameters;
 import net.talentum.jackie.robot.RobotInstruction;
+import net.talentum.jackie.system.Config;
 import net.talentum.jackie.tools.InstructionPainter;
 import net.talentum.jackie.tools.MathTools;
 
@@ -31,9 +31,8 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 	BooleanImageFilterModule mBooleanImageFilter;
 	BorderFinderModule mBorderFinder;
 
-	public HorizontalLevelObservingStrategy(Parameters param, ImageModifierModule mImageModifier,
+	public HorizontalLevelObservingStrategy(ImageModifierModule mImageModifier,
 			BooleanImageFilterModule mBooleanImageFilter, BorderFinderModule mBorderFinder) {
-		super(param);
 		this.mImageModifier = mImageModifier;
 		this.mBooleanImageFilter = mBooleanImageFilter;
 		this.mBorderFinder = mBorderFinder;
@@ -82,7 +81,7 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 	 * @return
 	 */
 	public Point checkLine(Point p, double direction) {
-		Point trail = d.findLinearlyNearestPoint(p, direction + Math.PI / 2, true, param.movedst, Integer.MAX_VALUE);
+		Point trail = d.findLinearlyNearestPoint(p, direction + Math.PI / 2, true, Config.movedst, Integer.MAX_VALUE);
 
 		if (trail != null) {
 

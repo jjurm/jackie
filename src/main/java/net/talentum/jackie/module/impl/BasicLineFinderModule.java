@@ -9,6 +9,7 @@ import net.talentum.jackie.module.BorderFinderModule;
 import net.talentum.jackie.module.LineFinderModule;
 import net.talentum.jackie.robot.MomentData;
 import net.talentum.jackie.robot.Situation;
+import net.talentum.jackie.system.Config;
 
 public class BasicLineFinderModule implements LineFinderModule {
 
@@ -30,7 +31,7 @@ public class BasicLineFinderModule implements LineFinderModule {
 		double direction = d.mDirectionManager.getDirection();
 
 		// distance from last known point
-		int r = (d.notFoundCount + 1) * d.param.movedst;
+		int r = (d.notFoundCount + 1) * Config.movedst;
 
 		Pair<Point, Point> borders = null;
 

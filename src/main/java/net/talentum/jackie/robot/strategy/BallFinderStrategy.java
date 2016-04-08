@@ -2,11 +2,6 @@ package net.talentum.jackie.robot.strategy;
 
 import java.awt.image.BufferedImage;
 
-import net.talentum.jackie.module.impl.BufferedImageMatConverterModule;
-import net.talentum.jackie.robot.Moment;
-import net.talentum.jackie.robot.Parameters;
-import net.talentum.jackie.robot.RobotInstruction;
-
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -14,12 +9,11 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import net.talentum.jackie.module.impl.BufferedImageMatConverterModule;
+import net.talentum.jackie.robot.Moment;
+import net.talentum.jackie.robot.RobotInstruction;
+
 public class BallFinderStrategy extends RobotStrategy {
-
-	public BallFinderStrategy(Parameters param) {
-		super(param);
-
-	}
 
 	@Override
 	public RobotInstruction evaluate() {
@@ -73,6 +67,7 @@ public class BallFinderStrategy extends RobotStrategy {
 			return bimcModule.toBufferedImage(frame);
 		}
 
+		@Override
 		public String getName() {
 			return name;
 		}

@@ -7,7 +7,6 @@ import net.talentum.jackie.module.LineFinderModule;
 import net.talentum.jackie.module.LineStartFinderModule;
 import net.talentum.jackie.module.ModuleSupplier;
 import net.talentum.jackie.module.TrailBordersMonitorModule;
-import net.talentum.jackie.robot.Parameters;
 import net.talentum.jackie.robot.RobotInstruction;
 import net.talentum.jackie.robot.Situation;
 
@@ -27,11 +26,10 @@ public class LineFollowingStrategy extends RobotStrategy {
 	ModuleSupplier<DirectionManagerModule> msDirectionManager;
 	LineFinderModule mLineFinder;
 
-	public LineFollowingStrategy(Parameters param, ImageModifierModule mImageModifier,
+	public LineFollowingStrategy(ImageModifierModule mImageModifier,
 			BooleanImageFilterModule mBooleanImageFilter, LineStartFinderModule mLineStartFinder,
 			ModuleSupplier<TrailBordersMonitorModule> msTrailBordersMonitor,
 			ModuleSupplier<DirectionManagerModule> msDirectionManager, LineFinderModule mLineFinder) {
-		super(param);
 		this.mImageModifier = mImageModifier;
 		this.mBooleanImageFilter = mBooleanImageFilter;
 		this.mLineStartFinder = mLineStartFinder;

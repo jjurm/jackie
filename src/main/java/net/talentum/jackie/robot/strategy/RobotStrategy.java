@@ -2,7 +2,6 @@ package net.talentum.jackie.robot.strategy;
 
 import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.MomentData;
-import net.talentum.jackie.robot.Parameters;
 import net.talentum.jackie.robot.RobotInstruction;
 
 /**
@@ -17,12 +16,7 @@ import net.talentum.jackie.robot.RobotInstruction;
  */
 public abstract class RobotStrategy {
 
-	protected Parameters param;
 	protected MomentData d;
-
-	public RobotStrategy(Parameters param) {
-		this.param = param;
-	}
 
 	/**
 	 * Prepares the strategy for processing the given moment. Involves creating
@@ -31,7 +25,7 @@ public abstract class RobotStrategy {
 	 * @param moment
 	 */
 	public void prepare(Moment moment) {
-		d = new MomentData(moment, param);
+		d = new MomentData(moment);
 	}
 
 	/**

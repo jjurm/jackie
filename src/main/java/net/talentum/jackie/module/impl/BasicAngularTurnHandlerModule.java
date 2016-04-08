@@ -5,6 +5,7 @@ import java.awt.Point;
 import net.talentum.jackie.module.AngularTurnHandlerModule;
 import net.talentum.jackie.robot.MomentData;
 import net.talentum.jackie.robot.Situation;
+import net.talentum.jackie.system.Config;
 
 public class BasicAngularTurnHandlerModule implements AngularTurnHandlerModule {
 
@@ -17,9 +18,9 @@ public class BasicAngularTurnHandlerModule implements AngularTurnHandlerModule {
 		double avgwidth = d.mTrailBordersMonitor.getTrailWidth();
 
 		Point pointR1 = d.move(expected, perpAngle, avgwidth * 1.5);
-		Point pointR2 = d.move(pointR1, direction, d.param.movedst * 2);
+		Point pointR2 = d.move(pointR1, direction, Config.movedst * 2);
 		Point pointL1 = d.move(expected, perpAngle, avgwidth * -1.5);
-		Point pointL2 = d.move(pointL1, direction, d.param.movedst * 2);
+		Point pointL2 = d.move(pointL1, direction, Config.movedst * 2);
 
 		if (!(d.inBounds(pointR1) && d.inBounds(pointL1) && d.inBounds(pointR2) && d.inBounds(pointL2)))
 			return null;
@@ -39,7 +40,7 @@ public class BasicAngularTurnHandlerModule implements AngularTurnHandlerModule {
 			if (!d.inBounds(point1) || !d.inBounds(point2))
 				return null;
 
-			int mdst = Math.max(1, d.param.movedst / 2);
+			int mdst = Math.max(1, Config.movedst / 2);
 			Point point1Border = d.findLinearlyNearestPoint(point1, direction, !d.isTrailPoint(point1), mdst,
 					(int) avgwidth);
 			Point point2Border = d.findLinearlyNearestPoint(point2, direction, !d.isTrailPoint(point2), mdst,

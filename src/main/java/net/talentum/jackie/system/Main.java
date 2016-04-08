@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.talentum.jackie.comm.ImageServer;
 import net.talentum.jackie.image.ImageSupplier;
 import net.talentum.jackie.image.ServerImageSupplier;
-import net.talentum.jackie.robot.Parameters;
 import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.state.State;
 
@@ -37,8 +36,7 @@ public class Main {
 		
 		// create robot
 		System.out.println("Creating robot");
-		Parameters param = new Parameters();
-		robot = new Robot(param);
+		robot = new Robot();
 		ConfigurationManager.setReloadedListener(robot::configurationReloaded);
 
 		// create image supplier

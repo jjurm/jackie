@@ -2,6 +2,7 @@
 <params>
     <threads>1</threads>
     <bwTreshold>60</bwTreshold>
+    <movedst>4</movedst>
     <lineFollowing>
         <pid>
             <P>0.7</P>

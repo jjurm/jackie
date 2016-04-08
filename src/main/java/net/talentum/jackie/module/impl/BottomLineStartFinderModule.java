@@ -5,6 +5,7 @@ import java.awt.Point;
 import net.talentum.jackie.module.LineStartFinderModule;
 import net.talentum.jackie.robot.MomentData;
 import net.talentum.jackie.robot.Situation;
+import net.talentum.jackie.system.Config;
 
 public class BottomLineStartFinderModule implements LineStartFinderModule {
 
@@ -12,7 +13,7 @@ public class BottomLineStartFinderModule implements LineStartFinderModule {
 	public Situation findLineStart(MomentData d) {
 
 		Point p = d.findLinearlyNearestPoint(new Point(d.image.getWidth() / 2, d.image.getHeight() - 1), 0, true,
-				d.param.movedst, d.image.getWidth() / 2);
+				Config.movedst, d.image.getWidth() / 2);
 		if (p == null)
 			return null;
 

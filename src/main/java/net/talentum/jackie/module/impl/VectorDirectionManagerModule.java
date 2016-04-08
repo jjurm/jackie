@@ -7,6 +7,7 @@ import java.util.LinkedList;
 
 import net.talentum.jackie.module.DirectionManagerModule;
 import net.talentum.jackie.robot.MomentData;
+import net.talentum.jackie.system.Config;
 
 public class VectorDirectionManagerModule implements DirectionManagerModule {
 
@@ -64,7 +65,7 @@ public class VectorDirectionManagerModule implements DirectionManagerModule {
 	public void overwriteAll(Point position, double direction, double weight, MomentData d) {
 		points.clear();
 		for (int i = 0; i < number; i++) {
-			points.addLast(d.move(position, direction, - d.param.movedst * i * weight));
+			points.addLast(d.move(position, direction, - Config.movedst * i * weight));
 		}
 	}
 

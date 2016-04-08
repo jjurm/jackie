@@ -49,6 +49,8 @@ public class ConfigurationManager {
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
 		}
+		
+		Config.reload();
 	}
 	
 	public static void setReloadedListener(Runnable listener) {

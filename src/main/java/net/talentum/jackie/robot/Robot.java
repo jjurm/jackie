@@ -10,6 +10,7 @@ import net.talentum.jackie.comm.SerialCommunicator;
 import net.talentum.jackie.image.ImageSupplier;
 import net.talentum.jackie.robot.state.LineFollowingState;
 import net.talentum.jackie.robot.state.State;
+import net.talentum.jackie.system.Config;
 
 /**
  * One instance of this class represents one robot (there should naturally be at
@@ -18,8 +19,6 @@ import net.talentum.jackie.robot.state.State;
  * @author JJurM
  */
 public class Robot {
-
-	Parameters param;
 
 	/**
 	 * Holds object that is capable of supplying webcam images.
@@ -42,14 +41,12 @@ public class Robot {
 	 */
 	private State state;
 
-	public Robot(Parameters param) {
-		this.param = param;
-
+	public Robot() {
 		// open serial communication
 		serial = new SerialCommunicator();
 
 		// create strategy
-		state = new LineFollowingState(param, this);
+		state = new LineFollowingState(this);
 	}
 
 	public void setImageSupplier(ImageSupplier imageSupplier) {
@@ -101,6 +98,7 @@ public class Robot {
 	 * been changed.
 	 */
 	public void configurationReloaded() {
+		Config.reload();
 		for (Runnable listener : configChangedListeners) {
 			listener.run();
 		}

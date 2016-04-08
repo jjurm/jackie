@@ -12,7 +12,6 @@ import net.talentum.jackie.module.impl.BlurImageModifierModule;
 import net.talentum.jackie.module.impl.LinearMotorIntensityFunction;
 import net.talentum.jackie.module.impl.UnivBooleanImageFilterModule;
 import net.talentum.jackie.robot.Moment;
-import net.talentum.jackie.robot.Parameters;
 import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.RobotInstruction;
 import net.talentum.jackie.robot.strategy.HorizontalLevelObservingStrategy;
@@ -26,7 +25,7 @@ public class LineFollowingState implements State {
 	protected PIDController pid;
 	private MotorIntensityFunction mif;
 
-	public LineFollowingState(Parameters param, Robot robot) {
+	public LineFollowingState(Robot robot) {
 		HierarchicalConfiguration config = ConfigurationManager.getGeneralConfiguration();
 
 		this.robot = robot;
@@ -34,7 +33,6 @@ public class LineFollowingState implements State {
 
 		// @formatter:off
 		this.strategy = new HorizontalLevelObservingStrategy(
-				param,
 				new BlurImageModifierModule(),
 				new UnivBooleanImageFilterModule(() -> ConfigurationManager.getGeneralConfiguration().getInt("params/bwTreshold")),
 				new BasicBorderFinderModule(2, 600, 3)

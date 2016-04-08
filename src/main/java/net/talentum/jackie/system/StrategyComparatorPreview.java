@@ -27,7 +27,6 @@ import net.talentum.jackie.module.impl.BottomLineStartFinderModule;
 import net.talentum.jackie.module.impl.BufferedImageMatConverterModule;
 import net.talentum.jackie.module.impl.UnivBooleanImageFilterModule;
 import net.talentum.jackie.module.impl.VectorDirectionManagerModule;
-import net.talentum.jackie.robot.Parameters;
 import net.talentum.jackie.robot.strategy.BallFinderStrategy;
 import net.talentum.jackie.robot.strategy.HorizontalLevelObservingStrategy;
 import net.talentum.jackie.robot.strategy.LineFollowingStrategy;
@@ -47,7 +46,6 @@ import net.talentum.jackie.ui.StrategyComparatorPanel;
  */
 public class StrategyComparatorPreview {
 
-	static Parameters param;
 	static ImageOutputSupplier[] imageOutputSuppliers;
 
 	static JFrame previewFrame;
@@ -65,8 +63,6 @@ public class StrategyComparatorPreview {
 
 		// load OpenCV library
 		Run.loadOpenCV();
-
-		param = new Parameters();
 
 		createImageOutputs();
 
@@ -100,7 +96,6 @@ public class StrategyComparatorPreview {
 			}
 		}));
 		list.add(p -> new RobotStrategyIROutput("*LineFollowing", new LineFollowingStrategy(
-				param,
 				new BlurImageModifierModule(),
 				new UnivBooleanImageFilterModule(100),
 				new BottomLineStartFinderModule(),
@@ -113,13 +108,11 @@ public class StrategyComparatorPreview {
 				)
 		)));
 		list.add(p -> new HorizontalLevelObservingStrategy.ImageOutput("*HorizontalLevelObserving (100)", new HorizontalLevelObservingStrategy(
-				param,
 				new BlurImageModifierModule(),
 				new UnivBooleanImageFilterModule(100),
 				new BasicBorderFinderModule(2, 600, 3)
 		)));
 		list.add(p -> new HorizontalLevelObservingStrategy.ImageOutput(String.format("*HorizontalLevelObserving (%s)", p), new HorizontalLevelObservingStrategy(
-				param,
 				new BlurImageModifierModule(),
 				new UnivBooleanImageFilterModule(MathTools.parseDefault(p, 100)),
 				new BasicBorderFinderModule(2, 600, 3)
