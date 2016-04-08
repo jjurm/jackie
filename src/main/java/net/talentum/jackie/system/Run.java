@@ -10,10 +10,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.SerialCommunicator;
 import net.talentum.jackie.image.LocalWebcamImageSupplier;
+import net.talentum.jackie.module.impl.BufferedImageMatConverterModule;
 import net.talentum.jackie.tools.MathTools;
 import net.talentum.jackie.tools.TimeTools;
 
 import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.videoio.VideoCapture;
 
 import com.github.sarxos.webcam.Webcam;
 
@@ -102,6 +105,30 @@ public class Run {
 			TimeTools.sleep(700);
 		}
 
+	}
+	
+	public static void openCVWebcamTest(String[] args) {
+		if(args.length > 0){
+			System.out.println("openCVWebcamTest needs an argument.");
+			return;
+		}
+		VideoCapture videoCapture = new VideoCapture(Integer.parseInt(args[0]));
+		System.out.println("Creater videoCapture, loaded webcam" + args[0]);		
+		
+		 if(!videoCapture.open(0)) {
+			 System.out.println("Cannot open videoCapture.");
+			 return;
+		 }
+		 System.out.println("Successfully opened videoCapture.");
+		 System.out.println("Trying to read an image.");
+		 
+		 Mat image = new Mat();
+		 videoCapture.read(image);
+		 System.out.println("Image read.");
+		 if(image != null) {
+			 System.out.println("Image not null. Everything may run correctly.");
+		 }
+		 
 	}
 
 	public static void testWebcam(String[] args) {
