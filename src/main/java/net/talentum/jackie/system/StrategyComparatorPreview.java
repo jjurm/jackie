@@ -24,9 +24,11 @@ import net.talentum.jackie.module.impl.BasicBorderFinderModule;
 import net.talentum.jackie.module.impl.BasicLineFinderModule;
 import net.talentum.jackie.module.impl.BlurImageModifierModule;
 import net.talentum.jackie.module.impl.BottomLineStartFinderModule;
+import net.talentum.jackie.module.impl.BufferedImageMatConverterModule;
 import net.talentum.jackie.module.impl.UnivBooleanImageFilterModule;
 import net.talentum.jackie.module.impl.VectorDirectionManagerModule;
 import net.talentum.jackie.robot.Parameters;
+import net.talentum.jackie.robot.strategy.BallFinderStrategy;
 import net.talentum.jackie.robot.strategy.HorizontalLevelObservingStrategy;
 import net.talentum.jackie.robot.strategy.LineFollowingStrategy;
 import net.talentum.jackie.tools.MathTools;
@@ -60,6 +62,9 @@ public class StrategyComparatorPreview {
 	public static void run(String[] args) {
 		// initialize configuration manager
 		ConfigurationManager.init();
+
+		// load OpenCV library
+		Run.loadOpenCV();
 
 		param = new Parameters();
 
@@ -119,6 +124,7 @@ public class StrategyComparatorPreview {
 				new UnivBooleanImageFilterModule(MathTools.parseDefault(p, 100)),
 				new BasicBorderFinderModule(2, 600, 3)
 		)));
+		list.add(p -> new BallFinderStrategy.ImageOutput("*BallFinding", new BufferedImageMatConverterModule()));
 		// @formatter:on
 
 		imageOutputSuppliers = list.toArray(new ImageOutputSupplier[0]);
