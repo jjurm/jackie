@@ -14,11 +14,11 @@ public class ObstacleAvoidanceState implements State {
 	@Override
 	public void run() {
 
-		robot.writeMotors(100, 100);
+		robot.commander.writePropulsionMotors(100, 100);
 
 		TimeTools.sleep(5000);
 		
-		robot.writeMotors(90, 110);
+		robot.commander.writePropulsionMotors(90, 110);
 		
 		robot.setState(new NullState());
 		

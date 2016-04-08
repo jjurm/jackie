@@ -66,13 +66,12 @@ import com.pi4j.io.i2c.I2CFactory;
  * <td>Write value for multiple motors</td>
  * <td>motor group index
  * <ul>
- * <li>0 - propulsion motors</li>
+ * <li>0 - propulsion motors (left, right)</li>
  * </ul>
  * </td>
  * <td>
  * <li>motor A value</li>
- * <li>motor B value</li>
- * </td>
+ * <li>motor B value</li></td>
  * <td></td>
  * </tr>
  * 
@@ -116,18 +115,14 @@ import com.pi4j.io.i2c.I2CFactory;
  */
 public class I2CCommunicator {
 
-	/**
-	 * Number of least significant bits that divide the first byte into
-	 * <i>command</i> part and <i>subcommand</i> part.
-	 * 
-	 * @see I2CCommunicator
-	 */
-	static final int S = 3;
-
 	protected I2CBus bus;
 
-	public Device arduino;
+	public Device deviceA;
+	public Device deviceB;
+	public Device deviceC;
 	public Device mpu6050;
+
+	public Device[] devices;
 
 	public I2CCommunicator() {
 		try {
@@ -136,8 +131,12 @@ public class I2CCommunicator {
 			bus = I2CFactory.getInstance(I2CBus.BUS_1);
 
 			// create predefined devices
-			arduino = new Device(bus.getDevice(0x04));
+			deviceA = new Device(bus.getDevice(0x04));
+			deviceB = new Device(bus.getDevice(0x05));
+			deviceC = new Device(bus.getDevice(0x06));
 			mpu6050 = new Device(bus.getDevice(0x68));
+
+			devices = new Device[] { deviceA, deviceB, deviceC };
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -152,12 +151,6 @@ public class I2CCommunicator {
 	 */
 	public I2CDevice getDevice(int address) throws IOException {
 		return bus.getDevice(address);
-	}
-
-	// ===== command methods =====
-
-	public int cTest(Device device, int number) {
-		return device.transfer(1, new byte[] { 1 << S, (byte) number })[0];
 	}
 
 }

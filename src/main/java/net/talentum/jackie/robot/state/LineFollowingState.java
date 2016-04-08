@@ -102,7 +102,7 @@ public class LineFollowingState implements State {
 		ImmutablePair<Integer, Integer> motors = mif.getMotors(heading);
 
 		// finally write motors
-		robot.writeMotors(motors.left, motors.right);
+		robot.commander.writePropulsionMotors(motors.left, motors.right);
 
 	}
 

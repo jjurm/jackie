@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.talentum.jackie.comm.Commander;
 import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.SerialCommunicator;
 import net.talentum.jackie.image.LocalWebcamImageSupplier;
@@ -97,10 +98,11 @@ public class Run {
 	public static void testI2C() {
 
 		I2CCommunicator i2c = new I2CCommunicator();
+		Commander comm = new Commander(i2c);
 
 		while (true) {
 			int n = MathTools.randomRange(0, 255);
-			int res = i2c.cTest(i2c.arduino, n);
+			int res = comm.testI2C(comm.i2c.deviceA, n);
 			System.out.println(String.format("sent: %d, received: %d", n, res));
 			TimeTools.sleep(700);
 		}

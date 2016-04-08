@@ -4,7 +4,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.talentum.jackie.comm.Commander;
+import net.talentum.jackie.comm.ConsoleReader;
+import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.ImageServer;
+import net.talentum.jackie.comm.TextInputProcessor;
 import net.talentum.jackie.image.ImageSupplier;
 import net.talentum.jackie.image.ServerImageSupplier;
 import net.talentum.jackie.robot.Robot;
@@ -22,6 +26,12 @@ import net.talentum.jackie.robot.state.State;
 public class Main {
 
 	private static ExecutorService executor = Executors.newCachedThreadPool();
+	
+	private static I2CCommunicator i2c;
+	private static Commander commander;
+	private static TextInputProcessor textInputProcessor;
+	private static ConsoleReader consoleReader;
+	
 	private static Robot robot;
 	private static ImageServer server;
 
@@ -37,8 +47,14 @@ public class Main {
 		Run.loadOpenCV();
 		
 		// create robot
+		System.out.println("Setting up control classes");
+		i2c = new I2CCommunicator();
+		commander = new Commander(i2c);
+		textInputProcessor = new TextInputProcessor(commander);
+		consoleReader = new ConsoleReader(textInputProcessor);
+		
 		System.out.println("Creating robot");
-		robot = new Robot();
+		robot = new Robot(commander);
 		ConfigurationManager.setReloadedListener(robot::configurationReloaded);
 
 		// create image supplier
@@ -55,6 +71,9 @@ public class Main {
 		server = new ImageServer(imageSupplier);
 		server.start();
 		
+		// start ConsoleReader
+		consoleReader.start();
+
 		System.out.println("Running...");
 
 		// monitor running
@@ -76,6 +95,11 @@ public class Main {
 		// run robot's cycle infinitely
 		robot.runCycle();
 
+	}
+	
+	public static void shutdown() {
+		consoleReader.stop();
+		
 	}
 
 }

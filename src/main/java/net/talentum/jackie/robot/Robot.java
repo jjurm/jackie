@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.talentum.jackie.comm.SerialCommunicator;
+import net.talentum.jackie.comm.Commander;
 import net.talentum.jackie.image.ImageSupplier;
 import net.talentum.jackie.robot.state.LineFollowingState;
 import net.talentum.jackie.robot.state.State;
@@ -31,7 +32,10 @@ public class Robot {
 	 * @see #constructMoment()
 	 */
 	public Deque<Moment> moments = new LinkedList<Moment>();
-	public SerialCommunicator serial;
+	
+	public final Commander commander;
+	
+	protected AtomicBoolean run = new AtomicBoolean(true);
 
 	protected List<Runnable> configChangedListeners = new ArrayList<Runnable>();
 
@@ -41,9 +45,8 @@ public class Robot {
 	 */
 	private State state;
 
-	public Robot() {
-		// open serial communication
-		serial = new SerialCommunicator();
+	public Robot(Commander commander) {
+		this.commander = commander;
 
 		// create strategy
 		state = new LineFollowingState(this);
@@ -87,10 +90,16 @@ public class Robot {
 	 * Runs {@link #runOnce()} repeatedly in a {@code while(true)} loop.
 	 */
 	public void runCycle() {
-		while (true) {
+		while (run.get()) {
 			state.run();
 		}
-
+	}
+	
+	/**
+	 * Stops the main cycle (method {@link #runCycle()}).
+	 */
+	public void stop() {
+		run.set(false);
 	}
 
 	/**
@@ -124,18 +133,5 @@ public class Robot {
 		System.out.println("State changed to " + state.getClass().getName());
 		this.state = state;
 	}
-
-	/**
-	 * Writes speed values to main propulsion motors.
-	 * 
-	 * @param left
-	 *            left motor
-	 * @param right
-	 *            right motor
-	 */
-	public void writeMotors(int left, int right) {
-		System.out.println(String.format("Writing angles (left=%d, right=%d)", left, right));
-		serial.write(1, left, right);
-	}
-
+	
 }
