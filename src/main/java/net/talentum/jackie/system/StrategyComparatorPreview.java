@@ -61,9 +61,8 @@ public class StrategyComparatorPreview {
 		// initialize configuration manager
 		ConfigurationManager.init();
 
-		// load OpenCV library
 		Run.loadOpenCV();
-
+		
 		createImageOutputs();
 
 		EventQueue.invokeLater(() -> {

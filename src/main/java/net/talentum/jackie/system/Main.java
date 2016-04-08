@@ -34,6 +34,8 @@ public class Main {
 		// initialize configuration manager
 		ConfigurationManager.init();
 		
+		Run.loadOpenCV();
+		
 		// create robot
 		System.out.println("Creating robot");
 		robot = new Robot();

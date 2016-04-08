@@ -5,10 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import org.opencv.core.Core;
-
-import com.github.sarxos.webcam.Webcam;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.SerialCommunicator;
@@ -16,10 +13,15 @@ import net.talentum.jackie.image.LocalWebcamImageSupplier;
 import net.talentum.jackie.tools.MathTools;
 import net.talentum.jackie.tools.TimeTools;
 
+import org.opencv.core.Core;
+
+import com.github.sarxos.webcam.Webcam;
+
 public class Run {
 
 	static ExecutorService executor = Executors.newSingleThreadExecutor();
-
+	static AtomicBoolean loadedOpenCV = new AtomicBoolean(false);
+	
 	public static void main(String[] args) {
 
 		run(args);
@@ -27,7 +29,13 @@ public class Run {
 	}
 
 	public static void loadOpenCV() {
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		if(!loadedOpenCV.getAndSet(true))
+			try {
+				System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+				
+			} catch(UnsatisfiedLinkError e) {
+				System.out.println("OpenCV not available.");
+			}
 	}
 
 	public static void run(String[] args) {
