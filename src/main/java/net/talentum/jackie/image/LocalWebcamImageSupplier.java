@@ -38,4 +38,12 @@ public class LocalWebcamImageSupplier implements ImageSupplier {
 		return webcam.getImage();
 	}
 
+	static class LocalWebcamImageSupplierProvider implements ImageSupplierProvider{
+
+		@Override
+		public ImageSupplier provide(String param) {
+			return new LocalWebcamImageSupplier();
+		}
+		
+	}
 }

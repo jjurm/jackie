@@ -41,5 +41,16 @@ public class OpenCVImageSupplier implements ImageSupplier {
 		 
 		 return(bimc.toBufferedImage(image));
 	}
+	
+	static class OpenCVImageSupplierProvider implements ImageSupplierProvider{
+
+		@Override
+		public ImageSupplier provide(String param) {
+			VideoCapture videoCapture = new VideoCapture(Integer.parseInt(param));
+			
+			return new OpenCVImageSupplier(videoCapture, new BufferedImageMatConverterModule());
+		}
+		
+	}
 
 }
