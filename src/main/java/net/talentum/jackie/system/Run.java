@@ -140,9 +140,9 @@ public class Run {
 				int size = Integer.parseInt(parts[0]);
 				parts = Arrays.copyOfRange(parts, 1, parts.length);
 				
-				byte[] command = ArrayUtils.toPrimitive(
-						Arrays.stream(parts).map(p -> (byte) Integer.parseInt(p)).toArray(s -> new Byte[s]));
-
+				Byte[] bs = Arrays.stream(parts).map(p -> (byte) Integer.parseInt(p)).toArray(s -> new Byte[s]);
+				byte[] command = ArrayUtils.toPrimitive(bs);
+				
 				int[] res = device.transfer(size, command);
 				String[] r = new String[res.length];
 				for (int i = 0; i < res.length; i++) {
