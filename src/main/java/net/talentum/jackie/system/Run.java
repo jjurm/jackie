@@ -16,12 +16,12 @@ import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 
 import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
 
 import net.talentum.jackie.comm.Commander;
 import net.talentum.jackie.comm.Device;
 import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.SerialCommunicator;
-import net.talentum.jackie.image.LocalWebcamImageSupplier;
 import net.talentum.jackie.tools.MathTools;
 import net.talentum.jackie.tools.TimeTools;
 
@@ -69,7 +69,7 @@ public class Run {
 			case "i2cm":
 				I2CCommunicator i2c = new I2CCommunicator();
 				Commander comm = new Commander(i2c);
-				switch(task.charAt(3)) {
+				switch (task.charAt(3)) {
 				case 'a':
 					testI2CDevice(comm.i2c.deviceA);
 					break;
@@ -139,10 +139,10 @@ public class Run {
 				String[] parts = br.readLine().split(" ");
 				int size = Integer.parseInt(parts[0]);
 				parts = Arrays.copyOfRange(parts, 1, parts.length);
-				
+
 				Byte[] bs = Arrays.stream(parts).map(p -> (byte) Integer.parseInt(p)).toArray(s -> new Byte[s]);
 				byte[] command = ArrayUtils.toPrimitive(bs);
-				
+
 				int[] res = device.transfer(size, command);
 				String[] r = new String[res.length];
 				for (int i = 0; i < res.length; i++) {
@@ -164,10 +164,10 @@ public class Run {
 			System.out.println("openCVWebcamTest needs an argument.");
 			return;
 		}
-		
+
 		System.out.println("Loading OpenCV native library");
 		loadOpenCV();
-		
+
 		System.out.println("Creating VideoCapture");
 		VideoCapture videoCapture = new VideoCapture(Integer.parseInt(args[0]));
 		System.out.println("Created VideoCapture, loaded webcam " + args[0]);
@@ -192,9 +192,13 @@ public class Run {
 
 		System.out.println("Testing connected webcams");
 
-		if (args.length > 0 && args[0].equalsIgnoreCase("1")) {
-			System.out.println("Setting V4l4j driver");
-			LocalWebcamImageSupplier.setV4l4jDriver();
+		if (args.length > 0) {
+			switch (args[0]) {
+			case "1":
+				System.out.println("Setting V4l4j driver");
+				Webcam.setDriver(new V4l4jDriver());
+				break;
+			}
 		}
 
 		System.out.println("Trying to establish a connection with the webcam library...");

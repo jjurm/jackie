@@ -12,6 +12,7 @@ import net.talentum.jackie.image.ImageSupplier;
 import net.talentum.jackie.robot.state.LineFollowingState;
 import net.talentum.jackie.robot.state.State;
 import net.talentum.jackie.system.Config;
+import net.talentum.jackie.system.Main;
 
 /**
  * One instance of this class represents one robot (there should naturally be at
@@ -55,6 +56,15 @@ public class Robot {
 	public void setImageSupplier(ImageSupplier imageSupplier) {
 		this.imageSupplier = imageSupplier;
 	}
+	
+	/**
+	 * Returns image got from {@link ImageSupplier}.
+	 * 
+	 * @return
+	 */
+	public BufferedImage getImage() {
+		return imageSupplier.getImage();
+	}
 
 	/**
 	 * Constructs {@link Moment}, which involves taking an image from webcam
@@ -92,6 +102,7 @@ public class Robot {
 	public void runCycle() {
 		while (run.get()) {
 			state.run();
+			Main.runs.getAndIncrement();
 		}
 	}
 	

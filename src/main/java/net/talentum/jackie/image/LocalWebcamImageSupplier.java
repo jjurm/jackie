@@ -19,6 +19,7 @@ public class LocalWebcamImageSupplier implements ImageSupplier {
 	private Webcam webcam;
 
 	public LocalWebcamImageSupplier() {
+		Webcam.setDriver(new V4l4jDriver());
 
 		try {
 			webcam = Webcam.getDefault(5, TimeUnit.SECONDS);
@@ -33,27 +34,22 @@ public class LocalWebcamImageSupplier implements ImageSupplier {
 		this.webcam = webcam;
 		webcam.open();
 	}
-	
-	public static void setV4l4jDriver() {
-		// set Webcam driver
-		Webcam.setDriver(new V4l4jDriver());
-	}
-	
+
 	@Override
 	public BufferedImage getImage() {
 		return webcam.getImage();
 	}
-	
+
 	public void setViewSize(Dimension d) {
 		webcam.setViewSize(d);
 	}
-	
+
 	@Override
 	public void close() {
 		webcam.close();
 	}
 
-	public static class Provider extends ImageSupplierProvider{
+	public static class Provider extends ImageSupplierProvider {
 
 		public Provider(String name) {
 			super(name);
@@ -63,6 +59,6 @@ public class LocalWebcamImageSupplier implements ImageSupplier {
 		public ImageSupplier provide(String param) {
 			return new LocalWebcamImageSupplier();
 		}
-		
+
 	}
 }

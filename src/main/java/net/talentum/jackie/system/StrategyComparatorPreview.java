@@ -23,6 +23,7 @@ import net.talentum.jackie.image.OpenCVImageSupplier;
 import net.talentum.jackie.image.RobotStrategyIROutput;
 import net.talentum.jackie.image.ServerImageSupplier;
 import net.talentum.jackie.image.SourceImageOutput;
+import net.talentum.jackie.image.SubtractingImageBallFinder;
 import net.talentum.jackie.module.impl.AveragingTrailWidthDeterminerModule;
 import net.talentum.jackie.module.impl.BasicAngularTurnHandlerModule;
 import net.talentum.jackie.module.impl.BasicBorderFinderModule;
@@ -144,6 +145,7 @@ public class StrategyComparatorPreview {
 				new BasicBorderFinderModule(2, 600, 3)
 		)));
 		list.add(p -> new BallFinderStrategy.ImageOutput("*BallFinding", new BufferedImageMatConverterModule()));
+		list.add(p -> new SubtractingImageBallFinder("*SubtractingImageBallFinder"));
 		// @formatter:on
 
 		imageOutputSuppliers = list.toArray(new ImageOutputSupplier[0]);

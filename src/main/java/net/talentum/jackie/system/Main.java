@@ -10,7 +10,7 @@ import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.ImageServer;
 import net.talentum.jackie.comm.TextInputProcessor;
 import net.talentum.jackie.image.ImageSupplier;
-import net.talentum.jackie.image.ServerImageSupplier;
+import net.talentum.jackie.image.LocalWebcamImageSupplier;
 import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.state.State;
 
@@ -41,6 +41,8 @@ public class Main {
 	public static AtomicInteger runs = new AtomicInteger(0);
 
 	public static void run(String[] args) {
+		registerShutdownHook();
+		
 		// initialize configuration manager
 		ConfigurationManager.init();
 		
@@ -58,13 +60,16 @@ public class Main {
 		ConfigurationManager.setReloadedListener(robot::configurationReloaded);
 
 		// create image supplier
-		if (args.length < 1) {
+		ImageSupplier imageSupplier;
+		
+		/*if (args.length < 1) {
 			System.out.println("You must supply server name");
 			return;
 		}
-		ImageSupplier imageSupplier = new ServerImageSupplier(args[0]);
+		imageSupplier = new ServerImageSupplier(args[0]);*/
+		imageSupplier = new LocalWebcamImageSupplier();
+		
 		robot.setImageSupplier(imageSupplier);
-		// robot.setWebcamImageSupplier(new LocalWebcamImageSupplier());
 		
 		// start webcam server
 		System.out.println("Starting webcam server");
@@ -97,8 +102,18 @@ public class Main {
 
 	}
 	
+	private static void registerShutdownHook() {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				shutdown();
+			}
+		});
+	}
+	
 	public static void shutdown() {
 		consoleReader.stop();
+		robot.stop();
 		
 	}
 
