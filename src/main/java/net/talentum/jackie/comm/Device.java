@@ -76,7 +76,7 @@ public class Device {
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			// ignore error writing to device
 			return null;
 		}
 	}

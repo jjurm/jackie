@@ -1,6 +1,7 @@
 package net.talentum.jackie.comm;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
@@ -27,6 +28,7 @@ import com.pi4j.io.i2c.I2CFactory;
  * <th>Arguments</th>
  * <th>Result</th>
  * </tr>
+ * 
  * <tr>
  * <th>1</th>
  * <td>Test command</td>
@@ -34,6 +36,14 @@ import com.pi4j.io.i2c.I2CFactory;
  * <td>
  * <li>number to send</li></td>
  * <td>one byte, returning the same number that was sent</td>
+ * </tr>
+ * 
+ * <tr>
+ * <th>2</th>
+ * <td>Start / stop</td>
+ * <td>{@code 1 =} start, {@code 0 =} stop</td>
+ * <td></td>
+ * <td></td>
  * </tr>
  * 
  * <tr>
@@ -140,6 +150,17 @@ public class I2CCommunicator {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Runs the command on each device.
+	 * 
+	 * @param c
+	 */
+	public void each(Consumer<Device> c) {
+		for (Device device : devices) {
+			c.accept(device);
 		}
 	}
 

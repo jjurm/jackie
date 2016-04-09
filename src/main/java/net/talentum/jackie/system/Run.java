@@ -7,19 +7,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.talentum.jackie.comm.Commander;
-import net.talentum.jackie.comm.I2CCommunicator;
-import net.talentum.jackie.comm.SerialCommunicator;
-import net.talentum.jackie.image.LocalWebcamImageSupplier;
-import net.talentum.jackie.module.impl.BufferedImageMatConverterModule;
-import net.talentum.jackie.tools.MathTools;
-import net.talentum.jackie.tools.TimeTools;
-
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 
 import com.github.sarxos.webcam.Webcam;
+
+import net.talentum.jackie.comm.Commander;
+import net.talentum.jackie.comm.I2CCommunicator;
+import net.talentum.jackie.comm.SerialCommunicator;
+import net.talentum.jackie.image.LocalWebcamImageSupplier;
+import net.talentum.jackie.tools.MathTools;
+import net.talentum.jackie.tools.TimeTools;
 
 public class Run {
 
@@ -63,6 +62,9 @@ public class Run {
 				break;
 			case "webcam":
 				testWebcam(args2);
+				break;
+			case "opencv":
+				openCVWebcamTest(args2);
 				break;
 			default:
 				if (!"".equals(task)) {
@@ -110,7 +112,7 @@ public class Run {
 	}
 	
 	public static void openCVWebcamTest(String[] args) {
-		if(args.length > 0){
+		if(args.length == 0){
 			System.out.println("openCVWebcamTest needs an argument.");
 			return;
 		}
