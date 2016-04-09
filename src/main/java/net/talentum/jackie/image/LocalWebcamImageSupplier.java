@@ -1,5 +1,6 @@
 package net.talentum.jackie.image;
 
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -28,6 +29,11 @@ public class LocalWebcamImageSupplier implements ImageSupplier {
 		webcam.open();
 	}
 
+	public LocalWebcamImageSupplier(Webcam webcam) {
+		this.webcam = webcam;
+		webcam.open();
+	}
+	
 	public static void setV4l4jDriver() {
 		// set Webcam driver
 		Webcam.setDriver(new V4l4jDriver());
@@ -37,8 +43,21 @@ public class LocalWebcamImageSupplier implements ImageSupplier {
 	public BufferedImage getImage() {
 		return webcam.getImage();
 	}
+	
+	public void setViewSize(Dimension d) {
+		webcam.setViewSize(d);
+	}
+	
+	@Override
+	public void close() {
+		webcam.close();
+	}
 
-	static class LocalWebcamImageSupplierProvider implements ImageSupplierProvider{
+	public static class Provider extends ImageSupplierProvider{
+
+		public Provider(String name) {
+			super(name);
+		}
 
 		@Override
 		public ImageSupplier provide(String param) {

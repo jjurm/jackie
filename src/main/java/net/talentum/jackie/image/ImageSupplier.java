@@ -17,4 +17,6 @@ public interface ImageSupplier {
 	 */
 	public BufferedImage getImage();
 
+	public void close();
+
 }

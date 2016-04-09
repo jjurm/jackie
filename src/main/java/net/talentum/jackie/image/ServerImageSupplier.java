@@ -34,9 +34,18 @@ public class ServerImageSupplier implements ImageSupplier {
 		}
 		return null;
 	}
-	
-	static class ServerImageSupplierProvider implements ImageSupplierProvider{
+
+	@Override
+	public void close() {
 		
+	}
+
+	public static class Provider extends ImageSupplierProvider{
+		
+		public Provider(String name) {
+			super(name);
+		}
+
 		@Override
 		public ImageSupplier provide(String param) {
 			return new ServerImageSupplier(param);

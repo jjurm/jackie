@@ -16,7 +16,12 @@ import net.talentum.jackie.image.BlurredBooleanImageOutput;
 import net.talentum.jackie.image.BooleanImageOutput;
 import net.talentum.jackie.image.ImageOutput;
 import net.talentum.jackie.image.ImageOutputSupplier;
+import net.talentum.jackie.image.ImageSupplier;
+import net.talentum.jackie.image.ImageSupplierProvider;
+import net.talentum.jackie.image.LocalWebcamImageSupplier;
+import net.talentum.jackie.image.OpenCVImageSupplier;
 import net.talentum.jackie.image.RobotStrategyIROutput;
+import net.talentum.jackie.image.ServerImageSupplier;
 import net.talentum.jackie.image.SourceImageOutput;
 import net.talentum.jackie.module.impl.AveragingTrailWidthDeterminerModule;
 import net.talentum.jackie.module.impl.BasicAngularTurnHandlerModule;
@@ -33,6 +38,8 @@ import net.talentum.jackie.robot.strategy.LineFollowingStrategy;
 import net.talentum.jackie.tools.MathTools;
 import net.talentum.jackie.ui.StrategyComparatorPanel;
 
+import com.github.sarxos.webcam.Webcam;
+
 /**
  * Runnable class.
  * 
@@ -47,6 +54,7 @@ import net.talentum.jackie.ui.StrategyComparatorPanel;
 public class StrategyComparatorPreview {
 
 	static ImageOutputSupplier[] imageOutputSuppliers;
+	static ImageSupplierProvider[] imageSupplierProviders;
 
 	static JFrame previewFrame;
 	static StrategyComparatorPanel strategyComparatorPanel;
@@ -64,10 +72,29 @@ public class StrategyComparatorPreview {
 		Run.loadOpenCV();
 		
 		createImageOutputs();
+		
+		createImageSupplierProviders();
 
 		EventQueue.invokeLater(() -> {
 			createFrame();
 		});
+	}
+
+	private static void createImageSupplierProviders() {
+		List<ImageSupplierProvider> list = new ArrayList<ImageSupplierProvider>();
+		List<Webcam> webcams = Webcam.getWebcams();
+		for (Webcam w : webcams) {
+			list.add(new ImageSupplierProvider(w.getName()) {
+				@Override
+				public ImageSupplier provide(String param) {
+					return new LocalWebcamImageSupplier(w);
+				}
+			});
+		}
+		list.add(new OpenCVImageSupplier.Provider("OpenCV"));
+		list.add(new ServerImageSupplier.Provider("Server"));
+		
+		imageSupplierProviders = list.toArray(new ImageSupplierProvider[0]);
 	}
 
 	/**
@@ -141,7 +168,7 @@ public class StrategyComparatorPreview {
 			}
 		});
 
-		strategyComparatorPanel = new StrategyComparatorPanel(imageOutputSuppliers);
+		strategyComparatorPanel = new StrategyComparatorPanel(imageOutputSuppliers, imageSupplierProviders);
 		previewFrame.setContentPane(strategyComparatorPanel);
 
 		previewFrame.setVisible(true);

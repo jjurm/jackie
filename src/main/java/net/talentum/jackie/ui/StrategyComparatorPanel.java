@@ -9,7 +9,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,13 +31,13 @@ import javax.swing.event.InternalFrameEvent;
 import net.talentum.jackie.comm.ImageServer;
 import net.talentum.jackie.image.ImageOutput;
 import net.talentum.jackie.image.ImageOutputSupplier;
+import net.talentum.jackie.image.ImageSupplier;
+import net.talentum.jackie.image.ImageSupplierProvider;
+import net.talentum.jackie.image.LocalWebcamImageSupplier;
 import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.SensorData;
 import net.talentum.jackie.system.StrategyComparatorPreview;
 import net.talentum.jackie.tools.AtomicTools;
-
-import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamPicker;
 
 /**
  * An implementation of {@link JPanel} that is put into the frame created by
@@ -62,6 +61,11 @@ public class StrategyComparatorPanel extends JPanel {
 	private ImageOutputSupplier[] imageOutputSuppliers;
 
 	/**
+	 * list of {@link ImageOutput}s to offer
+	 */
+	private ImageSupplierProvider[] imageSupplierProviders;
+
+	/**
 	 * List of opened {@link ImageOutputFrame}s
 	 */
 	private CopyOnWriteArrayList<ImageOutputFrame> imageOutputFrames = new CopyOnWriteArrayList<ImageOutputFrame>();
@@ -70,11 +74,6 @@ public class StrategyComparatorPanel extends JPanel {
 	 * Number of opened {@link ImageOutputFrame}s
 	 */
 	static int openFrameCount = 0;
-
-	/**
-	 * Webcam that was last selected
-	 */
-	private Webcam lastWebcam;
 
 	/**
 	 * Whether webcam is opened
@@ -103,9 +102,7 @@ public class StrategyComparatorPanel extends JPanel {
 
 	// components
 	private JPanel menu1;
-	private WebcamPicker webcamSelection;
 	private JComboBox<DimensionComboBoxItem> viewSizeSelection;
-	private JButton btnOpenClose;
 	private JButton btnRunServer;
 	private JPanel menu2;
 	private JComboBox<ImageOutputSupplier.ComboBoxItem> imageOutputSelection;
@@ -121,25 +118,34 @@ public class StrategyComparatorPanel extends JPanel {
 	private JComboBox<Double> scaleSelection;
 	private JDesktopPane desktopPane;
 	private JTextField imageOutputParameter;
+	private JComboBox<ImageSupplierProvider> imageSupplierProviderSelection;
+	private JButton btnOpenClose;
+	private JTextField txtProviderParameter;
 
-	public StrategyComparatorPanel(ImageOutputSupplier[] imageOutputSuppliers) {
+	private ImageSupplier imageSupplier;
+
+	public StrategyComparatorPanel(ImageOutputSupplier[] imageOutputSuppliers, ImageSupplierProvider[] imageSupplierProviders) {
 		this.imageOutputSuppliers = imageOutputSuppliers;
-		this.imageServer = new ImageServer(() -> {
-			if (!webcamOpen.get()) return null;
-			return webcamSelection.getSelectedWebcam().getImage();
+		this.imageSupplierProviders = imageSupplierProviders;
+		this.imageServer = new ImageServer(new ImageSupplier() {
+			@Override
+			public BufferedImage getImage() {
+				if (!webcamOpen.get()) return null;
+				return imageSupplier.getImage();
+			}
+			@Override
+			public void close() {
+			}
 		});
 	
 		setLayout(new BorderLayout(0, 0));
 		createComponents();
-		webcamChanged();
 	}
 
 	/**
 	 * Constructs GUI components inside the panel
 	 */
 	private void createComponents() {
-		List<Webcam> webcams = Webcam.getWebcams();
-
 		JPanel menuPanel = new JPanel();
 		add(menuPanel, BorderLayout.NORTH);
 		menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
@@ -149,32 +155,42 @@ public class StrategyComparatorPanel extends JPanel {
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		menuPanel.add(menu1);
 
-		webcamSelection = new WebcamPicker(webcams);
-		webcamSelection.setSelectedIndex(webcams.size() - 1);
-		webcamSelection.setPreferredSize(new Dimension(160, 20));
-		webcamSelection.addActionListener(e -> webcamChanged());
-		menu1.add(webcamSelection);
-
+		imageSupplierProviderSelection = new JComboBox<ImageSupplierProvider>();
+		imageSupplierProviderSelection.setPreferredSize(new Dimension(200, 20));
+		imageSupplierProviderSelection.setModel(new DefaultComboBoxModel<ImageSupplierProvider>(imageSupplierProviders));
+		imageSupplierProviderSelection.setMaximumRowCount(20);
+		menu1.add(imageSupplierProviderSelection);
+		
 		viewSizeSelection = new JComboBox<DimensionComboBoxItem>();
 		viewSizeSelection.setPreferredSize(new Dimension(80, 20));
+		viewSizeSelection.setModel(new DefaultComboBoxModel<DimensionComboBoxItem>(Arrays
+				.stream(new Dimension[]{
+						new Dimension(176, 144),
+						new Dimension(320, 240),
+						new Dimension(640, 480)
+						}).map((Dimension dimension) -> new DimensionComboBoxItem(dimension))
+				.toArray(size -> new DimensionComboBoxItem[size])));
+		viewSizeSelection.setSelectedIndex(2);
 		viewSizeSelection.addActionListener(e -> viewSizeChanged());
 		menu1.add(viewSizeSelection);
-
+		
+		txtProviderParameter = new JTextField();
+		txtProviderParameter.setColumns(10);
+		menu1.add(txtProviderParameter);
+	
 		btnOpenClose = new JButton("Open");
 		btnOpenClose.addActionListener(e -> {
 			btnOpenClose.setEnabled(false);
 			if (!AtomicTools.getAndNegate(webcamOpen)) {
 				// camera closed
-				setEnabledFor(false, webcamSelection, viewSizeSelection);
+				setEnabledFor(false, imageSupplierProviderSelection, viewSizeSelection);
 
 				executor.submit(() -> {
 					// open webcam
-					final boolean opened = webcamSelection.getSelectedWebcam().open();
-
+					imageSupplier = ((ImageSupplierProvider)imageSupplierProviderSelection.getSelectedItem()).provide(txtProviderParameter.getText());
 					// enqueue GUI changes
 					EventQueue.invokeLater(() -> {
-						if (opened)
-							btnOpenClose.setText("Close");
+						btnOpenClose.setText("Close");
 						btnOpenClose.setEnabled(true);
 					});
 				});
@@ -185,15 +201,16 @@ public class StrategyComparatorPanel extends JPanel {
 
 				executor.submit(() -> {
 					// close webcam
-					webcamSelection.getSelectedWebcam().close();
+					imageSupplier.close();
 
 					// enqueue GUI changes
 					EventQueue.invokeLater(() -> {
 						btnOpenClose.setText("Open");
-						setEnabledFor(true, webcamSelection, viewSizeSelection, btnOpenClose);
+						setEnabledFor(true, imageSupplierProviderSelection, viewSizeSelection, btnOpenClose);
 					});
 				});
 			}
+
 		});
 		menu1.add(btnOpenClose);
 
@@ -238,8 +255,7 @@ public class StrategyComparatorPanel extends JPanel {
 		imageOutputSelection = new JComboBox<ImageOutputSupplier.ComboBoxItem>();
 		imageOutputSelection.setPreferredSize(new Dimension(200, 20));
 		imageOutputSelection.setModel(new DefaultComboBoxModel<ImageOutputSupplier.ComboBoxItem>(
-				Arrays.stream(imageOutputSuppliers).map(s -> new ImageOutputSupplier.ComboBoxItem(s)).toArray(s -> new ImageOutputSupplier.ComboBoxItem[s])
-		));
+				Arrays.stream(imageOutputSuppliers).map(s -> new ImageOutputSupplier.ComboBoxItem(s)).toArray(s -> new ImageOutputSupplier.ComboBoxItem[s])));
 		imageOutputSelection.setMaximumRowCount(20);
 		menu2.add(imageOutputSelection);
 
@@ -263,8 +279,8 @@ public class StrategyComparatorPanel extends JPanel {
 			desktopPane.revalidate();
 			desktopPane.repaint();
 		});
-		menu2.add(btnAddOutput);
-
+		menu2.add(btnAddOutput);	
+		
 		horizontalStrut = Box.createHorizontalStrut(20);
 		menu2.add(horizontalStrut);
 
@@ -321,23 +337,6 @@ public class StrategyComparatorPanel extends JPanel {
 	}
 
 	/**
-	 * Method run when the webcam selection has been changed
-	 */
-	private void webcamChanged() {
-		Webcam webcam = webcamSelection.getSelectedWebcam();
-
-		if (webcam != lastWebcam) {
-			lastWebcam = webcam;
-			viewSizeSelection.setModel(new DefaultComboBoxModel<DimensionComboBoxItem>(Arrays
-					.stream(webcam.getViewSizes()).map((Dimension dimension) -> new DimensionComboBoxItem(dimension))
-					.toArray(size -> new DimensionComboBoxItem[size])));
-			viewSizeSelection.setSelectedIndex(webcam.getViewSizes().length - 1);
-		}
-
-		viewSizeChanged();
-	}
-
-	/**
 	 * Returns currently selected view size
 	 * 
 	 * @return
@@ -372,7 +371,11 @@ public class StrategyComparatorPanel extends JPanel {
 	 */
 	private void viewSizeChanged() {
 		Dimension viewSize = getViewSize();
-		webcamSelection.getSelectedWebcam().setViewSize(viewSize);
+		
+		if (imageSupplier instanceof LocalWebcamImageSupplier) {
+			LocalWebcamImageSupplier local = (LocalWebcamImageSupplier) imageSupplier;
+			local.setViewSize(viewSize);
+		}
 
 		scaledViewSizeChanged();
 	}
@@ -400,8 +403,7 @@ public class StrategyComparatorPanel extends JPanel {
 		long t = System.currentTimeMillis();
 		try {
 			// construct Moment
-			Webcam webcam = webcamSelection.getSelectedWebcam();
-			BufferedImage image = webcam.getImage();
+			BufferedImage image = imageSupplier.getImage();
 			SensorData sensorData = SensorData.collect();
 			Moment moment = new Moment(image, sensorData);
 

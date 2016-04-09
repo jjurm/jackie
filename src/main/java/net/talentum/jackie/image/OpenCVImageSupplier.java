@@ -31,18 +31,22 @@ public class OpenCVImageSupplier implements ImageSupplier {
 	 */
 	@Override
 	public BufferedImage getImage() {
-		
-		 if(!videoCapture.open(0)) {
-			 return null;
-		 }
-		
 		 Mat image = new Mat();
 		 videoCapture.read(image);
 		 
 		 return(bimc.toBufferedImage(image));
 	}
 	
-	static class OpenCVImageSupplierProvider implements ImageSupplierProvider{
+	@Override
+	public void close() {
+		videoCapture.release();
+	}
+	
+	public static class Provider extends ImageSupplierProvider{
+
+		public Provider(String name) {
+			super(name);
+		}
 
 		@Override
 		public ImageSupplier provide(String param) {

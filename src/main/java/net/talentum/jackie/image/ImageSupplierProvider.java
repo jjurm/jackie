@@ -5,9 +5,19 @@ package net.talentum.jackie.image;
  * @author padr31
  *
  */
-public interface ImageSupplierProvider {
+public abstract class ImageSupplierProvider {
 
-	public ImageSupplier provide(String param);
-
+	private String name;
+	
+	public ImageSupplierProvider(String name) {
+		this.name = name;
+	}
+	
+	public String toString() {
+		return this.name;
+	}
+	
+	public abstract ImageSupplier provide(String param);
+	
 }
 
