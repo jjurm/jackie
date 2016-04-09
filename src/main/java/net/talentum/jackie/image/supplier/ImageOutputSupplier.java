@@ -1,4 +1,6 @@
-package net.talentum.jackie.image;
+package net.talentum.jackie.image.supplier;
+
+import net.talentum.jackie.image.output.ImageOutput;
 
 @FunctionalInterface
 public interface ImageOutputSupplier {

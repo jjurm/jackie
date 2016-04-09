@@ -20,7 +20,7 @@ public class BallFinderStrategy extends RobotStrategy {
 		return null;
 	}
 
-	public static class ImageOutput extends net.talentum.jackie.image.ImageOutput {
+	public static class ImageOutput extends net.talentum.jackie.image.output.ImageOutput {
 
 		private BufferedImageMatConverterModule bimcModule;
 
@@ -37,17 +37,21 @@ public class BallFinderStrategy extends RobotStrategy {
 			Mat thresholded = new Mat();
 			Mat thresholded2 = new Mat();
 			
-			Scalar hsv_min = new Scalar(0, 50, 50, 0);  
-		    Scalar hsv_max = new Scalar(6, 255, 255, 0);  
-		    Scalar hsv_min2 = new Scalar(175, 50, 50, 0);  
-		    Scalar hsv_max2 = new Scalar(179, 255, 255, 0); 
+			Scalar hsv_min = new Scalar(0, 0, 0, 0);  
+		    Scalar hsv_max = new Scalar(255, 50, 100, 0);  
+		    Scalar hsv_min2 = new Scalar(0, 120, 100, 0);  
+		    Scalar hsv_max2 = new Scalar(255, 255, 255, 0); 
 		     
 		    Core.inRange(frame, hsv_min, hsv_max, thresholded);           
 	        Core.inRange(frame, hsv_min2, hsv_max2, thresholded2);  
 	        Core.bitwise_or(thresholded, thresholded2, thresholded);
 	        
 			Mat canny = new Mat();
-			Imgproc.Canny(frame, canny, 100, 120);
+			Imgproc.Canny(frame, canny, 0, 200);
+			
+			
+			Mat grey = new Mat();
+			Imgproc.cvtColor(frame, grey, Imgproc.COLOR_RGB2GRAY);
 			
 			Mat circles = new Mat();
 	        Imgproc.HoughCircles(thresholded, circles, Imgproc.CV_HOUGH_GRADIENT, 2, thresholded.height()/4, 500, 50, 0, 0); 
@@ -64,7 +68,7 @@ public class BallFinderStrategy extends RobotStrategy {
              }  
            }
            	
-			return bimcModule.toBufferedImage(frame);
+			return bimcModule.toBufferedImage(thresholded);
 		}
 
 		@Override

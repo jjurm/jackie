@@ -1,4 +1,5 @@
-package net.talentum.jackie.image;
+package net.talentum.jackie.image.supplier;
+
 
 /**
  * 

@@ -1,4 +1,4 @@
-package net.talentum.jackie.image;
+package net.talentum.jackie.image.output;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

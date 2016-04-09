@@ -29,11 +29,11 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import net.talentum.jackie.comm.ImageServer;
-import net.talentum.jackie.image.ImageOutput;
-import net.talentum.jackie.image.ImageOutputSupplier;
-import net.talentum.jackie.image.ImageSupplier;
-import net.talentum.jackie.image.ImageSupplierProvider;
-import net.talentum.jackie.image.LocalWebcamImageSupplier;
+import net.talentum.jackie.image.output.ImageOutput;
+import net.talentum.jackie.image.supplier.ImageOutputSupplier;
+import net.talentum.jackie.image.supplier.ImageSupplier;
+import net.talentum.jackie.image.supplier.ImageSupplierProvider;
+import net.talentum.jackie.image.supplier.LocalWebcamImageSupplier;
 import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.SensorData;
 import net.talentum.jackie.system.StrategyComparatorPreview;

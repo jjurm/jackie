@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
+import net.talentum.jackie.image.output.ImageOutput;
 import net.talentum.jackie.module.impl.BlurImageModifierModule;
 import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.system.ConfigurationManager;

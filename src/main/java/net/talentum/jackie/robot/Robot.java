@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.talentum.jackie.comm.Commander;
-import net.talentum.jackie.image.ImageSupplier;
+import net.talentum.jackie.image.supplier.ImageSupplier;
 import net.talentum.jackie.robot.state.LineFollowingState;
 import net.talentum.jackie.robot.state.State;
 import net.talentum.jackie.system.Config;

@@ -9,8 +9,8 @@ import net.talentum.jackie.comm.ConsoleReader;
 import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.ImageServer;
 import net.talentum.jackie.comm.TextInputProcessor;
-import net.talentum.jackie.image.ImageSupplier;
-import net.talentum.jackie.image.LocalWebcamImageSupplier;
+import net.talentum.jackie.image.supplier.ImageSupplier;
+import net.talentum.jackie.image.supplier.LocalWebcamImageSupplier;
 import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.state.State;
 

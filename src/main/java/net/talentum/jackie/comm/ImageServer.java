@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.imageio.ImageIO;
 
-import net.talentum.jackie.image.ImageSupplier;
+import net.talentum.jackie.image.supplier.ImageSupplier;
 
 /**
  * Class providing network access to the given {@link ImageSupplier}. Method

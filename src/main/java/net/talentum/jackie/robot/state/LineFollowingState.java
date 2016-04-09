@@ -18,6 +18,11 @@ import net.talentum.jackie.robot.strategy.HorizontalLevelObservingStrategy;
 import net.talentum.jackie.robot.strategy.RobotStrategy;
 import net.talentum.jackie.system.ConfigurationManager;
 
+/**
+ * State intended for following black line, using the line {@link HorizontalLevelObservingStrategy}.
+ * @author padr31
+ *
+ */
 public class LineFollowingState implements State {
 
 	private RobotStrategy strategy;

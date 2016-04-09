@@ -115,7 +115,7 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 	 * 
 	 * @author JJurM
 	 */
-	public static class ImageOutput extends net.talentum.jackie.image.ImageOutput {
+	public static class ImageOutput extends net.talentum.jackie.image.output.ImageOutput {
 
 		HorizontalLevelObservingStrategy strategy;
 

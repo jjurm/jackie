@@ -1,4 +1,4 @@
-package net.talentum.jackie.image;
+package net.talentum.jackie.image.supplier;
 
 import java.awt.image.BufferedImage;
 import java.net.Socket;

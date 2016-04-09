@@ -6,7 +6,7 @@ import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 
-import net.talentum.jackie.image.ImageOutput;
+import net.talentum.jackie.image.output.ImageOutput;
 import net.talentum.jackie.module.ImageModifierModule;
 import net.talentum.jackie.robot.Moment;
 
