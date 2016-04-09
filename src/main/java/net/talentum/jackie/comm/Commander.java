@@ -164,4 +164,44 @@ public class Commander {
 		return pulse / 58.138;
 	}
 
+	/**
+	 * Reads acceleration data from MPU-6050. Returns array containing 3 values
+	 * - acceleration data of axes {@code x}, {@code y} and {@code z}.
+	 * 
+	 * @return array of length 3
+	 */
+	public int[] getAcceleration() {
+		int[] res = i2c.mpu6050.transfer(6, (byte) MPU6050.REGISTER_ACCEL);
+		int[] accel = new int[3];
+		accel[0] = res[0] << 8 | res[1]; // X
+		accel[1] = res[2] << 8 | res[3]; // Y
+		accel[2] = res[4] << 8 | res[5]; // Z
+		return accel;
+	}
+
+	/**
+	 * Reads gyroscope data from MPU-6050. Returns array containing 3 values -
+	 * gyro data of axes {@code x}, {@code y} and {@code z}.
+	 * 
+	 * @return
+	 */
+	public int[] getGyro() {
+		int[] res = i2c.mpu6050.transfer(14, (byte) MPU6050.REGISTER_GYRO);
+		int[] gyro = new int[3];
+		gyro[0] = res[0] << 8 | res[1]; // X
+		gyro[1] = res[2] << 8 | res[3]; // Y
+		gyro[2] = res[4] << 8 | res[5]; // Z
+		return gyro;
+	}
+
+	/**
+	 * Reads gyroscope data for Z-axis rotation.
+	 * 
+	 * @return
+	 */
+	public int getGyroZ() {
+		int[] res = i2c.mpu6050.transfer(14, (byte) MPU6050.REGISTER_GYRO_Z);
+		return res[0] << 8 | res[1];
+	}
+
 }

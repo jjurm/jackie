@@ -1,12 +1,16 @@
 package net.talentum.jackie.system;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
@@ -14,6 +18,7 @@ import org.opencv.videoio.VideoCapture;
 import com.github.sarxos.webcam.Webcam;
 
 import net.talentum.jackie.comm.Commander;
+import net.talentum.jackie.comm.Device;
 import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.SerialCommunicator;
 import net.talentum.jackie.image.LocalWebcamImageSupplier;
@@ -24,7 +29,7 @@ public class Run {
 
 	static ExecutorService executor = Executors.newSingleThreadExecutor();
 	static AtomicBoolean loadedOpenCV = new AtomicBoolean(false);
-	
+
 	public static void main(String[] args) {
 
 		run(args);
@@ -32,11 +37,11 @@ public class Run {
 	}
 
 	public static void loadOpenCV() {
-		if(!loadedOpenCV.getAndSet(true))
+		if (!loadedOpenCV.getAndSet(true))
 			try {
 				System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-				
-			} catch(UnsatisfiedLinkError e) {
+
+			} catch (UnsatisfiedLinkError e) {
 				System.out.println("OpenCV not available.");
 			}
 	}
@@ -59,6 +64,19 @@ public class Run {
 				break;
 			case "i2c":
 				testI2C();
+				break;
+			case "i2ca":
+			case "i2cm":
+				I2CCommunicator i2c = new I2CCommunicator();
+				Commander comm = new Commander(i2c);
+				switch(task.charAt(3)) {
+				case 'a':
+					testI2CDevice(comm.i2c.deviceA);
+					break;
+				case 'm':
+					testI2CDevice(comm.i2c.mpu6050);
+					break;
+				}
 				break;
 			case "webcam":
 				testWebcam(args2);
@@ -110,29 +128,64 @@ public class Run {
 		}
 
 	}
-	
+
+	public static void testI2CDevice(Device device) {
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+		try {
+			while (true) {
+
+				String[] parts = br.readLine().split(" ");
+				int size = Integer.parseInt(parts[0]);
+				parts = Arrays.copyOfRange(parts, 1, parts.length);
+				
+				byte[] command = ArrayUtils.toPrimitive(
+						Arrays.stream(parts).map(p -> (byte) Integer.parseInt(p)).toArray(s -> new Byte[s]));
+
+				int[] res = device.transfer(size, command);
+				String[] r = new String[res.length];
+				for (int i = 0; i < res.length; i++) {
+					r[i] = String.valueOf(res[i]);
+				}
+
+				System.out.println(String.format("received: [%s]", String.join(", ", r)));
+
+				TimeTools.sleep(700);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	public static void openCVWebcamTest(String[] args) {
-		if(args.length == 0){
+		if (args.length == 0) {
 			System.out.println("openCVWebcamTest needs an argument.");
 			return;
 		}
-		VideoCapture videoCapture = new VideoCapture(Integer.parseInt(args[0]));
-		System.out.println("Creater videoCapture, loaded webcam" + args[0]);		
 		
-		 if(!videoCapture.open(0)) {
-			 System.out.println("Cannot open videoCapture.");
-			 return;
-		 }
-		 System.out.println("Successfully opened videoCapture.");
-		 System.out.println("Trying to read an image.");
-		 
-		 Mat image = new Mat();
-		 videoCapture.read(image);
-		 System.out.println("Image read.");
-		 if(image != null) {
-			 System.out.println("Image not null. Everything may run correctly.");
-		 }
-		 
+		System.out.println("Loading OpenCV native library");
+		loadOpenCV();
+		
+		System.out.println("Creating VideoCapture");
+		VideoCapture videoCapture = new VideoCapture(Integer.parseInt(args[0]));
+		System.out.println("Created VideoCapture, loaded webcam " + args[0]);
+
+		if (!videoCapture.open(0)) {
+			System.out.println("Cannot open VideoCapture.");
+			return;
+		}
+		System.out.println("Successfully opened VideoCapture.");
+		System.out.println("Trying to read an image.");
+
+		Mat image = new Mat();
+		videoCapture.read(image);
+		System.out.println("Image read.");
+		if (image != null) {
+			System.out.println("Image not null. Everything may run correctly.");
+		}
+
 	}
 
 	public static void testWebcam(String[] args) {

@@ -130,7 +130,7 @@ public class I2CCommunicator {
 	public Device deviceA;
 	public Device deviceB;
 	public Device deviceC;
-	public Device mpu6050;
+	public MPU6050 mpu6050;
 
 	public Device[] devices;
 
@@ -144,10 +144,12 @@ public class I2CCommunicator {
 			deviceA = new Device(bus.getDevice(0x04));
 			deviceB = new Device(bus.getDevice(0x05));
 			deviceC = new Device(bus.getDevice(0x06));
-			mpu6050 = new Device(bus.getDevice(0x68));
+			mpu6050 = new MPU6050(bus.getDevice(0x68));
 
 			devices = new Device[] { deviceA, deviceB, deviceC };
-
+			
+			mpu6050.wake();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
