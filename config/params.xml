@@ -5,19 +5,22 @@
     <movedst>4</movedst>
     <lineFollowing>
         <pid>
-            <P>0.7</P>
-            <I>0.1</I>
+            <P>0.8</P>
+            <I>0.02</I>
             <D>0.2</D>
         </pid>
         <motorIntensityFunction>
             <baseSpeed>0.14</baseSpeed>
             <decelerateExponent>1.5</decelerateExponent>
-            <decelerateCoefficient>0.7</decelerateCoefficient>
+            <decelerateCoefficient>0.6</decelerateCoefficient>
             <internalCoefficient>1.4</internalCoefficient>
             <coefficient>3</coefficient>
-            <positiveMotorExponent>1.5</positiveMotorExponent>
+            <positiveMotorExponent>2</positiveMotorExponent>
             <negativeMotorExponent>3.0</negativeMotorExponent>
             <positiveMotorCoefficient>0.6</positiveMotorCoefficient>
         </motorIntensityFunction>
     </lineFollowing>
+    <ballFinding>
+        <minMaxValue>42</minMaxValue>
+    </ballFinding>
 </params>

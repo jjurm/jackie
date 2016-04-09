@@ -25,6 +25,30 @@ public class Commander {
 		this.i2c = i2c;
 	}
 
+	// ===== Helper methods =====
+
+	protected byte cmd(int type, int subcommand) {
+		return (byte) ((type << S) | (subcommand & 0xFF));
+	}
+
+	protected byte b(boolean value) {
+		return (byte) (value ? 1 : 0);
+	}
+
+	protected byte b(int number) {
+		return (byte) number;
+	}
+
+	protected int join(int[] arr) {
+		int num = 0;
+		for (int i : arr) {
+			num = (num << 8) | i;
+		}
+		return num;
+	}
+
+	// ===== Public methods =====
+
 	/**
 	 * Sends test command to the given device. Returns the received result
 	 * number.
@@ -36,7 +60,7 @@ public class Commander {
 	 * @return received response
 	 */
 	public int testI2C(Device device, int number) {
-		return device.transfer(1, (byte) (1 << S), (byte) number)[0];
+		return device.transfer(1, cmd(0x01, 0), (byte) number)[0];
 	}
 
 	/**
@@ -45,9 +69,9 @@ public class Commander {
 	 * 
 	 * @return {@code true} if the test was successful
 	 */
-	public boolean testI2CAuto() {
+	public boolean testI2CAll() {
 		for (Device d : i2c.devices) {
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 5; i++) {
 				int num = MathTools.randomRange(1, 255);
 				int got = testI2C(d, num);
 				if (num != got) {
@@ -62,14 +86,14 @@ public class Commander {
 	 * Sends start command to all I2C devices.
 	 */
 	public void start() {
-		i2c.each(d -> d.transfer(0, (byte) ((2 << S) + 1)));
+		i2c.each(d -> d.transfer(0, cmd(0x02, 1)));
 	}
 
 	/**
 	 * Sends stop command to all I2C devices.
 	 */
 	public void stop() {
-		i2c.each(d -> d.transfer(0, (byte) (2 << S)));
+		i2c.each(d -> d.transfer(0, cmd(0x02, 0)));
 	}
 
 	/**
@@ -84,7 +108,7 @@ public class Commander {
 	 * @param
 	 */
 	public void writeLED(int group, int led, boolean value) {
-		i2c.deviceB.transfer(0, (byte) (((0x08 + (group & 0x01)) << S) + (led & 0x07)), (byte) (value ? 1 : 0));
+		i2c.deviceB.transfer(0, cmd(0x08 + (group & 0x01), led), b(value));
 	}
 
 	/**
@@ -96,7 +120,7 @@ public class Commander {
 	 *            value (0-180)
 	 */
 	public void writeMotor(int index, int value) {
-		i2c.deviceA.transfer(0, (byte) ((0x0A << S) + (index & 0x07)), (byte) value);
+		i2c.deviceA.transfer(0, cmd(0x0A, index), b(value));
 	}
 
 	/**
@@ -109,7 +133,19 @@ public class Commander {
 	 */
 	public void writePropulsionMotors(int left, int right) {
 		System.out.println(String.format("Writing motor values (left=%d, right=%d)", left, right));
-		i2c.deviceA.transfer(0, (byte) (11 << S), (byte) (left & 0xFF), (byte) (right & 0xFF));
+		i2c.deviceA.transfer(0, cmd(0x0B, 0), b(left), b(right));
+	}
+
+	/**
+	 * Turns light on or off.
+	 * 
+	 * @param index
+	 *            index of the light
+	 * @param value
+	 *            {@code true =} on, {@code false =} off
+	 */
+	public void light(int index, boolean value) {
+		i2c.deviceA.transfer(0, cmd(12, index), b(value));
 	}
 
 	/**
@@ -122,7 +158,7 @@ public class Commander {
 	 * @return {@code true} if the button is pressed
 	 */
 	public boolean readButton(int group, int index) {
-		int[] res = i2c.deviceB.transfer(1, (byte) (((0x10 + (group & 0x01)) << S) + (index & 0x07)));
+		int[] res = i2c.deviceB.transfer(1, cmd(0x10 + (group & 0x01), index));
 		return res[0] != 0;
 	}
 
@@ -135,7 +171,7 @@ public class Commander {
 	 * @return
 	 */
 	public int readMultipleButtons(int group) {
-		int[] res = i2c.deviceB.transfer(1, (byte) ((0x12 << S) + (group & 0x01)));
+		int[] res = i2c.deviceB.transfer(1, cmd(0x12, group & 0x01));
 		return res[0];
 	}
 
@@ -147,7 +183,7 @@ public class Commander {
 	 * @return
 	 */
 	public boolean readSwitch(int index) {
-		int[] res = i2c.deviceB.transfer(1, (byte) (((0x13) << S) + (index & 0x07)));
+		int[] res = i2c.deviceB.transfer(1, cmd(0x13, index));
 		return res[0] != 0;
 	}
 
@@ -159,10 +195,24 @@ public class Commander {
 	 * @return distance in centimeters
 	 */
 	public double readUltrasonicSensor(int index) {
-		int[] res = i2c.deviceA.transfer(2, (byte) (20 << S), (byte) index);
-		int pulse = res[0] << 8 + res[1];
+		int[] res = i2c.deviceA.transfer(2, cmd(0x14, index));
+		int pulse = join(res);
 		return pulse / 58.138;
 	}
+
+	/**
+	 * Reads value of infrared sensor specified by the index.
+	 * 
+	 * @param index
+	 *            index of the infrared sensor
+	 * @return measured analog value (0-1023)
+	 */
+	public int readInfraredSensor(int index) {
+		int[] res = i2c.deviceA.transfer(2, (byte) ((21 << S) + (index & 0x07)));
+		return join(res);
+	}
+
+	// ===== MPU-6050 =====
 
 	/**
 	 * Reads acceleration data from MPU-6050. Returns array containing 3 values
@@ -173,9 +223,9 @@ public class Commander {
 	public int[] getAcceleration() {
 		int[] res = i2c.mpu6050.transfer(6, (byte) MPU6050.REGISTER_ACCEL);
 		int[] accel = new int[3];
-		accel[0] = res[0] << 8 | res[1]; // X
-		accel[1] = res[2] << 8 | res[3]; // Y
-		accel[2] = res[4] << 8 | res[5]; // Z
+		accel[0] = (res[0] << 8) | res[1]; // X
+		accel[1] = (res[2] << 8) | res[3]; // Y
+		accel[2] = (res[4] << 8) | res[5]; // Z
 		return accel;
 	}
 
@@ -188,9 +238,9 @@ public class Commander {
 	public int[] getGyro() {
 		int[] res = i2c.mpu6050.transfer(14, (byte) MPU6050.REGISTER_GYRO);
 		int[] gyro = new int[3];
-		gyro[0] = res[0] << 8 | res[1]; // X
-		gyro[1] = res[2] << 8 | res[3]; // Y
-		gyro[2] = res[4] << 8 | res[5]; // Z
+		gyro[0] = (res[0] << 8) | res[1]; // X
+		gyro[1] = (res[2] << 8) | res[3]; // Y
+		gyro[2] = (res[4] << 8) | res[5]; // Z
 		return gyro;
 	}
 
@@ -201,7 +251,7 @@ public class Commander {
 	 */
 	public int getGyroZ() {
 		int[] res = i2c.mpu6050.transfer(14, (byte) MPU6050.REGISTER_GYRO_Z);
-		return res[0] << 8 | res[1];
+		return join(res);
 	}
 
 }

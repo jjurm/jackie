@@ -62,8 +62,11 @@ public class SubtractingImageBallFinder extends ImageOutput {
 	 * @return
 	 */
 	public Point find(BufferedImage img1, BufferedImage img2) {
+		// create image
 		result = new BufferedImage(img1.getWidth(), img1.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Color c1, c2, r;
+		
+		// do the subtracting
 		for (int x = 0; x < img1.getWidth(); x++) {
 			for (int y = 0; y < img1.getHeight(); y++) {
 				c1 = new Color(img1.getRGB(x, y));
@@ -74,8 +77,10 @@ public class SubtractingImageBallFinder extends ImageOutput {
 			}
 		}
 
+		// blur image
 		result = blur.modify(result);
 
+		// find point with maximum brightness
 		double val;
 		double maxVal = ConfigurationManager.getGeneralConfiguration().getInt("params/ballFinding/minMaxValue");
 		Point maxPoint = null;

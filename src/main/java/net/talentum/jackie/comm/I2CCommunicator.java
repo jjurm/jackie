@@ -86,6 +86,20 @@ import com.pi4j.io.i2c.I2CFactory;
  * </tr>
  * 
  * <tr>
+ * <th>12</th>
+ * <td>Turn light on or off</td>
+ * <td>index of the light
+ * <ul>
+ * <li>0 - bottom backlight</li>
+ * <li>1 - flashlight</li>
+ * </ul>
+ * </td>
+ * <td>
+ * <li>digital value (1/0)</li></td>
+ * <td></td>
+ * </tr>
+ * 
+ * <tr>
  * <th>16/17</th>
  * <td>Read button state, group A/B</td>
  * <td>button index in the group</td>
@@ -119,6 +133,15 @@ import com.pi4j.io.i2c.I2CFactory;
  * <tt>log<sub>2</sub>(38000)<=16</tt>, the command returns one 16-bit number
  * split into <i>2 bytes</i>, with MSB bits first.</td>
  * </tr>
+ * 
+ * <tr>
+ * <th>21</th>
+ * <td>Read infrared sensor value</td>
+ * <td>infrared sensor index</td>
+ * <td></td>
+ * <td>Measured analog value (0-1023). The command returns one 16-bit number
+ * split into <i>2 bytes</i>, with MSB bits first.</td>
+ * </tr>
  * </table>
  * 
  * @author JJurM
@@ -147,14 +170,14 @@ public class I2CCommunicator {
 			mpu6050 = new MPU6050(bus.getDevice(0x68));
 
 			devices = new Device[] { deviceA, deviceB, deviceC };
-			
+
 			mpu6050.wake();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Runs the command on each device.
 	 * 

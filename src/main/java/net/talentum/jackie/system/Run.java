@@ -84,6 +84,9 @@ public class Run {
 			case "opencv":
 				openCVWebcamTest(args2);
 				break;
+			case "us":
+				testUltrasonicSensor();
+				break;
 			default:
 				if (!"".equals(task)) {
 					System.out.println(String.format("'%s' is not a task.", args[0]));
@@ -236,6 +239,21 @@ public class Run {
 		}
 
 		System.out.println("Returned image is an object :)");
+
+	}
+
+	public static void testUltrasonicSensor() {
+
+		while (true) {
+			I2CCommunicator i2c = new I2CCommunicator();
+			Commander comm = new Commander(i2c);
+
+			double dst = comm.readUltrasonicSensor(0);
+			System.out.println(String.format("%.2f cm", dst));
+
+			TimeTools.sleep(700);
+
+		}
 
 	}
 
