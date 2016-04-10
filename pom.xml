@@ -143,6 +143,19 @@
           <skip>true</skip>
         </configuration>
       </plugin>
+
+      <!-- Run configuration -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.4.0</version>
+        <configuration>
+          <mainClass>net.talentum.jackie.system.Run</mainClass>
+          <arguments>
+            <argument>run</argument>
+          </arguments>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
