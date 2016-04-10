@@ -66,35 +66,6 @@
         </configuration>
       </plugin>
 
-      <!-- Unpack OpenCV native library -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.10</version>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>package</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>com.jjurm.libs.opencv</groupId>
-                  <artifactId>opencv-${build.type}</artifactId>
-                  <version>3.1.0</version>
-                  <type>jar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/native</outputDirectory>
-                  <includes>**/*.dll,**/*.so</includes>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
       <!-- Make executable JAR -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -252,29 +223,5 @@
       <version>3.1.0</version>
     </dependency>
   </dependencies>
-
-  <profiles>
-    <profile>
-      <id>win64</id>
-      <properties>
-        <build.type>win64</build.type>
-      </properties>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-    </profile>
-    <profile>
-      <id>win32</id>
-      <properties>
-        <build.type>win32</build.type>
-      </properties>
-    </profile>
-    <profile>
-      <id>linux</id>
-      <properties>
-        <build.type>linux</build.type>
-      </properties>
-    </profile>
-  </profiles>
 
 </project>
