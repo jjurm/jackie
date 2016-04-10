@@ -38,16 +38,6 @@ public class TextInputProcessor {
 		commands.put("close", (args, br, pw) -> {
 			throw new StreamCloseRequest();
 		});
-
-		commands.put("test", new CommandGroup() {{
-			commands.put("", (a, br, pw) -> pw.println("Available tests are: i2c"));
-			commands.put("i2c", new Command() {
-				@Override
-				public void process(String[] args, BufferedReader br, PrintWriter pw) throws StreamCloseRequest {
-					
-				}
-			});
-		}});
 	}
 
 	/**

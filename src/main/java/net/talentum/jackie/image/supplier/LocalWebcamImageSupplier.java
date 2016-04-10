@@ -27,7 +27,9 @@ public class LocalWebcamImageSupplier implements ImageSupplier {
 			e.printStackTrace();
 			return;
 		}
-		webcam.open();
+		if (webcam != null) {
+			webcam.open();
+		}
 	}
 
 	public LocalWebcamImageSupplier(Webcam webcam) {

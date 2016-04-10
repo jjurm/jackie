@@ -7,14 +7,13 @@ import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.RobotInstruction;
 
-public class EvacuationState implements State{
+public class EvacuationState extends AbstractState {
 
 	private SubtractingImageBallFinder subtractingImageBallFinder;
-	private Robot robot;
 	
 	public EvacuationState(SubtractingImageBallFinder subtractingImageBallFinder, Robot robot) {
+		super(robot);
 		this.subtractingImageBallFinder = subtractingImageBallFinder;
-		this.robot = robot;
 	}
 	
 	public final synchronized RobotInstruction process(Moment momentOff, Moment momentOn) {
@@ -30,7 +29,7 @@ public class EvacuationState implements State{
 	}
 	
 	@Override
-	public void run() {
+	public void run0() {
 		double heading = 0.0;
 		
 		light(false);

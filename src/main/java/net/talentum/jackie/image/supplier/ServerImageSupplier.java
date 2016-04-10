@@ -1,6 +1,7 @@
 package net.talentum.jackie.image.supplier;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.net.Socket;
 
 import javax.imageio.ImageIO;
@@ -29,8 +30,8 @@ public class ServerImageSupplier implements ImageSupplier {
 			BufferedImage img = ImageIO.read(ImageIO.createImageInputStream(server.getInputStream()));
 			server.close();
 			return img;
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			// ignore error, try to reconnect next time
 		}
 		return null;
 	}

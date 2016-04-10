@@ -35,6 +35,7 @@ public class ImageServer implements Runnable {
 	public ImageServer(ImageSupplier imageSupplier) {
 		this.imageSupplier = imageSupplier;
 		serverThread = new Thread(this);
+		serverThread.setName("ImageServerThread");
 	}
 
 	public void start() {
@@ -51,6 +52,7 @@ public class ImageServer implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		serverThread.interrupt();
 
 	}
 

@@ -12,4 +12,9 @@ public class NullState implements State {
 
 	}
 
+	@Override
+	public void interrupt() {
+		// no need for interrupting
+	}
+
 }

@@ -2,13 +2,14 @@ package net.talentum.jackie.robot;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.talentum.jackie.comm.Commander;
 import net.talentum.jackie.image.supplier.ImageSupplier;
+import net.talentum.jackie.robot.state.InterruptedExecution;
 import net.talentum.jackie.robot.state.LineFollowingState;
 import net.talentum.jackie.robot.state.State;
 import net.talentum.jackie.system.Config;
@@ -23,21 +24,28 @@ import net.talentum.jackie.system.Main;
 public class Robot {
 
 	/**
+	 * Executor for running mainly the robot's cycle.
+	 */
+	ExecutorService executor = Executors.newCachedThreadPool();
+	
+	/**
 	 * Holds object that is capable of supplying webcam images.
 	 */
 	ImageSupplier imageSupplier;
 
 	/**
-	 * Shallow history of past moments
-	 * 
-	 * @see #constructMoment()
+	 * Reference to the {@link Commander}
 	 */
-	public Deque<Moment> moments = new LinkedList<Moment>();
-	
 	public final Commander commander;
 	
-	protected AtomicBoolean run = new AtomicBoolean(true);
+	/**
+	 * Whether the robot should run
+	 */
+	public final AtomicBoolean run = new AtomicBoolean(true);
 
+	/**
+	 * List of listeners to call in case of config changed event
+	 */
 	protected List<Runnable> configChangedListeners = new ArrayList<Runnable>();
 
 	/**
@@ -46,6 +54,11 @@ public class Robot {
 	 */
 	private State state;
 
+	/**
+	 * Default constructor
+	 * 
+	 * @param commander
+	 */
 	public Robot(Commander commander) {
 		this.commander = commander;
 
@@ -87,13 +100,7 @@ public class Robot {
 		g.drawImage(scaled, 0, 0, null);
 		g.dispose();*/
 
-		Moment moment = new Moment(image, sensorData);
-
-		moments.push(moment);
-		while (moments.size() > 2) {
-			moments.pollLast();
-		}
-		return moment;
+		return new Moment(image, sensorData);
 	}
 
 	/**
@@ -101,8 +108,12 @@ public class Robot {
 	 */
 	public void runCycle() {
 		while (run.get()) {
-			state.run();
-			Main.runs.getAndIncrement();
+			try {
+				state.run();
+				Main.runs.getAndIncrement();
+			} catch (InterruptedExecution e) {
+				// start cycle again and check "run" variable
+			}
 		}
 	}
 	

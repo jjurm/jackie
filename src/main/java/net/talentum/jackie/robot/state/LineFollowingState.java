@@ -23,17 +23,16 @@ import net.talentum.jackie.system.ConfigurationManager;
  * @author padr31
  *
  */
-public class LineFollowingState implements State {
+public class LineFollowingState extends AbstractState {
 
 	private RobotStrategy strategy;
-	private Robot robot;
 	protected PIDController pid;
 	private MotorIntensityFunction mif;
 
 	public LineFollowingState(Robot robot) {
+		super(robot);
 		HierarchicalConfiguration config = ConfigurationManager.getGeneralConfiguration();
 
-		this.robot = robot;
 		this.mif = new LinearMotorIntensityFunction();
 
 		// @formatter:off
@@ -78,7 +77,7 @@ public class LineFollowingState implements State {
 	}
 
 	@Override
-	public void run() {
+	public void run0() {
 		double heading = 0.0;
 
 		// obtain moment

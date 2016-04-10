@@ -8,9 +8,20 @@ package net.talentum.jackie.robot.state;
  * 
  * @author padr31
  */
-public interface State extends Runnable {
+public interface State {
 
-	@Override
-	public void run();
+	/**
+	 * One run of the state method.
+	 * 
+	 * @throws InterruptedExecution
+	 *             thrown in case when the execution should be interrupted
+	 */
+	public void run() throws InterruptedExecution;
+
+	/**
+	 * Interrupts current execution of the run. Every child of {@link State}
+	 * should implement some way of interrupting the computing thread.
+	 */
+	public void interrupt();
 
 }
