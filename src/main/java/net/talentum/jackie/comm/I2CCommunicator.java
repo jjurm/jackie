@@ -1,10 +1,11 @@
 package net.talentum.jackie.comm;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import com.pi4j.io.i2c.I2CBus;
-import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
 
 /**
@@ -157,6 +158,8 @@ public class I2CCommunicator {
 
 	public Device[] devices;
 
+	public Map<String, Device> deviceMap = new HashMap<String, Device>();
+
 	public I2CCommunicator() {
 		try {
 
@@ -170,6 +173,11 @@ public class I2CCommunicator {
 			mpu6050 = new MPU6050(bus.getDevice(0x68));
 
 			devices = new Device[] { deviceA, deviceB, deviceC };
+
+			deviceMap.put("a", deviceA);
+			deviceMap.put("b", deviceB);
+			deviceMap.put("c", deviceC);
+			deviceMap.put("m", mpu6050);
 
 			mpu6050.wake();
 
@@ -190,13 +198,13 @@ public class I2CCommunicator {
 	}
 
 	/**
-	 * @deprecated Use predefined devices of {@link Device} class instead.
+	 * Searches the list of devices for one specified with the key string.
+	 * 
 	 * @param address
-	 * @return
-	 * @throws IOException
+	 * @return found device or {@code null}
 	 */
-	public I2CDevice getDevice(int address) throws IOException {
-		return bus.getDevice(address);
+	public Device getDevice(String key) {
+		return deviceMap.get(key.toLowerCase());
 	}
 
 }

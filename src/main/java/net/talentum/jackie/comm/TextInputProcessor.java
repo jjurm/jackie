@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import net.talentum.jackie.system.Main;
 
 /**
@@ -19,6 +21,8 @@ public class TextInputProcessor {
 
 	Commander commander;
 	
+	String lastCommand;
+
 	/**
 	 * Basic constructor
 	 */
@@ -28,16 +32,64 @@ public class TextInputProcessor {
 	}
 
 	void createCommands() {
+		Command c;
+		
 		// exit
-		Command exit = (args, br, pw) -> Main.shutdown();
-		commands.put("exit", exit);
-		commands.put("quit", exit);
-		commands.put("q", exit);
+		c = (args, br, pw) -> Main.shutdown();
+		commands.put("exit", c);
+		commands.put("quit", c);
+		commands.put("q", c);
 
 		// stream close
 		commands.put("close", (args, br, pw) -> {
 			throw new StreamCloseRequest();
 		});
+
+		// utility commands
+		c = (args, br, pw) -> i2cArbitraryTransfer(args, pw);
+		commands.put("i2c", c);
+		commands.put("i", c);
+		commands.put("us", (args, br, pw) -> readUltrasonic(args, pw));
+	}
+
+	public void i2cArbitraryTransfer(String[] args, PrintWriter pw) {
+		if (args.length < 2) {
+			pw.println("Syntax: i2c <device> <size> [command1] [command2] ...");
+			return;
+		}
+
+		String deviceName = args[0];
+		Device device = commander.i2c.getDevice(deviceName);
+
+		if (device == null) {
+			pw.println("No such device found");
+			return;
+		}
+
+		int size = Integer.parseInt(args[1]);
+		args = Arrays.copyOfRange(args, 2, args.length);
+
+		Byte[] bs = Arrays.stream(args).map(p -> (byte) Integer.parseInt(p)).toArray(s -> new Byte[s]);
+		byte[] command = ArrayUtils.toPrimitive(bs);
+
+		int[] res = device.transfer(size, command);
+		String[] r = new String[res.length];
+		for (int i = 0; i < res.length; i++) {
+			r[i] = String.valueOf(res[i]);
+		}
+
+		System.out.println(String.format("received: [%s]", String.join(", ", r)));
+	}
+
+	public void readUltrasonic(String[] args, PrintWriter pw) {
+		if (args.length < 1) {
+			System.out.println("Syntax: us <index>");
+		}
+
+		int index = Integer.parseInt(args[0]);
+		double dst = commander.readUltrasonicSensor(index);
+		pw.println(String.format("%.2f cm", dst));
+
 	}
 
 	/**
@@ -58,7 +110,12 @@ public class TextInputProcessor {
 			if (line == null) {
 				throw new StreamCloseRequest();
 			}
-			String[] parts = line.trim().split("\\s+");
+			line = line.trim();
+			// if the string equals ".", use last command
+			if (lastCommand != null && ".".equals(line)) {
+				line = lastCommand;
+			}
+			String[] parts = line.split("\\s+");
 			String commandName = parts[0].trim();
 
 			Command command = commands.get(commandName);
