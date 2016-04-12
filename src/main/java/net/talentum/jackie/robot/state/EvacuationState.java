@@ -1,11 +1,13 @@
 package net.talentum.jackie.robot.state;
 
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 
 import net.talentum.jackie.image.SubtractingImageBallFinder;
 import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.RobotInstruction;
+import net.talentum.jackie.tools.TimeTools;
 
 public class EvacuationState extends AbstractState {
 
@@ -23,25 +25,22 @@ public class EvacuationState extends AbstractState {
 		return null;
 	}
 	
-	//TODO attach a light to robot 
-	private void light(boolean on) {
-		
-	}
-	
 	@Override
 	public State run0() {
 		double heading = 0.0;
 		
-		light(false);
-		Moment momentOff = robot.constructMoment();
+		robot.commander.light(1, false);
+		BufferedImage img1 = robot.getImage();
 		
-		light(true);
-		Moment momentOn = robot.constructMoment();
-		light(false);
+		robot.commander.light(1, true);
+		TimeTools.sleep(500);
+		BufferedImage img2 = robot.getImage();
+		robot.commander.light(1, false);
 		
 		Point maxPoint = null;
-		if(momentOff != null && momentOn != null)
-			maxPoint = subtractingImageBallFinder.find(momentOff.image, momentOn.image);
+		if(img1 != null && img2 != null) {
+			maxPoint = subtractingImageBallFinder.find(img1, img2);
+		}
 		
 		if(maxPoint == null) {
 			search();
@@ -56,6 +55,8 @@ public class EvacuationState extends AbstractState {
 	 * Pick up a ball.
 	 */
 	private void pick() {
+	
+		
 		
 	}
 
@@ -63,6 +64,7 @@ public class EvacuationState extends AbstractState {
 	 * This method moves the robot in order to search for the ball.
 	 */
 	private void search() {
+		
 		
 	}
 
