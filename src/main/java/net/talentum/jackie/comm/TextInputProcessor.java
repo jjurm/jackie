@@ -20,7 +20,7 @@ public class TextInputProcessor {
 	Map<String, Command> commands = new HashMap<String, Command>();
 
 	Commander commander;
-	
+
 	String lastCommand;
 
 	/**
@@ -33,7 +33,7 @@ public class TextInputProcessor {
 
 	void createCommands() {
 		Command c;
-		
+
 		// exit
 		c = (args, br, pw) -> Main.shutdown();
 		commands.put("exit", c);
@@ -50,6 +50,15 @@ public class TextInputProcessor {
 		commands.put("i2c", c);
 		commands.put("i", c);
 		commands.put("us", (args, br, pw) -> readUltrasonic(args, pw));
+		commands.put("test", (args, br, pw) -> pw.println(commander.testI2CAll()));
+		commands.put("accel", (args, br, pw) -> pw.println(String.join(", ", Arrays.stream(commander.getAcceleration())
+				.mapToObj(i -> String.valueOf(i)).toArray(s -> new String[s]))));
+		commands.put("gyro", (args, br, pw) -> pw.println(String.join(", ",
+				Arrays.stream(commander.getGyro()).mapToObj(i -> String.valueOf(i)).toArray(s -> new String[s]))));
+
+		// robot commands
+		commands.put("refresh", (args, br, pw) -> Main.robot.refresh());
+
 	}
 
 	public void i2cArbitraryTransfer(String[] args, PrintWriter pw) {
@@ -112,16 +121,18 @@ public class TextInputProcessor {
 			}
 			line = line.trim();
 			// if the string equals ".", use last command
-			if (lastCommand != null && ".".equals(line)) {
+			if (lastCommand != null && line.length() == 0) {
 				line = lastCommand;
+			} else {
+				lastCommand = line;
 			}
-			String[] parts = line.split("\\s+");
+			String[] parts = line.split("\\s+|\\+");
 			String commandName = parts[0].trim();
 
 			Command command = commands.get(commandName);
-			if (commandName.length() == 0) {
-				// ignore empty line
-			} else if (command != null) {
+			/*
+			 * if (commandName.length() == 0) { // ignore empty line } else
+			 */ if (command != null) {
 				String[] args = Arrays.copyOfRange(parts, 1, parts.length);
 				command.process(args, br, pw);
 			}

@@ -20,8 +20,6 @@ public class EvacuationState extends AbstractState {
 	
 	public final synchronized RobotInstruction process(Moment momentOff, Moment momentOn) {
 		
-		
-		
 		return null;
 	}
 	

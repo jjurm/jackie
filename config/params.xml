@@ -6,21 +6,49 @@
     <lineFollowing>
         <pid>
             <P>0.8</P>
-            <I>0.02</I>
-            <D>0.2</D>
+            <I>0.0</I>
+            <D>0.3</D>
         </pid>
         <motorIntensityFunction>
             <baseSpeed>0.14</baseSpeed>
             <decelerateExponent>1.5</decelerateExponent>
             <decelerateCoefficient>0.6</decelerateCoefficient>
-            <internalCoefficient>1.4</internalCoefficient>
-            <coefficient>3</coefficient>
-            <positiveMotorExponent>2</positiveMotorExponent>
-            <negativeMotorExponent>3.0</negativeMotorExponent>
+            <internalCoefficient>1.2</internalCoefficient>
+            <coefficient>0.6</coefficient>
+            <positiveMotorExponent>1.5</positiveMotorExponent>
+            <negativeMotorExponent>1.0</negativeMotorExponent>
             <positiveMotorCoefficient>0.6</positiveMotorCoefficient>
         </motorIntensityFunction>
+        <intersectionFactor>3</intersectionFactor>
     </lineFollowing>
     <ballFinding>
         <minMaxValue>42</minMaxValue>
     </ballFinding>
+    <motorDelay>300</motorDelay>
+    <motorPositions>
+        <m2>
+            <up>50</up>
+            <normal>70</normal>
+            <down>160</down>
+        </m2>
+        <m4>
+            <up>180</up>
+            <down>113</down>
+        </m4>
+        <m5>
+            <up>85</up>
+            <middle>115</middle>
+            <down>165</down>
+        </m5>
+    </motorPositions>
+    <speeds>
+        <normal>10</normal>
+        <reverse>80</reverse>
+        <reverseTime>1000</reverseTime>
+        <rotation>10</rotation>
+        <rotationTime>1200</rotationTime>
+    </speeds>
+    <intersections>
+        <minMaxValue></minMaxValue>
+    </intersections>
 </params>

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import net.talentum.jackie.module.BooleanImageFilterModule;
 import net.talentum.jackie.module.BorderFinderModule;
 import net.talentum.jackie.module.ImageModifierModule;
+import net.talentum.jackie.module.IntersectionSolver;
 import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.MomentData;
 import net.talentum.jackie.robot.RobotInstruction;
@@ -30,12 +31,15 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 	ImageModifierModule mImageModifier;
 	BooleanImageFilterModule mBooleanImageFilter;
 	BorderFinderModule mBorderFinder;
+	IntersectionSolver mIntersectionSolver;
 
 	public HorizontalLevelObservingStrategy(ImageModifierModule mImageModifier,
-			BooleanImageFilterModule mBooleanImageFilter, BorderFinderModule mBorderFinder) {
+			BooleanImageFilterModule mBooleanImageFilter, BorderFinderModule mBorderFinder,
+			IntersectionSolver mIntersectionSolver) {
 		this.mImageModifier = mImageModifier;
 		this.mBooleanImageFilter = mBooleanImageFilter;
 		this.mBorderFinder = mBorderFinder;
+		this.mIntersectionSolver = mIntersectionSolver;
 	}
 
 	@SuppressWarnings("unused")
@@ -55,16 +59,41 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		Point top = checkLine(new Point(x, y - y / 2), -Math.PI / 2);
 		Point middle = checkLine(new Point(x, y), -Math.PI / 2);
 		Point bottom = checkLine(new Point(x, y + y / 2), -Math.PI / 2);
-		Point abottom = checkLine(new Point(x, 2 * y - 1), -Math.PI / 2);
+		Point abottom = checkLine(new Point(x, 2 * y - 10), -Math.PI / 2);
 
-		if (bottom == null)
-			return new RobotInstruction(d.m, d);
+		Point primary = bottom;
+		Point secondary = null;
+
+		if (primary == null) {
+			primary = middle;
+			secondary = null;
+		}
+		if (primary == null) {
+			primary = top;
+		}
+		if (primary == null) {
+			primary = abottom;
+		}
+		if (primary == null) {
+			primary = abottom;
+		}
+		if (primary == null) {
+			return new RobotInstruction(d.m, d, new Point(0, 1));
+		}
 
 		Point destination;
-		if (abottom == null) {
+		if (secondary == null) {
 			destination = new Point(bottom);
 		} else {
 			destination = new Point((int) Math.round(1.5 * bottom.x - 0.5 * abottom.x), bottom.y);
+		}
+
+		Point intersection = mIntersectionSolver.findMark(d.image, primary.y);
+		if (intersection != null) {
+			d.highlight.add(intersection);
+
+			int diff = intersection.x - destination.x;
+			destination.x += diff * Config.get().getDouble("params/lineFollowing/intersectionFactor");
 		}
 
 		destination.translate(-x, 0);
@@ -138,7 +167,7 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 			g.drawLine(0, y / 2, d.image.getWidth(), y / 2);
 			g.drawLine(0, y, d.image.getWidth(), y);
 			g.drawLine(0, y * 3 / 2, d.image.getWidth(), y * 3 / 2);
-			g.drawLine(0, 2 * y - 1, d.image.getWidth(), 2 * y - 1);
+			g.drawLine(0, 2 * y - 10, d.image.getWidth(), 2 * y - 10);
 
 			g.setColor(Color.GREEN);
 			d.bordersL.stream().forEach(p -> g.fillOval(p.x - 6, p.y - 6, 12, 12));
@@ -146,6 +175,9 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 
 			g.setColor(Color.RED);
 			d.line.stream().forEach(p -> g.fillRect(p.x - 2, p.y - 2, 4, 4));
+
+			g.setColor(Color.CYAN);
+			d.highlight.stream().forEach(p -> g.fillRect(p.x - 2, p.y - 2, 4, 4));
 
 			return img;
 		}

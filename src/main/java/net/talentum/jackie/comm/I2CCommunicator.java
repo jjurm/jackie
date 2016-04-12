@@ -101,6 +101,20 @@ import com.pi4j.io.i2c.I2CFactory;
  * </tr>
  * 
  * <tr>
+ * <th>13</th>
+ * <td>Write light analog value</td>
+ * <td>index of the light
+ * <ul>
+ * <li>0 - bottom backlight</li>
+ * <li>1 - flashlight</li>
+ * </ul>
+ * </td>
+ * <td>
+ * <li>analog value (0-255)</li></td>
+ * <td></td>
+ * </tr>
+ * 
+ * <tr>
  * <th>16/17</th>
  * <td>Read button state, group A/B</td>
  * <td>button index in the group</td>

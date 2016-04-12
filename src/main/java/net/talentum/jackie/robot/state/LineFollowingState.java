@@ -8,6 +8,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import net.talentum.jackie.libs.PIDController;
 import net.talentum.jackie.module.MotorIntensityFunction;
 import net.talentum.jackie.module.impl.BasicBorderFinderModule;
+import net.talentum.jackie.module.impl.BasicIntersectionSolver;
 import net.talentum.jackie.module.impl.BlurImageModifierModule;
 import net.talentum.jackie.module.impl.LinearMotorIntensityFunction;
 import net.talentum.jackie.module.impl.UnivBooleanImageFilterModule;
@@ -16,10 +17,14 @@ import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.RobotInstruction;
 import net.talentum.jackie.robot.strategy.HorizontalLevelObservingStrategy;
 import net.talentum.jackie.robot.strategy.RobotStrategy;
+import net.talentum.jackie.system.Config;
 import net.talentum.jackie.system.ConfigurationManager;
+import net.talentum.jackie.tools.TimeTools;
 
 /**
- * State intended for following black line, using the line {@link HorizontalLevelObservingStrategy}.
+ * State intended for following black line, using the line
+ * {@link HorizontalLevelObservingStrategy}.
+ * 
  * @author padr31
  *
  */
@@ -39,7 +44,8 @@ public class LineFollowingState extends AbstractState {
 		this.strategy = new HorizontalLevelObservingStrategy(
 				new BlurImageModifierModule(),
 				new UnivBooleanImageFilterModule(() -> ConfigurationManager.getGeneralConfiguration().getInt("params/bwTreshold")),
-				new BasicBorderFinderModule(2, 600, 3)
+				new BasicBorderFinderModule(2, 600, 3),
+				new BasicIntersectionSolver()
 		);
 
 		// create and setup PIDController
@@ -80,6 +86,10 @@ public class LineFollowingState extends AbstractState {
 	public State run0() {
 		double heading = 0.0;
 
+		if (robot.commander.readUltrasonicSensor(0) < 6) {
+			return new ObstacleAvoidanceState(robot);
+		}
+
 		// obtain moment
 		Moment moment = robot.constructMoment();
 
@@ -99,7 +109,7 @@ public class LineFollowingState extends AbstractState {
 		}
 
 		// compute heading (= control variable of PID controller)
-		pid.getInput(heading);
+		pid.getInput(-heading);
 		heading = pid.performPID();
 
 		// get angle values to send
@@ -107,8 +117,32 @@ public class LineFollowingState extends AbstractState {
 
 		// finally write motors
 		robot.commander.writePropulsionMotors(motors.left, motors.right);
-		
+
 		return this;
+	}
+
+	@Override
+	public void begin() {
+		// move camera up
+		robot.commander.writeMotor(5, Config.get().getInt("params/motorPositions/m5/up"));
+		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
+
+		// move arm up
+		robot.commander.writeMotor(2, Config.get().getInt("params/motorPositions/m2/normal"));
+		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
+
+		// turn backlight on
+		robot.commander.light(0, true);
+
+		// move camera down
+		robot.commander.writeMotor(5, Config.get().getInt("params/motorPositions/m5/down"));
+		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
+	}
+
+	@Override
+	public void end() {
+		// backlight off
+		robot.commander.light(0, false);
 	}
 
 }

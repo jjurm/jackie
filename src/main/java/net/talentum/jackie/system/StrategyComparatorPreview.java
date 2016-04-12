@@ -27,6 +27,7 @@ import net.talentum.jackie.image.supplier.ServerImageSupplier;
 import net.talentum.jackie.module.impl.AveragingTrailWidthDeterminerModule;
 import net.talentum.jackie.module.impl.BasicAngularTurnHandlerModule;
 import net.talentum.jackie.module.impl.BasicBorderFinderModule;
+import net.talentum.jackie.module.impl.BasicIntersectionSolver;
 import net.talentum.jackie.module.impl.BasicLineFinderModule;
 import net.talentum.jackie.module.impl.BlurImageModifierModule;
 import net.talentum.jackie.module.impl.BottomLineStartFinderModule;
@@ -122,6 +123,12 @@ public class StrategyComparatorPreview {
 				return ((double) c.getGreen()) / (c.getBlue() + c.getRed() + 1) > 0.64;
 			}
 		}));
+		list.add(p -> new BlurredBooleanImageOutput("Green () + blur", new Function<Color, Boolean>() {
+			@Override
+			public Boolean apply(Color c) {
+				return ((double) c.getGreen()) / (c.getBlue() + c.getRed() + 1) > Double.parseDouble(p);
+			}
+		}));
 		list.add(p -> new RobotStrategyIROutput("*LineFollowing", new LineFollowingStrategy(
 				new BlurImageModifierModule(),
 				new UnivBooleanImageFilterModule(100),
@@ -137,12 +144,14 @@ public class StrategyComparatorPreview {
 		list.add(p -> new HorizontalLevelObservingStrategy.ImageOutput("*HorizontalLevelObserving (100)", new HorizontalLevelObservingStrategy(
 				new BlurImageModifierModule(),
 				new UnivBooleanImageFilterModule(100),
-				new BasicBorderFinderModule(2, 600, 3)
+				new BasicBorderFinderModule(2, 600, 3),
+				new BasicIntersectionSolver()
 		)));
 		list.add(p -> new HorizontalLevelObservingStrategy.ImageOutput(String.format("*HorizontalLevelObserving (%s)", p), new HorizontalLevelObservingStrategy(
 				new BlurImageModifierModule(),
 				new UnivBooleanImageFilterModule(MathTools.parseDefault(p, 100)),
-				new BasicBorderFinderModule(2, 600, 3)
+				new BasicBorderFinderModule(2, 600, 3),
+				new BasicIntersectionSolver()
 		)));
 		list.add(p -> new BallFinderStrategy.ImageOutput("*BallFinding", new BufferedImageMatConverterModule()));
 		list.add(p -> new SubtractingImageBallFinder("*SubtractingImageBallFinder"));

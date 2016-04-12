@@ -37,7 +37,7 @@ public class Main {
 	private static TextInputProcessor textInputProcessor;
 	private static ConsoleReader consoleReader;
 
-	private static Robot robot;
+	public static Robot robot;
 	private static ImageSupplier imageSupplier;
 	private static ImageServer imageServer;
 	private static AtomicBoolean running = new AtomicBoolean(true);
@@ -88,7 +88,7 @@ public class Main {
 
 		// run robot's cycle infinitely
 		robot.init();
-		executor.submit(robot::runCycle);
+		robot.start();
 
 		// monitor running
 		while (running.get()) {

@@ -16,6 +16,7 @@ import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
 
 import net.talentum.jackie.comm.Commander;
+import net.talentum.jackie.comm.ConsoleReader;
 import net.talentum.jackie.comm.Device;
 import net.talentum.jackie.comm.I2CCommunicator;
 import net.talentum.jackie.comm.SerialCommunicator;
@@ -60,18 +61,6 @@ public class RuntimeTests {
 	}
 
 	public static void testI2C() {
-		init();
-
-		while (true) {
-			int n = MathTools.randomRange(0, 255);
-			int res = commander.testI2C(commander.i2c.deviceA, n);
-			System.out.println(String.format("sent: %d, received: %d", n, res));
-			TimeTools.sleep(700);
-		}
-
-	}
-
-	public static void testI2CDevice(Device device) {
 		init();
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -183,6 +172,12 @@ public class RuntimeTests {
 			
 		}
 
+	}
+	
+	public static void testText() {
+		init();
+		ConsoleReader cr = new ConsoleReader(textInputProcessor);
+		cr.start();
 	}
 
 }

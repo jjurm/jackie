@@ -5,9 +5,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.opencv.core.Core;
 
-import net.talentum.jackie.comm.Commander;
-import net.talentum.jackie.comm.I2CCommunicator;
-
 /**
  * Primary runnable class.
  * 
@@ -52,19 +49,6 @@ public class Run {
 			case "i2c":
 				RuntimeTests.testI2C();
 				break;
-			case "i2ca":
-			case "i2cm":
-				I2CCommunicator i2c = new I2CCommunicator();
-				Commander comm = new Commander(i2c);
-				switch (task.charAt(3)) {
-				case 'a':
-					RuntimeTests.testI2CDevice(comm.i2c.deviceA);
-					break;
-				case 'm':
-					RuntimeTests.testI2CDevice(comm.i2c.mpu6050);
-					break;
-				}
-				break;
 			case "webcam":
 				RuntimeTests.testWebcam(args2);
 				break;
@@ -73,6 +57,9 @@ public class Run {
 				break;
 			case "us":
 				RuntimeTests.testUltrasonicSensor(args2);
+				break;
+			case "text":
+				RuntimeTests.testText();
 				break;
 			default:
 				if (!"".equals(task)) {

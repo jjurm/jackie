@@ -25,6 +25,12 @@ public class Commander {
 		this.i2c = i2c;
 	}
 
+	public void end() {
+		light(0, false);
+		light(1, false);
+		writePropulsionMotors(90, 90);
+	}
+
 	// ===== Helper methods =====
 
 	protected byte cmd(int type, int subcommand) {
@@ -132,8 +138,19 @@ public class Commander {
 	 *            motor controlling the right wheel
 	 */
 	public void writePropulsionMotors(int left, int right) {
-		System.out.println(String.format("Writing motor values (left=%d, right=%d)", left, right));
 		i2c.deviceA.transfer(0, cmd(0x0B, 0), b(left), b(right));
+	}
+
+	protected Device getDeviceLight(int index) {
+		Device d;
+		switch (index) {
+		case 0:
+		default:
+			d = i2c.deviceA;
+		case 1:
+			d = i2c.deviceB;
+		}
+		return d;
 	}
 
 	/**
@@ -145,7 +162,21 @@ public class Commander {
 	 *            {@code true =} on, {@code false =} off
 	 */
 	public void light(int index, boolean value) {
-		i2c.deviceA.transfer(0, cmd(12, index), b(value));
+		Device d = getDeviceLight(index);
+		d.transfer(0, cmd(12, index), b(value));
+	}
+
+	/**
+	 * Writes light analog value.
+	 * 
+	 * @param index
+	 *            index of the light
+	 * @param value
+	 *            analog value (0-255)
+	 */
+	public void lightAnalog(int index, int value) {
+		Device d = getDeviceLight(index);
+		d.transfer(0, cmd(13, index), b(value));
 	}
 
 	/**

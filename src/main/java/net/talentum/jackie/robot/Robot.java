@@ -3,8 +3,6 @@ package net.talentum.jackie.robot;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.talentum.jackie.comm.Commander;
@@ -23,11 +21,8 @@ import net.talentum.jackie.system.Main;
  */
 public class Robot {
 
-	/**
-	 * Executor for running mainly the robot's cycle.
-	 */
-	ExecutorService executor = Executors.newCachedThreadPool();
-	
+	Thread thread;
+
 	/**
 	 * Holds object that is capable of supplying webcam images.
 	 */
@@ -37,7 +32,7 @@ public class Robot {
 	 * Reference to the {@link Commander}
 	 */
 	public final Commander commander;
-	
+
 	/**
 	 * Whether the robot should run
 	 */
@@ -53,6 +48,8 @@ public class Robot {
 	 * in a loop.
 	 */
 	private State state;
+	
+	private AtomicBoolean toRefresh = new AtomicBoolean(false);
 
 	/**
 	 * Default constructor
@@ -62,20 +59,20 @@ public class Robot {
 	public Robot(Commander commander) {
 		this.commander = commander;
 	}
-	
+
 	/**
 	 * This should be called just before the loop {@link #runCycle()}.
 	 */
 	public void init() {
 		// create state
-		State state = new LineFollowingState(this);
+		state = new LineFollowingState(this);
 		state.begin();
 	}
 
 	public void setImageSupplier(ImageSupplier imageSupplier) {
 		this.imageSupplier = imageSupplier;
 	}
-	
+
 	/**
 	 * Returns image got from {@link ImageSupplier}.
 	 * 
@@ -109,16 +106,23 @@ public class Robot {
 		return new Moment(image, sensorData);
 	}
 
+	public void start() {
+		thread = new Thread(this::runCycle);
+		thread.start();
+	}
+
 	/**
 	 * Runs {@link #runOnce()} repeatedly in a {@code while(true)} loop.
 	 */
-	public void runCycle() {
+	protected void runCycle() {
+		Thread.currentThread().setName("RobotThread");
 		while (run.get()) {
 			try {
 				State next = state.run();
 				Main.runs.getAndIncrement();
-				if (next != state) {
+				if (toRefresh.getAndSet(false) || next != state) {
 					// switching to next state
+					toRefresh.set(false);
 					state.end();
 					next.begin();
 				}
@@ -126,13 +130,21 @@ public class Robot {
 				// start cycle again and check "run" variable
 			}
 		}
+		state.end();
+		System.out.println("Robot stopped");
 	}
-	
+
 	/**
 	 * Stops the main cycle (method {@link #runCycle()}).
 	 */
 	public void stop() {
 		run.set(false);
+		state.interrupt();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -155,6 +167,13 @@ public class Robot {
 	 */
 	public void addConfigChangedListener(Runnable listener) {
 		configChangedListeners.add(listener);
+	}
+	
+	/**
+	 * 
+	 */
+	public void refresh() {
+		toRefresh.set(true);
 	}
 
 }
