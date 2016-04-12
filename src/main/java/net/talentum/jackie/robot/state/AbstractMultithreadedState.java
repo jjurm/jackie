@@ -23,9 +23,12 @@ public abstract class AbstractMultithreadedState implements State {
 	public int running = 0;
 	long lastRun = -1;
 	long lastDuration = -1;
+	
+	State nextState;
 
 	@Override
-	public final void run() {
+	public final State run() {
+		nextState = this;
 		// set started
 		started.set(true);
 
@@ -44,7 +47,8 @@ public abstract class AbstractMultithreadedState implements State {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
+		return nextState;
 	}
 
 	/**

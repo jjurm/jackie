@@ -77,7 +77,7 @@ public class LineFollowingState extends AbstractState {
 	}
 
 	@Override
-	public void run0() {
+	public State run0() {
 		double heading = 0.0;
 
 		// obtain moment
@@ -107,7 +107,8 @@ public class LineFollowingState extends AbstractState {
 
 		// finally write motors
 		robot.commander.writePropulsionMotors(motors.left, motors.right);
-
+		
+		return this;
 	}
 
 }

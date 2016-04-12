@@ -87,6 +87,7 @@ public class Main {
 		System.out.println("Running...");
 
 		// run robot's cycle infinitely
+		robot.init();
 		executor.submit(robot::runCycle);
 
 		// monitor running

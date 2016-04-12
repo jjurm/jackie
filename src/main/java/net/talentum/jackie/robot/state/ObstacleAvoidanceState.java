@@ -10,14 +10,14 @@ public class ObstacleAvoidanceState extends AbstractState {
 	}
 
 	@Override
-	public void run0() {
+	public State run0() {
 		robot.commander.writePropulsionMotors(100, 100);
 
 		TimeTools.sleep(5000);
 		
 		robot.commander.writePropulsionMotors(90, 110);
 		
-		robot.setState(new NullState());
+		return new NullState();
 	}
 
 }

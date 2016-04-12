@@ -69,7 +69,7 @@ public class Robot {
 	public void init() {
 		// create state
 		State state = new LineFollowingState(this);
-		setState(state);
+		state.begin();
 	}
 
 	public void setImageSupplier(ImageSupplier imageSupplier) {
@@ -115,8 +115,13 @@ public class Robot {
 	public void runCycle() {
 		while (run.get()) {
 			try {
-				state.run();
+				State next = state.run();
 				Main.runs.getAndIncrement();
+				if (next != state) {
+					// switching to next state
+					state.end();
+					next.begin();
+				}
 			} catch (InterruptedExecution e) {
 				// start cycle again and check "run" variable
 			}
@@ -152,18 +157,4 @@ public class Robot {
 		configChangedListeners.add(listener);
 	}
 
-	/**
-	 * Method for setting the Robot's {@link State}
-	 * 
-	 * @param state
-	 */
-	public void setState(State state) {
-		System.out.println("State changed to " + state.getClass().getName());
-		if (this.state != null)
-			this.state.end();
-		this.state = state;
-		if (state != null)
-			state.begin();
-	}
-	
 }

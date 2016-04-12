@@ -13,10 +13,11 @@ public interface State {
 	/**
 	 * One run of the state method.
 	 * 
+	 * @return state that should be used next time
 	 * @throws InterruptedExecution
 	 *             thrown in case when the execution should be interrupted
 	 */
-	public void run() throws InterruptedExecution;
+	public State run() throws InterruptedExecution;
 
 	/**
 	 * This method is called on the active state once, before the first run,

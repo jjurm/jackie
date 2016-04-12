@@ -83,7 +83,7 @@ public class TextInputProcessor {
 
 	public void readUltrasonic(String[] args, PrintWriter pw) {
 		if (args.length < 1) {
-			System.out.println("Syntax: us <index>");
+			pw.println("Syntax: us <index>");
 		}
 
 		int index = Integer.parseInt(args[0]);

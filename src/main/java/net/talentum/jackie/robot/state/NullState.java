@@ -8,8 +8,8 @@ package net.talentum.jackie.robot.state;
 public class NullState implements State {
 
 	@Override
-	public void run() {
-
+	public State run() {
+		return this;
 	}
 
 	@Override

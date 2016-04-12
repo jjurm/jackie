@@ -29,7 +29,7 @@ public class EvacuationState extends AbstractState {
 	}
 	
 	@Override
-	public void run0() {
+	public State run0() {
 		double heading = 0.0;
 		
 		light(false);
@@ -49,7 +49,7 @@ public class EvacuationState extends AbstractState {
 			pick();
 		}
 			
-		
+		return this;
 	}
 	
 	/**

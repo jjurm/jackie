@@ -23,15 +23,15 @@ public abstract class AbstractState implements State {
 	}
 
 	@Override
-	public final void run() {
+	public final State run() {
 		thread = Thread.currentThread();
-		run0();
+		return run0();
 	}
 
 	/**
 	 * Internal method called from outside the run method.
 	 */
-	public abstract void run0();
+	public abstract State run0();
 
 	@Override
 	public void interrupt() {
