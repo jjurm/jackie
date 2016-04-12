@@ -17,10 +17,12 @@ import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
 public class LocalWebcamImageSupplier implements ImageSupplier {
 
 	private Webcam webcam;
+	
+	static {
+		Webcam.setDriver(new V4l4jDriver());
+	}
 
 	public LocalWebcamImageSupplier() {
-		Webcam.setDriver(new V4l4jDriver());
-
 		try {
 			webcam = Webcam.getDefault(5, TimeUnit.SECONDS);
 		} catch (WebcamException | TimeoutException e) {

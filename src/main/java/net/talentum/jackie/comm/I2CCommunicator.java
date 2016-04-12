@@ -143,6 +143,16 @@ import com.pi4j.io.i2c.I2CFactory;
  * <td>Measured analog value (0-1023). The command returns one 16-bit number
  * split into <i>2 bytes</i>, with MSB bits first.</td>
  * </tr>
+ * 
+ * <tr>
+ * <th>22</th>
+ * <td>Read infrared line sensor values</td>
+ * <td></td>
+ * <td></td>
+ * <td>8 measured analog values (0-255), each consisting of 1 byte. The command
+ * returns 8 bytes, each corresponding to {@code i}-th infrared sensor on the
+ * line sensor.</td>
+ * </tr>
  * </table>
  * 
  * @author JJurM

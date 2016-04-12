@@ -1,7 +1,6 @@
 package net.talentum.jackie.comm;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -58,11 +57,11 @@ public class ConsoleReader implements Runnable {
 	public void stop() {
 		if (run.get()) {
 			stopped.set(true);
-			try {
+			/*try {
 				isr.close();
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
+			}*/
 		}
 	}
 

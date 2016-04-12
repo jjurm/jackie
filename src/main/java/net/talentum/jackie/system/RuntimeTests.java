@@ -170,9 +170,17 @@ public class RuntimeTests {
 
 	public static void testUltrasonicSensor(String[] args) {
 		init();
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		
 		while (true) {
+			
+			try {
+				String[] parts = br.readLine().split("\\s");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			textInputProcessor.readUltrasonic(args, pw);
+			
 		}
 
 	}

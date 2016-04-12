@@ -48,5 +48,15 @@ public abstract class AbstractState implements State {
 			throw new InterruptedExecution();
 		}
 	}
+	
+	@Override
+	public void begin() {
+		// do nothing as default
+	}
+	
+	@Override
+	public void end() {
+		// do nothing as default
+	}
 
 }

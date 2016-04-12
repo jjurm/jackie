@@ -19,6 +19,18 @@ public interface State {
 	public void run() throws InterruptedExecution;
 
 	/**
+	 * This method is called on the active state once, before the first run,
+	 * after each switching.
+	 */
+	public void begin();
+
+	/**
+	 * This method is called on the active state once, just before being
+	 * switched with another state.
+	 */
+	public void end();
+
+	/**
 	 * Interrupts current execution of the run. Every child of {@link State}
 	 * should implement some way of interrupting the computing thread.
 	 */

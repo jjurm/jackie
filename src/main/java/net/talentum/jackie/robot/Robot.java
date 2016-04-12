@@ -61,9 +61,15 @@ public class Robot {
 	 */
 	public Robot(Commander commander) {
 		this.commander = commander;
-
-		// create strategy
-		state = new LineFollowingState(this);
+	}
+	
+	/**
+	 * This should be called just before the loop {@link #runCycle()}.
+	 */
+	public void init() {
+		// create state
+		State state = new LineFollowingState(this);
+		setState(state);
 	}
 
 	public void setImageSupplier(ImageSupplier imageSupplier) {
@@ -153,7 +159,11 @@ public class Robot {
 	 */
 	public void setState(State state) {
 		System.out.println("State changed to " + state.getClass().getName());
+		if (this.state != null)
+			this.state.end();
 		this.state = state;
+		if (state != null)
+			state.begin();
 	}
 	
 }

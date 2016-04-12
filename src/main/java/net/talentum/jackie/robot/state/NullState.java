@@ -17,4 +17,14 @@ public class NullState implements State {
 		// no need for interrupting
 	}
 
+	@Override
+	public void begin() {
+
+	}
+
+	@Override
+	public void end() {
+
+	}
+
 }

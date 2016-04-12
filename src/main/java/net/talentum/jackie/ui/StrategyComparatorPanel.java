@@ -89,7 +89,7 @@ public class StrategyComparatorPanel extends JPanel {
 	 * Server for transferring images.
 	 */
 	private ImageServer imageServer;
-	
+
 	/**
 	 * Whether the continuous shot mode has been started
 	 */
@@ -124,20 +124,23 @@ public class StrategyComparatorPanel extends JPanel {
 
 	private ImageSupplier imageSupplier;
 
-	public StrategyComparatorPanel(ImageOutputSupplier[] imageOutputSuppliers, ImageSupplierProvider[] imageSupplierProviders) {
+	public StrategyComparatorPanel(ImageOutputSupplier[] imageOutputSuppliers,
+			ImageSupplierProvider[] imageSupplierProviders) {
 		this.imageOutputSuppliers = imageOutputSuppliers;
 		this.imageSupplierProviders = imageSupplierProviders;
 		this.imageServer = new ImageServer(new ImageSupplier() {
 			@Override
 			public BufferedImage getImage() {
-				if (!webcamOpen.get()) return null;
+				if (!webcamOpen.get())
+					return null;
 				return imageSupplier.getImage();
 			}
+
 			@Override
 			public void close() {
 			}
 		});
-	
+
 		setLayout(new BorderLayout(0, 0));
 		createComponents();
 	}
@@ -157,27 +160,27 @@ public class StrategyComparatorPanel extends JPanel {
 
 		imageSupplierProviderSelection = new JComboBox<ImageSupplierProvider>();
 		imageSupplierProviderSelection.setPreferredSize(new Dimension(200, 20));
-		imageSupplierProviderSelection.setModel(new DefaultComboBoxModel<ImageSupplierProvider>(imageSupplierProviders));
+		imageSupplierProviderSelection
+				.setModel(new DefaultComboBoxModel<ImageSupplierProvider>(imageSupplierProviders));
 		imageSupplierProviderSelection.setMaximumRowCount(20);
 		menu1.add(imageSupplierProviderSelection);
-		
+
 		viewSizeSelection = new JComboBox<DimensionComboBoxItem>();
 		viewSizeSelection.setPreferredSize(new Dimension(80, 20));
-		viewSizeSelection.setModel(new DefaultComboBoxModel<DimensionComboBoxItem>(Arrays
-				.stream(new Dimension[]{
-						new Dimension(176, 144),
-						new Dimension(320, 240),
-						new Dimension(640, 480)
-						}).map((Dimension dimension) -> new DimensionComboBoxItem(dimension))
-				.toArray(size -> new DimensionComboBoxItem[size])));
+		viewSizeSelection
+				.setModel(new DefaultComboBoxModel<DimensionComboBoxItem>(Arrays
+						.stream(new Dimension[] { new Dimension(176, 144), new Dimension(320, 240),
+								new Dimension(640, 480) })
+						.map((Dimension dimension) -> new DimensionComboBoxItem(dimension))
+						.toArray(size -> new DimensionComboBoxItem[size])));
 		viewSizeSelection.setSelectedIndex(2);
 		viewSizeSelection.addActionListener(e -> viewSizeChanged());
 		menu1.add(viewSizeSelection);
-		
+
 		txtProviderParameter = new JTextField();
 		txtProviderParameter.setColumns(10);
 		menu1.add(txtProviderParameter);
-	
+
 		btnOpenClose = new JButton("Open");
 		btnOpenClose.addActionListener(e -> {
 			btnOpenClose.setEnabled(false);
@@ -187,7 +190,8 @@ public class StrategyComparatorPanel extends JPanel {
 
 				executor.submit(() -> {
 					// open webcam
-					imageSupplier = ((ImageSupplierProvider)imageSupplierProviderSelection.getSelectedItem()).provide(txtProviderParameter.getText());
+					imageSupplier = ((ImageSupplierProvider) imageSupplierProviderSelection.getSelectedItem())
+							.provide(txtProviderParameter.getText());
 					// enqueue GUI changes
 					EventQueue.invokeLater(() -> {
 						btnOpenClose.setText("Close");
@@ -255,18 +259,20 @@ public class StrategyComparatorPanel extends JPanel {
 		imageOutputSelection = new JComboBox<ImageOutputSupplier.ComboBoxItem>();
 		imageOutputSelection.setPreferredSize(new Dimension(200, 20));
 		imageOutputSelection.setModel(new DefaultComboBoxModel<ImageOutputSupplier.ComboBoxItem>(
-				Arrays.stream(imageOutputSuppliers).map(s -> new ImageOutputSupplier.ComboBoxItem(s)).toArray(s -> new ImageOutputSupplier.ComboBoxItem[s])));
+				Arrays.stream(imageOutputSuppliers).map(s -> new ImageOutputSupplier.ComboBoxItem(s))
+						.toArray(s -> new ImageOutputSupplier.ComboBoxItem[s])));
 		imageOutputSelection.setMaximumRowCount(20);
 		menu2.add(imageOutputSelection);
 
 		imageOutputParameter = new JTextField();
 		imageOutputParameter.setColumns(10);
 		menu2.add(imageOutputParameter);
-		
+
 		btnAddOutput = new JButton("Add output");
 		btnAddOutput.addActionListener(e -> {
 			// create new image output frame
-			ImageOutputSupplier imageOutputSupplier = ((ImageOutputSupplier.ComboBoxItem) imageOutputSelection.getSelectedItem()).getValue();
+			ImageOutputSupplier imageOutputSupplier = ((ImageOutputSupplier.ComboBoxItem) imageOutputSelection
+					.getSelectedItem()).getValue();
 			ImageOutput imageOutput = imageOutputSupplier.get(imageOutputParameter.getText());
 			ImageOutputFrame frame = new ImageOutputFrame(imageOutput);
 			imageOutputFrames.add(frame);
@@ -279,8 +285,8 @@ public class StrategyComparatorPanel extends JPanel {
 			desktopPane.revalidate();
 			desktopPane.repaint();
 		});
-		menu2.add(btnAddOutput);	
-		
+		menu2.add(btnAddOutput);
+
 		horizontalStrut = Box.createHorizontalStrut(20);
 		menu2.add(horizontalStrut);
 
@@ -371,7 +377,7 @@ public class StrategyComparatorPanel extends JPanel {
 	 */
 	private void viewSizeChanged() {
 		Dimension viewSize = getViewSize();
-		
+
 		if (imageSupplier instanceof LocalWebcamImageSupplier) {
 			LocalWebcamImageSupplier local = (LocalWebcamImageSupplier) imageSupplier;
 			local.setViewSize(viewSize);
@@ -404,6 +410,10 @@ public class StrategyComparatorPanel extends JPanel {
 		try {
 			// construct Moment
 			BufferedImage image = imageSupplier.getImage();
+			if (image == null) {
+				return;
+			}
+
 			SensorData sensorData = SensorData.collect();
 			Moment moment = new Moment(image, sensorData);
 
@@ -562,8 +572,6 @@ public class StrategyComparatorPanel extends JPanel {
 	 * Continuously runs server (while not stopped by user)
 	 */
 	public void runServer() {
-
-		
 
 	}
 }
