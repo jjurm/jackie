@@ -6,12 +6,13 @@ import java.awt.image.BufferedImage;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import net.talentum.jackie.comm.Commander;
 import net.talentum.jackie.libs.PIDController;
 import net.talentum.jackie.module.MotorIntensityFunction;
 import net.talentum.jackie.module.impl.BasicBorderFinderModule;
 import net.talentum.jackie.module.impl.BasicIntersectionSolver;
 import net.talentum.jackie.module.impl.BlurImageModifierModule;
-import net.talentum.jackie.module.impl.LinearMotorIntensityFunction;
+import net.talentum.jackie.module.impl.BasicMotorIntensityFunction;
 import net.talentum.jackie.module.impl.UnivBooleanImageFilterModule;
 import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.RobotInstruction;
@@ -38,7 +39,7 @@ public class LineFollowingState extends AbstractState {
 		super(robot);
 		HierarchicalConfiguration config = ConfigurationManager.getGeneralConfiguration();
 
-		this.mif = new LinearMotorIntensityFunction();
+		this.mif = new BasicMotorIntensityFunction();
 
 		// @formatter:off
 		this.strategy = new HorizontalLevelObservingStrategy(
@@ -83,12 +84,30 @@ public class LineFollowingState extends AbstractState {
 	}
 
 	@Override
+	public void begin() {
+		// move camera up
+		robot.commander.writeMotor(Commander.MOTOR_CAMERA, Config.get().getInt("params/motorPositions/camera/up"));
+		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
+
+		// move arm up
+		robot.commander.writeMotor(Commander.MOTOR_ARM, Config.get().getInt("params/motorPositions/arm/normal"));
+		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
+
+		// turn backlight on
+		robot.commander.light(Commander.BACKLIGHT, true);
+
+		// move camera down
+		robot.commander.writeMotor(Commander.MOTOR_CAMERA, Config.get().getInt("params/motorPositions/camera/down"));
+		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
+	}
+
+	@Override
 	public State run0() {
 		double heading = 0.0;
 
-		if (robot.commander.readUltrasonicSensor(0) < 6) {
+		/*if (robot.commander.readUltrasonicSensor(0) < 6) {
 			return new ObstacleAvoidanceState(robot);
-		}
+		}*/
 
 		// obtain image
 		BufferedImage img = robot.getImage();
@@ -122,27 +141,9 @@ public class LineFollowingState extends AbstractState {
 	}
 
 	@Override
-	public void begin() {
-		// move camera up
-		robot.commander.writeMotor(5, Config.get().getInt("params/motorPositions/m5/up"));
-		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
-
-		// move arm up
-		robot.commander.writeMotor(2, Config.get().getInt("params/motorPositions/m2/normal"));
-		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
-
-		// turn backlight on
-		robot.commander.light(0, true);
-
-		// move camera down
-		robot.commander.writeMotor(5, Config.get().getInt("params/motorPositions/m5/down"));
-		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
-	}
-
-	@Override
 	public void end() {
 		// backlight off
-		robot.commander.light(0, false);
+		robot.commander.light(Commander.BACKLIGHT, false);
 	}
 
 }

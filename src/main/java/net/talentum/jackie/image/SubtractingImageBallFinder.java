@@ -22,7 +22,11 @@ public class SubtractingImageBallFinder extends ImageOutput {
 
 	BufferedImage img1;
 	BufferedImage img2;
-	BufferedImage result;
+	public BufferedImage result;
+
+	public SubtractingImageBallFinder() {
+		super("");
+	}
 
 	public SubtractingImageBallFinder(String name) {
 		super(name);
@@ -56,15 +60,17 @@ public class SubtractingImageBallFinder extends ImageOutput {
 	/**
 	 * Finds point of ball, or returns {@code null} if the ball was not found.
 	 * 
-	 * @param img1 image without light
-	 * @param img2 image with light
+	 * @param img1
+	 *            image without light
+	 * @param img2
+	 *            image with light
 	 * @return
 	 */
 	public Point find(BufferedImage img1, BufferedImage img2) {
 		// create image
 		result = new BufferedImage(img1.getWidth(), img1.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Color c1, c2, r;
-		
+
 		// do the subtracting
 		for (int x = 0; x < img1.getWidth(); x++) {
 			for (int y = 0; y < img1.getHeight(); y++) {
@@ -93,6 +99,7 @@ public class SubtractingImageBallFinder extends ImageOutput {
 				}
 			}
 		}
+		
 		return maxPoint;
 	}
 

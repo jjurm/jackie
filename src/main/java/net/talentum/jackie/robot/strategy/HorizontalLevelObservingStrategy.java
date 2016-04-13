@@ -82,7 +82,7 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 
 		Point destination;
 		if (secondary == null) {
-			destination = new Point(bottom);
+			destination = new Point(primary);
 		} else {
 			destination = new Point((int) Math.round(1.5 * bottom.x - 0.5 * abottom.x), bottom.y);
 		}

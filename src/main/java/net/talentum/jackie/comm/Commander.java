@@ -19,6 +19,21 @@ public class Commander {
 	 */
 	static final int S = 3;
 
+	// ===== Constants =====
+
+	public static final int MOTOR_LEFT = 0;
+	public static final int MOTOR_RIGHT = 1;
+	public static final int MOTOR_ARM = 2;
+	public static final int MOTOR_SHUTTER = 4;
+	public static final int MOTOR_CAMERA = 5;
+
+	public static final int BACKLIGHT = 0;
+	public static final int FLASHLIGHT = 1;
+
+	public static final int ULTRASONIC_FRONT = 0;
+	public static final int ULTRASONIC_LEFT = 3;
+	public static final int ULTRASONIC_RIGHT = 5;
+
 	public final I2CCommunicator i2c;
 
 	public Commander(I2CCommunicator i2c) {
@@ -28,7 +43,7 @@ public class Commander {
 	public void end() {
 		light(0, false);
 		light(1, false);
-		writePropulsionMotors(90, 90);
+		writePropulsionMotors(0, 0);
 	}
 
 	// ===== Helper methods =====
@@ -133,14 +148,33 @@ public class Commander {
 	 * Write motor values. Both values are converted to bytes.
 	 * 
 	 * @param left
-	 *            motor controlling the left wheel
+	 *            motor controlling the left wheel (-90 to 90)
 	 * @param right
-	 *            motor controlling the right wheel
+	 *            motor controlling the right wheel (-90 to 90)
 	 */
 	public void writePropulsionMotors(int left, int right) {
+		left = 90 + left;
+		right = 90 + right;
 		i2c.deviceA.transfer(0, cmd(0x0B, 0), b(left), b(right));
 	}
 
+	/**
+	 * Write propulsion motor values.
+	 * 
+	 * @param both
+	 *            value for both right and left motors (0-90 to 90)
+	 * @see #writePropulsionMotors(int, int)
+	 */
+	public void writePropulsionMotors(int both) {
+		writePropulsionMotors(both, both);
+	}
+
+	/**
+	 * Returns device that corresponds to the light of the specified index.
+	 * 
+	 * @param index
+	 * @return
+	 */
 	protected Device getDeviceLight(int index) {
 		Device d;
 		switch (index) {
@@ -227,6 +261,9 @@ public class Commander {
 	 */
 	public double readUltrasonicSensor(int index) {
 		int[] res = i2c.deviceA.transfer(2, cmd(0x14, index));
+		if (res == null) {
+			return Double.MAX_VALUE;
+		}
 		int pulse = join(res);
 		return pulse / 58.138;
 	}

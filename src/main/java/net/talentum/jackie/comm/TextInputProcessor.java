@@ -58,6 +58,8 @@ public class TextInputProcessor {
 
 		// robot commands
 		commands.put("refresh", (args, br, pw) -> Main.robot.refresh());
+		
+		commands.put("stop", (args, br, pw) -> commander.writePropulsionMotors(0));
 
 	}
 

@@ -40,7 +40,7 @@ public class Main {
 
 	public static Robot robot;
 	private static ImageSupplier imageSupplier;
-	private static ImageServer imageServer;
+	//private static ImageServer imageServer;
 	private static AtomicBoolean running = new AtomicBoolean(true);
 
 	/**
@@ -69,14 +69,14 @@ public class Main {
 
 		// create image supplier
 		imageSupplier = new ServerImageSupplier("localhost");
-		//imageSupplier = new LocalWebcamImageSupplier();
+		// imageSupplier = new LocalWebcamImageSupplier();
 
 		robot.setImageSupplier(imageSupplier);
 
 		// start webcam server
-		System.out.println("Starting webcam server");
+		/*-System.out.println("Starting webcam server");
 		imageServer = new ImageServer(imageSupplier);
-		imageServer.start();
+		imageServer.start();*/
 
 		// start ConsoleReader
 		consoleReader.start();
@@ -132,11 +132,14 @@ public class Main {
 		FileChangedAutoReloadingStrategy.stopAll();
 
 		// stop ImageServer
-		imageServer.stop();
+		//imageServer.stop();
 
 		// stop Robot
 		executor.shutdown();
 		robot.stop();
+
+		// end Commander
+		commander.end();
 
 		// stop ConsoleReader
 		consoleReader.stop();

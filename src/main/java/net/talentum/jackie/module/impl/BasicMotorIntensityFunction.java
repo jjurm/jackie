@@ -9,7 +9,7 @@ import net.talentum.jackie.module.MotorIntensityFunction;
 import net.talentum.jackie.system.ConfigurationManager;
 import net.talentum.jackie.tools.MathTools;
 
-public class LinearMotorIntensityFunction implements MotorIntensityFunction {
+public class BasicMotorIntensityFunction implements MotorIntensityFunction {
 
 	@Override
 	public ImmutablePair<Integer, Integer> getMotors(double heading) {
@@ -37,7 +37,7 @@ public class LinearMotorIntensityFunction implements MotorIntensityFunction {
 						+ Math.pow(Math.abs(heading * internalCoefficient), exponent) * motor * coefficient
 						* MathTools.side(heading) * (positiveMotor ? positiveMotorCoefficient : 1),
 						-1, 1);
-				return (int) (Math.round(value * 90)) + 90;
+				return (int) (Math.round(value * 90));
 			}
 		};
 

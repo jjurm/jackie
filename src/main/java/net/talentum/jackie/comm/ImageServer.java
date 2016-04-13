@@ -35,12 +35,19 @@ public class ImageServer implements Runnable {
 
 	public static void main(String[] args) {
 		System.out.println("Running Image server");
-		
+
 		ImageSupplier imageSupplier = new LocalWebcamImageSupplier();
-		ImageServer imageServer = new ImageServer(imageSupplier);
+		final ImageServer imageServer = new ImageServer(imageSupplier);
 		imageServer.start();
+
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				imageServer.stop();
+			}
+		}));
 	}
-	
+
 	public ImageServer(ImageSupplier imageSupplier) {
 		this.imageSupplier = imageSupplier;
 		serverThread = new Thread(this);
@@ -62,36 +69,42 @@ public class ImageServer implements Runnable {
 			e.printStackTrace();
 		}
 		serverThread.interrupt();
-
 	}
 
 	@Override
 	public void run() {
 		try {
-			serverSocket = new ServerSocket(portNumber);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		while (startedServer.get()) {
 			try {
-				Socket client = serverSocket.accept();
+				serverSocket = new ServerSocket(portNumber);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
-				executor.submit(() -> {
-					try {
-						BufferedImage image = imageSupplier.getImage();
-						ImageIO.write(image, "JPG", client.getOutputStream());
-						client.close();
-					} catch (Exception e) {
+			while (startedServer.get()) {
+				try {
+					Socket client = serverSocket.accept();
+
+					executor.submit(() -> {
+						try {
+							BufferedImage image = null;
+							while (image == null) {
+								image = imageSupplier.getImage();
+							}
+							ImageIO.write(image, "JPG", client.getOutputStream());
+							client.close();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					});
+
+				} catch (IOException e) {
+					if (startedServer.get()) {
 						e.printStackTrace();
 					}
-				});
-
-			} catch (IOException e) {
-				if (startedServer.get()) {
-					e.printStackTrace();
 				}
 			}
+		} catch (Exception e) {
+			// ignore
 		}
 	}
 

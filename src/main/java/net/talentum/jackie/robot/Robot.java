@@ -99,6 +99,7 @@ public class Robot {
 				if (toRefresh.getAndSet(false) || next != state) {
 					// switching to next state
 					toRefresh.set(false);
+					System.out.println("Switching strategy to " + next.getClass().getCanonicalName());
 					state.end();
 					next.begin();
 				}

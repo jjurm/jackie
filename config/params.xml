@@ -26,29 +26,30 @@
     </ballFinding>
     <motorDelay>300</motorDelay>
     <motorPositions>
-        <m2>
-            <up>50</up>
-            <normal>70</normal>
-            <down>160</down>
-        </m2>
-        <m4>
+        <arm>
+            <up>5</up>
+            <normal>25</normal>
+            <down>98</down>
+        </arm>
+        <shutter>
             <up>180</up>
             <down>113</down>
-        </m4>
-        <m5>
+        </shutter>
+        <camera>
             <up>85</up>
             <middle>115</middle>
             <down>165</down>
-        </m5>
+        </camera>
     </motorPositions>
     <speeds>
         <normal>10</normal>
-        <reverse>80</reverse>
+        <slow>5</slow>
+        <reverse>-10</reverse>
         <reverseTime>1000</reverseTime>
         <rotation>10</rotation>
         <rotationTime>1200</rotationTime>
     </speeds>
     <intersections>
-        <minMaxValue></minMaxValue>
+        <minMaxValue>1000</minMaxValue>
     </intersections>
 </params>

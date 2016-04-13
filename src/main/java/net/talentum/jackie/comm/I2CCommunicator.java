@@ -154,8 +154,7 @@ import com.pi4j.io.i2c.I2CFactory;
  * <td>Read infrared sensor value</td>
  * <td>infrared sensor index</td>
  * <td></td>
- * <td>Measured analog value (0-1023). The command returns one 16-bit number
- * split into <i>2 bytes</i>, with MSB bits first.</td>
+ * <td>Measured analog value (0-255). The command returns one byte.</td>
  * </tr>
  * 
  * <tr>
