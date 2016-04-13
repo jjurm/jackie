@@ -14,6 +14,7 @@ import net.talentum.jackie.comm.ImageServer;
 import net.talentum.jackie.comm.TextInputProcessor;
 import net.talentum.jackie.image.supplier.ImageSupplier;
 import net.talentum.jackie.image.supplier.LocalWebcamImageSupplier;
+import net.talentum.jackie.image.supplier.ServerImageSupplier;
 import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.state.State;
 import net.talentum.jackie.tools.FileChangedAutoReloadingStrategy;
@@ -67,12 +68,8 @@ public class Main {
 		ConfigurationManager.setReloadedListener(robot::configurationReloaded);
 
 		// create image supplier
-		/*
-		 * if (args.length < 1) { System.out.println(
-		 * "You must supply server name"); return; } imageSupplier = new
-		 * ServerImageSupplier(args[0]);
-		 */
-		imageSupplier = new LocalWebcamImageSupplier();
+		imageSupplier = new ServerImageSupplier("localhost");
+		//imageSupplier = new LocalWebcamImageSupplier();
 
 		robot.setImageSupplier(imageSupplier);
 

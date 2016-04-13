@@ -81,7 +81,7 @@
         </configuration>
       </plugin>
 
-      <!-- Make executable JAR with libraries -->
+      <!-- Make executable JARs with libraries -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -108,7 +108,39 @@
               <attach>false</attach>
             </configuration>
           </execution>
+          <execution>
+            <id>server</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+              <archive>
+                <manifest>
+                  <addClasspath>true</addClasspath>
+                  <mainClass>net.talentum.jackie.comm.ImageServer</mainClass>
+                </manifest>
+              </archive>
+              <finalName>server</finalName>
+              <appendAssemblyId>false</appendAssemblyId>
+              <attach>false</attach>
+            </configuration>
+          </execution>
         </executions>
+      </plugin>
+
+      <!-- Copy dependencies, triggered with 'mvn dependency:copy-dependencies' -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <outputDirectory>
+            ${project.build.directory}
+          </outputDirectory>
+        </configuration>
       </plugin>
 
       <!-- Upload assembled JAR on 'deploy' -->

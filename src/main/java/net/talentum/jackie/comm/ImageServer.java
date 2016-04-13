@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.imageio.ImageIO;
 
 import net.talentum.jackie.image.supplier.ImageSupplier;
+import net.talentum.jackie.image.supplier.LocalWebcamImageSupplier;
 
 /**
  * Class providing network access to the given {@link ImageSupplier}. Method
@@ -32,6 +33,14 @@ public class ImageServer implements Runnable {
 
 	private AtomicBoolean startedServer = new AtomicBoolean(false);
 
+	public static void main(String[] args) {
+		System.out.println("Running Image server");
+		
+		ImageSupplier imageSupplier = new LocalWebcamImageSupplier();
+		ImageServer imageServer = new ImageServer(imageSupplier);
+		imageServer.start();
+	}
+	
 	public ImageServer(ImageSupplier imageSupplier) {
 		this.imageSupplier = imageSupplier;
 		serverThread = new Thread(this);
