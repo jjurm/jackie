@@ -66,46 +66,52 @@
         </configuration>
       </plugin>
 
-      <!-- Make executable JAR -->
+      <!-- Make executable JARs with libraries -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
+        <artifactId>maven-assembly-plugin</artifactId>
         <version>2.6</version>
         <executions>
           <execution>
             <id>jackie</id>
             <phase>package</phase>
             <goals>
-              <goal>jar</goal>
+              <goal>single</goal>
             </goals>
             <configuration>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
               <archive>
                 <manifest>
                   <addClasspath>true</addClasspath>
                   <mainClass>net.talentum.jackie.system.Run</mainClass>
-                  <classpathPrefix>lib/</classpathPrefix>
                 </manifest>
               </archive>
               <finalName>jackie</finalName>
               <appendAssemblyId>false</appendAssemblyId>
+              <attach>false</attach>
             </configuration>
           </execution>
           <execution>
             <id>server</id>
             <phase>package</phase>
             <goals>
-              <goal>jar</goal>
+              <goal>single</goal>
             </goals>
             <configuration>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
               <archive>
                 <manifest>
                   <addClasspath>true</addClasspath>
                   <mainClass>net.talentum.jackie.comm.ImageServer</mainClass>
-                  <classpathPrefix>lib/</classpathPrefix>
                 </manifest>
               </archive>
               <finalName>server</finalName>
               <appendAssemblyId>false</appendAssemblyId>
+              <attach>false</attach>
             </configuration>
           </execution>
         </executions>
