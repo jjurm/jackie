@@ -130,18 +130,21 @@ public class TextInputProcessor {
 			} else {
 				lastCommand = line;
 			}
-			String[] parts = line.split("\\s+|\\+");
-			String commandName = parts[0].trim();
 
-			Command command = commands.get(commandName);
-			/*
-			 * if (commandName.length() == 0) { // ignore empty line } else
-			 */ if (command != null) {
-				String[] args = Arrays.copyOfRange(parts, 1, parts.length);
-				command.process(args, br, pw);
-			}
+			performCommand(line, br, pw);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void performCommand(String line, BufferedReader br, PrintWriter pw) throws StreamCloseRequest {
+		String[] parts = line.split("\\s+|\\+");
+		String commandName = parts[0].trim();
+
+		Command command = commands.get(commandName);
+		if (command != null) {
+			String[] args = Arrays.copyOfRange(parts, 1, parts.length);
+			command.process(args, br, pw);
 		}
 	}
 
