@@ -52,4 +52,9 @@
     <intersections>
         <minMaxValue>1000</minMaxValue>
     </intersections>
+    <buttons>
+        <b1>echo</b1>
+        <b2>echo</b2>
+        <b3>echo</b3>
+    </buttons>
 </params>

@@ -34,6 +34,8 @@ public class TextInputProcessor {
 	void createCommands() {
 		Command c;
 
+		commands.put("echo", (args, br, pw) -> pw.println("Echo"));
+
 		// exit
 		c = (args, br, pw) -> Main.shutdown();
 		commands.put("exit", c);
@@ -58,7 +60,7 @@ public class TextInputProcessor {
 
 		// robot commands
 		commands.put("refresh", (args, br, pw) -> Main.robot.refresh());
-		
+
 		commands.put("stop", (args, br, pw) -> commander.writePropulsionMotors(0));
 
 	}

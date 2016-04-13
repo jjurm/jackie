@@ -228,16 +228,14 @@ public class Commander {
 	}
 
 	/**
-	 * Reads all buttons in a group. Returns one byte containing all values.
-	 * Every {@code i}-th bit from the right (LSB) describes state of the
-	 * {@code i}-th button.
+	 * Reads all buttons in a group. Returns one byte for each button.
 	 * 
 	 * @param group
 	 * @return
 	 */
-	public int readMultipleButtons(int group) {
-		int[] res = i2c.deviceB.transfer(1, cmd(0x12, group & 0x01));
-		return res[0];
+	public int[] readMultipleButtons(int group) {
+		int[] res = i2c.deviceC.transfer(3, cmd(0x12, group & 0x01));
+		return res;
 	}
 
 	/**
