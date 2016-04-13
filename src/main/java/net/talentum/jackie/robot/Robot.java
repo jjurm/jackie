@@ -82,30 +82,6 @@ public class Robot {
 		return imageSupplier.getImage();
 	}
 
-	/**
-	 * Constructs {@link Moment}, which involves taking an image from webcam
-	 * supplier and collecting sensor data.
-	 * 
-	 * @return
-	 */
-	public Moment constructMoment() {
-		BufferedImage image = imageSupplier.getImage();
-		if (image == null) {
-			System.out.println("Got null image");
-			return null;
-		}
-		SensorData sensorData = SensorData.collect();
-
-		/*-Image scaled = image.getScaledInstance(image.getWidth() / 2, image.getHeight() / 2,
-				BufferedImage.SCALE_FAST);
-		image = new BufferedImage(scaled.getWidth(null), scaled.getHeight(null), BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = image.createGraphics();
-		g.drawImage(scaled, 0, 0, null);
-		g.dispose();*/
-
-		return new Moment(image, sensorData);
-	}
-
 	public void start() {
 		thread = new Thread(this::runCycle);
 		thread.start();

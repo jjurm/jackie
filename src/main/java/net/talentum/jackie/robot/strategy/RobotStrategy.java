@@ -1,6 +1,7 @@
 package net.talentum.jackie.robot.strategy;
 
-import net.talentum.jackie.robot.Moment;
+import java.awt.image.BufferedImage;
+
 import net.talentum.jackie.robot.MomentData;
 import net.talentum.jackie.robot.RobotInstruction;
 
@@ -22,10 +23,10 @@ public abstract class RobotStrategy {
 	 * Prepares the strategy for processing the given moment. Involves creating
 	 * {@link MomentData} bonded to the moment.
 	 * 
-	 * @param moment
+	 * @param image
 	 */
-	public void prepare(Moment moment) {
-		d = new MomentData(moment);
+	public void prepare(BufferedImage image) {
+		d = new MomentData(image);
 	}
 
 	/**

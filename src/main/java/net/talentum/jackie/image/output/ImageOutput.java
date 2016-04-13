@@ -2,7 +2,6 @@ package net.talentum.jackie.image.output;
 
 import java.awt.image.BufferedImage;
 
-import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.system.StrategyComparatorPreview;
 
 /**
@@ -25,7 +24,7 @@ public abstract class ImageOutput {
 	 * @param moment
 	 * @return
 	 */
-	public abstract BufferedImage process(Moment moment);
+	public abstract BufferedImage process(BufferedImage moment);
 
 	public String getName() {
 		return name;

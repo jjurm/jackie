@@ -2,7 +2,6 @@ package net.talentum.jackie.image.output;
 
 import java.awt.image.BufferedImage;
 
-import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.RobotInstruction;
 import net.talentum.jackie.robot.RobotInstructionRegister;
 import net.talentum.jackie.robot.strategy.RobotStrategy;
@@ -24,14 +23,13 @@ public class RobotStrategyIROutput extends ImageOutput {
 	}
 
 	@Override
-	public BufferedImage process(Moment moment) {
-		strategy.prepare(moment);
+	public BufferedImage process(BufferedImage image) {
+		strategy.prepare(image);
 		RobotInstruction instruction = strategy.evaluate();
 		register.push(instruction);
 
-		BufferedImage image = InstructionPainter.paintOnImage(moment.image, instruction);
-
-		return image;
+		BufferedImage painted = InstructionPainter.paintOnImage(image, instruction);
+		return painted;
 	}
 
 }

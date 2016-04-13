@@ -34,8 +34,6 @@ import net.talentum.jackie.image.supplier.ImageOutputSupplier;
 import net.talentum.jackie.image.supplier.ImageSupplier;
 import net.talentum.jackie.image.supplier.ImageSupplierProvider;
 import net.talentum.jackie.image.supplier.LocalWebcamImageSupplier;
-import net.talentum.jackie.robot.Moment;
-import net.talentum.jackie.robot.SensorData;
 import net.talentum.jackie.system.StrategyComparatorPreview;
 import net.talentum.jackie.tools.AtomicTools;
 
@@ -414,12 +412,9 @@ public class StrategyComparatorPanel extends JPanel {
 				return;
 			}
 
-			SensorData sensorData = SensorData.collect();
-			Moment moment = new Moment(image, sensorData);
-
 			// arrange for processing
 			for (ImageOutputFrame p : imageOutputFrames) {
-				p.receive(moment);
+				p.receive(image);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -510,13 +505,13 @@ public class StrategyComparatorPanel extends JPanel {
 		 * 
 		 * @param moment
 		 */
-		void receive(Moment moment) {
-			Image image = imageOutput.process(moment);
+		void receive(BufferedImage image) {
+			Image result = imageOutput.process(image);
 
-			Dimension scaled = getScaledViewSize();
-			image = image.getScaledInstance(scaled.width, scaled.height, Image.SCALE_FAST);
+			Dimension scaledDimension = getScaledViewSize();
+			Image scaled = result.getScaledInstance(scaledDimension.width, scaledDimension.height, Image.SCALE_FAST);
 
-			imagePanel.setImage(image);
+			imagePanel.setImage(scaled);
 			imagePanel.repaint();
 		}
 

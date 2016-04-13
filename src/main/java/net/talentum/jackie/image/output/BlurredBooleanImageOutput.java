@@ -6,7 +6,6 @@ import java.util.function.Function;
 
 import net.talentum.jackie.module.impl.BlurImageModifierModule;
 import net.talentum.jackie.module.impl.UnivBooleanImageFilterModule;
-import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.tools.InstructionPainter;
 
 public class BlurredBooleanImageOutput extends ImageOutput {
@@ -27,8 +26,8 @@ public class BlurredBooleanImageOutput extends ImageOutput {
 	}
 
 	@Override
-	public BufferedImage process(Moment moment) {
-		BufferedImage blurred = blurModifier.modify(moment.image);
+	public BufferedImage process(BufferedImage image) {
+		BufferedImage blurred = blurModifier.modify(image);
 		boolean[][] bw = bwFilter.filter(blurred);
 		return InstructionPainter.getBooleanImage(bw);
 	}

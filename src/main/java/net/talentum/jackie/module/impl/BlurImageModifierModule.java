@@ -8,7 +8,6 @@ import java.awt.image.Kernel;
 
 import net.talentum.jackie.image.output.ImageOutput;
 import net.talentum.jackie.module.ImageModifierModule;
-import net.talentum.jackie.robot.Moment;
 
 public class BlurImageModifierModule extends ImageOutput implements ImageModifierModule {
 
@@ -45,8 +44,8 @@ public class BlurImageModifierModule extends ImageOutput implements ImageModifie
 	}
 
 	@Override
-	public BufferedImage process(Moment moment) {
-		return modify(moment.image);
+	public BufferedImage process(BufferedImage image) {
+		return modify(image);
 	}
 
 }

@@ -19,7 +19,6 @@ import net.talentum.jackie.system.Config;
  */
 public class MomentData {
 
-	public Moment m;
 	public BufferedImage image;
 	public SensorData sensorData;
 
@@ -38,10 +37,8 @@ public class MomentData {
 	public DirectionManagerModule mDirectionManager;
 	public TrailBordersMonitorModule mTrailBordersMonitor;
 
-	public MomentData(Moment moment) {
-		this.m = moment;
-		this.image = moment.image;
-		this.sensorData = moment.sensorData;
+	public MomentData(BufferedImage image) {
+		this.image = image;
 	}
 
 	// ===== helper functions =====

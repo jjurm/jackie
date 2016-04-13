@@ -11,7 +11,6 @@ import net.talentum.jackie.module.BooleanImageFilterModule;
 import net.talentum.jackie.module.BorderFinderModule;
 import net.talentum.jackie.module.ImageModifierModule;
 import net.talentum.jackie.module.IntersectionSolver;
-import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.MomentData;
 import net.talentum.jackie.robot.RobotInstruction;
 import net.talentum.jackie.system.Config;
@@ -78,7 +77,7 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 			primary = abottom;
 		}
 		if (primary == null) {
-			return new RobotInstruction(d.m, d, new Point(0, 1));
+			return new RobotInstruction(d.image, d, new Point(0, 1));
 		}
 
 		Point destination;
@@ -98,7 +97,7 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 
 		destination.translate(-x, 0);
 
-		return new RobotInstruction(d.m, d, destination);
+		return new RobotInstruction(d.image, d, destination);
 	}
 
 	/**
@@ -154,8 +153,8 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		}
 
 		@Override
-		public BufferedImage process(Moment moment) {
-			strategy.prepare(moment);
+		public BufferedImage process(BufferedImage image) {
+			strategy.prepare(image);
 			RobotInstruction instruction = strategy.evaluate();
 			MomentData d = instruction.momentData;
 

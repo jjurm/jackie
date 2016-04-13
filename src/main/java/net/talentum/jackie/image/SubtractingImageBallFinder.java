@@ -7,7 +7,6 @@ import java.awt.image.BufferedImage;
 
 import net.talentum.jackie.image.output.ImageOutput;
 import net.talentum.jackie.module.impl.BlurImageModifierModule;
-import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.system.ConfigurationManager;
 
 /**
@@ -30,14 +29,14 @@ public class SubtractingImageBallFinder extends ImageOutput {
 	}
 
 	@Override
-	public BufferedImage process(Moment moment) {
+	public BufferedImage process(BufferedImage image) {
 		if (first) {
 			first = false;
-			img1 = moment.image;
+			img1 = image;
 			return img1;
 		} else {
 			first = true;
-			img2 = moment.image;
+			img2 = image;
 
 			Point p = find(img1, img2);
 

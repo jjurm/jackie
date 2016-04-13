@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.util.function.Function;
 
 import net.talentum.jackie.module.impl.UnivBooleanImageFilterModule;
-import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.tools.InstructionPainter;
 
 public class BooleanImageOutput extends ImageOutput {
@@ -23,8 +22,8 @@ public class BooleanImageOutput extends ImageOutput {
 	}
 
 	@Override
-	public BufferedImage process(Moment moment) {
-		boolean[][] bw = filter.filter(moment.image);
+	public BufferedImage process(BufferedImage image) {
+		boolean[][] bw = filter.filter(image);
 		return InstructionPainter.getBooleanImage(bw);
 	}
 

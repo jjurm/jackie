@@ -4,9 +4,7 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 import net.talentum.jackie.image.SubtractingImageBallFinder;
-import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.Robot;
-import net.talentum.jackie.robot.RobotInstruction;
 import net.talentum.jackie.tools.TimeTools;
 
 public class EvacuationState extends AbstractState {
@@ -16,11 +14,6 @@ public class EvacuationState extends AbstractState {
 	public EvacuationState(SubtractingImageBallFinder subtractingImageBallFinder, Robot robot) {
 		super(robot);
 		this.subtractingImageBallFinder = subtractingImageBallFinder;
-	}
-	
-	public final synchronized RobotInstruction process(Moment momentOff, Moment momentOn) {
-		
-		return null;
 	}
 	
 	@Override

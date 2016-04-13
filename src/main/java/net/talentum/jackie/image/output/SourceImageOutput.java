@@ -2,8 +2,6 @@ package net.talentum.jackie.image.output;
 
 import java.awt.image.BufferedImage;
 
-import net.talentum.jackie.robot.Moment;
-
 public class SourceImageOutput extends ImageOutput {
 
 	public SourceImageOutput(String name) {
@@ -11,8 +9,8 @@ public class SourceImageOutput extends ImageOutput {
 	}
 
 	@Override
-	public BufferedImage process(Moment moment) {
-		return moment.image;
+	public BufferedImage process(BufferedImage image) {
+		return image;
 	}
-	
+
 }

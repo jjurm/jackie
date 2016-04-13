@@ -1,6 +1,7 @@
 package net.talentum.jackie.robot.state;
 
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -12,7 +13,6 @@ import net.talentum.jackie.module.impl.BasicIntersectionSolver;
 import net.talentum.jackie.module.impl.BlurImageModifierModule;
 import net.talentum.jackie.module.impl.LinearMotorIntensityFunction;
 import net.talentum.jackie.module.impl.UnivBooleanImageFilterModule;
-import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.RobotInstruction;
 import net.talentum.jackie.robot.strategy.HorizontalLevelObservingStrategy;
@@ -75,8 +75,8 @@ public class LineFollowingState extends AbstractState {
 	 * @param moment
 	 * @return
 	 */
-	public final synchronized RobotInstruction process(Moment moment) {
-		strategy.prepare(moment);
+	public final synchronized RobotInstruction process(BufferedImage image) {
+		strategy.prepare(image);
 		RobotInstruction instruction = strategy.evaluate();
 
 		return instruction;
@@ -90,12 +90,12 @@ public class LineFollowingState extends AbstractState {
 			return new ObstacleAvoidanceState(robot);
 		}
 
-		// obtain moment
-		Moment moment = robot.constructMoment();
+		// obtain image
+		BufferedImage img = robot.getImage();
 
-		if (moment != null) {
+		if (img != null) {
 			// process
-			RobotInstruction instruction = process(moment);
+			RobotInstruction instruction = process(img);
 
 			// set motors
 			// check if the result is valid
@@ -104,7 +104,7 @@ public class LineFollowingState extends AbstractState {
 				// direction = Math.PI / 2 -
 				// Math.atan2(instruction.destination.y,
 				// instruction.destination.x);
-				heading = ((double) instruction.destination.x) / instruction.moment.image.getWidth();
+				heading = ((double) instruction.destination.x) / instruction.image.getWidth();
 			}
 		}
 

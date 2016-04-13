@@ -53,7 +53,7 @@ public class LineFollowingStrategy extends RobotStrategy {
 		// find line start
 		Situation lineStart = mLineStartFinder.findLineStart(d);
 		if (lineStart == null)
-			return new RobotInstruction(d.m, d);
+			return new RobotInstruction(d.image, d);
 
 		// setup DirectionManagerModule
 		d.mDirectionManager = msDirectionManager.create(d);
@@ -66,7 +66,7 @@ public class LineFollowingStrategy extends RobotStrategy {
 		}
 
 		// result
-		RobotInstruction instruction = new RobotInstruction(d.m, d);
+		RobotInstruction instruction = new RobotInstruction(d.image, d);
 		return instruction;
 	}
 

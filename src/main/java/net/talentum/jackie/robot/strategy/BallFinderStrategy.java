@@ -10,7 +10,6 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import net.talentum.jackie.module.impl.BufferedImageMatConverterModule;
-import net.talentum.jackie.robot.Moment;
 import net.talentum.jackie.robot.RobotInstruction;
 
 public class BallFinderStrategy extends RobotStrategy {
@@ -31,8 +30,8 @@ public class BallFinderStrategy extends RobotStrategy {
 		}
 
 		@Override
-		public BufferedImage process(Moment moment) {
-			Mat frame = bimcModule.toMat(moment.image);
+		public BufferedImage process(BufferedImage image) {
+			Mat frame = bimcModule.toMat(image);
 			
 			Mat thresholded = new Mat();
 			Mat thresholded2 = new Mat();

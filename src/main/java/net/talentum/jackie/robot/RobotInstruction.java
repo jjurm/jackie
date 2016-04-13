@@ -1,12 +1,13 @@
 package net.talentum.jackie.robot;
 
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 
 /**
  * This class holds:
  * <ul>
- * <li>{@link Moment} that was the initiator of the processing, which led to
- * this instruction</li>
+ * <li>Image that was the initiator of the processing, which led to this
+ * instruction</li>
  * <li>{@link MomentData} that was created for processing</li>
  * <li>destination {@link Point}, which specifies the position relative to the
  * robot where the robot should go</li>
@@ -16,7 +17,7 @@ import java.awt.Point;
  */
 public class RobotInstruction {
 
-	public Moment moment;
+	public BufferedImage image;
 	public MomentData momentData;
 	public Point destination;
 
@@ -28,8 +29,8 @@ public class RobotInstruction {
 	 * @param moment
 	 * @param momentData
 	 */
-	public RobotInstruction(Moment moment, MomentData momentData) {
-		this(moment, momentData, null);
+	public RobotInstruction(BufferedImage image, MomentData momentData) {
+		this(image, momentData, null);
 	}
 
 	/**
@@ -39,8 +40,8 @@ public class RobotInstruction {
 	 * @param momentData
 	 * @param destination
 	 */
-	public RobotInstruction(Moment moment, MomentData momentData, Point destination) {
-		this.moment = moment;
+	public RobotInstruction(BufferedImage image, MomentData momentData, Point destination) {
+		this.image = image;
 		this.momentData = momentData;
 		this.destination = destination;
 	}
