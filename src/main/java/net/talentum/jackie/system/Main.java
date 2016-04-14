@@ -7,13 +7,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
+import net.talentum.jackie.comm.ButtonManager;
 import net.talentum.jackie.comm.Commander;
 import net.talentum.jackie.comm.ConsoleReader;
 import net.talentum.jackie.comm.I2CCommunicator;
-import net.talentum.jackie.comm.ImageServer;
 import net.talentum.jackie.comm.TextInputProcessor;
 import net.talentum.jackie.image.supplier.ImageSupplier;
-import net.talentum.jackie.image.supplier.LocalWebcamImageSupplier;
 import net.talentum.jackie.image.supplier.ServerImageSupplier;
 import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.state.State;
@@ -37,6 +36,7 @@ public class Main {
 	private static Commander commander;
 	private static TextInputProcessor textInputProcessor;
 	private static ConsoleReader consoleReader;
+	private static ButtonManager buttonManager;
 
 	public static Robot robot;
 	private static ImageSupplier imageSupplier;
@@ -62,6 +62,8 @@ public class Main {
 		commander = new Commander(i2c);
 		textInputProcessor = new TextInputProcessor(commander);
 		consoleReader = new ConsoleReader(textInputProcessor);
+		buttonManager = new ButtonManager(commander, textInputProcessor);
+		buttonManager.start();
 
 		System.out.println("Creating robot");
 		robot = new Robot(commander);

@@ -74,4 +74,8 @@ public class ButtonManager implements Runnable{
 		}
 		buttonStates = buttons;
 	}
+	
+	public void getCommand() {
+		
+	}
 }

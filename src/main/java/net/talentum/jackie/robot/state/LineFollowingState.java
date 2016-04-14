@@ -6,22 +6,18 @@ import java.awt.image.BufferedImage;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
-import net.talentum.jackie.comm.Commander;
 import net.talentum.jackie.libs.PIDController;
 import net.talentum.jackie.module.MotorIntensityFunction;
 import net.talentum.jackie.module.impl.BasicBorderFinderModule;
 import net.talentum.jackie.module.impl.BasicIntersectionSolver;
 import net.talentum.jackie.module.impl.BlurImageModifierModule;
-import net.talentum.jackie.module.impl.BasicMotorIntensityFunction;
+import net.talentum.jackie.module.impl.SimpleMotorIntensityFunction;
 import net.talentum.jackie.module.impl.UnivBooleanImageFilterModule;
 import net.talentum.jackie.robot.Robot;
 import net.talentum.jackie.robot.RobotInstruction;
 import net.talentum.jackie.robot.strategy.HorizontalLevelObservingStrategy;
-import net.talentum.jackie.robot.strategy.LineFollowingStrategy;
-import net.talentum.jackie.robot.strategy.RobotStrategy;
 import net.talentum.jackie.system.Config;
 import net.talentum.jackie.system.ConfigurationManager;
-import net.talentum.jackie.tools.TimeTools;
 
 /**
  * State intended for following black line, using the line
@@ -43,7 +39,7 @@ public class LineFollowingState extends AbstractState {
 		super(robot);
 		HierarchicalConfiguration config = ConfigurationManager.getGeneralConfiguration();
 
-		this.mif = new BasicMotorIntensityFunction();
+		this.mif = new SimpleMotorIntensityFunction();
 
 		// @formatter:off
 		this.strategy = new HorizontalLevelObservingStrategy(
