@@ -37,7 +37,9 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 	BorderFinderModule mBorderFinder;
 	IntersectionSolver mIntersectionSolver;
 	
-	long observeTopMillis = 0;
+	long observeTopMillis;
+	RobotInstruction lastInstruction;
+	long lastInstructionUntil;
 
 	public HorizontalLevelObservingStrategy(ImageModifierModule mImageModifier,
 			BooleanImageFilterModule mBooleanImageFilter, BorderFinderModule mBorderFinder,
@@ -66,6 +68,11 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 	}
 
 	public RobotInstruction evaluateA() {
+		if (System.currentTimeMillis() < lastInstructionUntil) {
+			System.out.println("Skipping");
+			return lastInstruction;
+		}
+		
 		// find line
 		int x = d.image.getWidth() / 2;
 		int y = d.image.getHeight() / 2;
@@ -97,7 +104,22 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 			return new RobotInstruction(d.image, d, new Point(0, 1));
 		}
 
-		// detect green
+		Point destination;
+		if (secondary == null) {
+			destination = new Point(primary.getMiddle());
+		} else {
+			destination = new Point((int) Math.round(1.5 * bottom.getMiddle().x - 0.5 * abottom.getMiddle().x), bottom.getMiddle().y);
+		}
+		
+		Point intersection = mIntersectionSolver.findMark(d.image, primary.getMiddle().y);
+		if (intersection != null) {
+			System.out.println("Found green mark");
+			d.highlight.add(intersection);
+			//lastInstruction = new RobotInstruction(d.image, d, new Point((diff > 0 ? 1 : -1) * (d.image.getWidth() / 2), primary.getMiddle().y));
+			lastInstruction = new RobotInstruction(d.image, d, new Point(40, primary.getMiddle().y));
+			lastInstructionUntil = System.currentTimeMillis() + 600;
+			return lastInstruction;
+		}
 
 		if (primary == bottom && top != null && d.dst(bottom.getLeft(), bottom.getRight()) > d.image.getWidth() / 3) {
 			primary = top;
@@ -105,21 +127,12 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 			System.out.println("Recognized intersection");
 		}
 		
-		Point destination;
 		if (secondary == null) {
 			destination = new Point(primary.getMiddle());
 		} else {
 			destination = new Point((int) Math.round(1.5 * bottom.getMiddle().x - 0.5 * abottom.getMiddle().x), bottom.getMiddle().y);
 		}
-
-		Point intersection = mIntersectionSolver.findMark(d.image, primary.getMiddle().y);
-		if (intersection != null) {
-			d.highlight.add(intersection);
-
-			int diff = intersection.x - destination.x;
-			destination.x += diff * Config.get().getDouble("params/lineFollowing/intersectionFactor");
-		}
-
+		
 		destination.translate(-x, 0);
 
 		return new RobotInstruction(d.image, d, destination);

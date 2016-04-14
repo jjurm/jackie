@@ -16,7 +16,7 @@ public class BasicIntersectionSolver implements IntersectionSolver {
 		function = new Function<Color, Double>() {
 			@Override
 			public Double apply(Color c) {
-				return ((double) c.getGreen()) / (c.getBlue() + c.getRed() + 1);
+				return ((double) c.getGreen()) * 100 / (c.getBlue() + c.getRed() + 1);
 			}
 		};
 	}
@@ -39,7 +39,7 @@ public class BasicIntersectionSolver implements IntersectionSolver {
 				maxPoint = new Point(x, y);
 			}
 		}
-		if (maxVal >= Config.get().getInt("params/intersections/minMaxValue")) {
+		if (maxVal >= Config.get().getDouble("params/intersections/minMaxValue")) {
 			return maxPoint;
 		} else {
 			return null;

@@ -9,7 +9,6 @@ import net.talentum.jackie.comm.Commander;
 import net.talentum.jackie.image.supplier.ImageSupplier;
 import net.talentum.jackie.robot.state.InterruptedExecution;
 import net.talentum.jackie.robot.state.LineFollowingState;
-import net.talentum.jackie.robot.state.ObstacleAvoidanceState;
 import net.talentum.jackie.robot.state.State;
 import net.talentum.jackie.system.Config;
 import net.talentum.jackie.system.Main;
@@ -50,9 +49,9 @@ public class Robot {
 	 * in a loop.
 	 */
 	private State state;
-	
+
 	private AtomicBoolean toRefresh = new AtomicBoolean(false);
-	
+
 	public LineFollowingState lineFollowingState = new LineFollowingState(this);
 
 	/**
@@ -69,9 +68,9 @@ public class Robot {
 	 */
 	public void init() {
 		// create state
-		//state = new HorizontalLevelObservingState(this);
+		// state = new HorizontalLevelObservingState(this);
 		lineFollowingState = new LineFollowingState(this);
-		//state = new ObstacleAvoidanceState(this);
+		// state = new ObstacleAvoidanceState(this);
 		state = lineFollowingState;
 		state.begin();
 	}
@@ -153,14 +152,14 @@ public class Robot {
 	public void addConfigChangedListener(Runnable listener) {
 		configChangedListeners.add(listener);
 	}
-	
+
 	/**
 	 * 
 	 */
 	public void refresh() {
 		toRefresh.set(true);
 	}
-	
+
 	public void begin() {
 		// move camera up
 		commander.writeMotor(Commander.MOTOR_CAMERA, Config.get().getInt("params/motorPositions/camera/up"));
@@ -178,11 +177,11 @@ public class Robot {
 		commander.writeMotor(Commander.MOTOR_CAMERA, Config.get().getInt("params/motorPositions/camera/down"));
 		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
 	}
-	
+
 	public void end() {
 		commander.light(0, false);
 		commander.light(1, false);
-		commander.writePropulsionMotors(0, 0);
+		commander.writePropulsionMotors(0);
 	}
 
 }

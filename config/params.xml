@@ -20,6 +20,7 @@
             <positiveMotorCoefficient>0.6</positiveMotorCoefficient>
         </motorIntensityFunction>
         <intersectionFactor>3</intersectionFactor>
+        <intersectionBreaktrough>1000</intersectionBreaktrough>
     </lineFollowing>
     <ballFinding>
         <minMaxValue>42</minMaxValue>
@@ -27,9 +28,9 @@
     <motorDelay>300</motorDelay>
     <motorPositions>
         <arm>
-            <up>5</up>
-            <normal>25</normal>
-            <down>98</down>
+            <up>0</up>
+            <normal>0</normal>
+            <down>135</down>
         </arm>
         <shutter>
             <up>180</up>
@@ -47,10 +48,10 @@
         <reverse>-10</reverse>
         <reverseTime>1000</reverseTime>
         <rotation>10</rotation>
-        <rotationTime>1200</rotationTime>
+        <rotationTime>1700</rotationTime>
     </speeds>
     <intersections>
-        <minMaxValue>1000</minMaxValue>
+        <minMaxValue>100</minMaxValue>
     </intersections>
     <buttons>
         <b1>echo</b1>

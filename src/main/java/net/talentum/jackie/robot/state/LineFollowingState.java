@@ -18,6 +18,7 @@ import net.talentum.jackie.robot.RobotInstruction;
 import net.talentum.jackie.robot.strategy.HorizontalLevelObservingStrategy;
 import net.talentum.jackie.system.Config;
 import net.talentum.jackie.system.ConfigurationManager;
+import net.talentum.jackie.tools.TimeTools;
 
 /**
  * State intended for following black line, using the line
@@ -34,6 +35,8 @@ public class LineFollowingState extends AbstractState {
 	private MotorIntensityFunction mif;
 	
 	private int nearMeasurements = 0;
+	
+	private long lastUS = 0;
 
 	public LineFollowingState(Robot robot) {
 		super(robot);
@@ -85,15 +88,30 @@ public class LineFollowingState extends AbstractState {
 
 	@Override
 	public State run0() {
+		/*if (Robot.lastSpeedup + 5000 < System.currentTimeMillis() && Robot.reversed.getAndSet(false)) {
+			robot.commander.writePropulsionMotors(Config.get().getInt("params/speeds/reverse"));
+			TimeTools.sleep(1000);
+		}*/
+		
 		double heading = 0.0;
-
-		if (robot.commander.readUltrasonicSensor(0) < 6) {
-			nearMeasurements++;
-			if (nearMeasurements >= 3) {
-				return new ObstacleAvoidanceState(robot);
+		if (lastUS + 300 < System.currentTimeMillis()) {
+			double us = robot.commander.readUltrasonicSensor(0);
+			lastUS = System.currentTimeMillis();
+			if (us < 6 && us > 0.1) {
+				nearMeasurements++;
+				if (nearMeasurements >= 3) {
+					//return new ObstacleAvoidanceState(robot);
+					/*Robot.lastSpeedup = System.currentTimeMillis();
+					Robot.reversed.set(true);*/
+					nearMeasurements = 0;
+					robot.commander.writePropulsionMotors(Config.get().getInt("params/speeds/normal"));
+					TimeTools.sleep(3000);
+					robot.commander.writePropulsionMotors(Config.get().getInt("params/speeds/reverse"));
+					TimeTools.sleep(1500);
+				}
+			} else {
+				nearMeasurements = 0;
 			}
-		} else {
-			nearMeasurements = 0;
 		}
 
 		// obtain image
