@@ -235,9 +235,13 @@ public class Commander {
 	 * @param group
 	 * @return
 	 */
-	public int[] readMultipleButtons(int group) {
+	public boolean[] readMultipleButtons(int group) {
 		int[] res = i2c.deviceC.transfer(3, cmd(0x12, group & 0x01));
-		return res;
+		boolean[] values = new boolean[res.length];
+		for (int i = 0; i < res.length; i++) {
+			values[i] = res[i] == 0;
+		}
+		return values;
 	}
 
 	/**
