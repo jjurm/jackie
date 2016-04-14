@@ -31,19 +31,13 @@ public class Commander {
 	public static final int FLASHLIGHT = 1;
 
 	public static final int ULTRASONIC_FRONT = 0;
-	public static final int ULTRASONIC_LEFT = 3;
+	public static final int ULTRASONIC_LEFT = 4;
 	public static final int ULTRASONIC_RIGHT = 5;
 
 	public final I2CCommunicator i2c;
 
 	public Commander(I2CCommunicator i2c) {
 		this.i2c = i2c;
-	}
-
-	public void end() {
-		light(0, false);
-		light(1, false);
-		writePropulsionMotors(0, 0);
 	}
 
 	// ===== Helper methods =====
@@ -268,7 +262,7 @@ public class Commander {
 	public double readUltrasonicSensor(int index) {
 		int[] res = i2c.deviceA.transfer(2, cmd(0x14, index));
 		if (res == null) {
-			return Double.MAX_VALUE;
+			return 500;
 		}
 		int pulse = join(res);
 		return pulse / 58.138;

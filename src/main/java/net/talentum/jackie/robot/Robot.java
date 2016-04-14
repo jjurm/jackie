@@ -9,9 +9,11 @@ import net.talentum.jackie.comm.Commander;
 import net.talentum.jackie.image.supplier.ImageSupplier;
 import net.talentum.jackie.robot.state.InterruptedExecution;
 import net.talentum.jackie.robot.state.LineFollowingState;
+import net.talentum.jackie.robot.state.ObstacleAvoidanceState;
 import net.talentum.jackie.robot.state.State;
 import net.talentum.jackie.system.Config;
 import net.talentum.jackie.system.Main;
+import net.talentum.jackie.tools.TimeTools;
 
 /**
  * One instance of this class represents one robot (there should naturally be at
@@ -50,6 +52,8 @@ public class Robot {
 	private State state;
 	
 	private AtomicBoolean toRefresh = new AtomicBoolean(false);
+	
+	public LineFollowingState lineFollowingState = new LineFollowingState(this);
 
 	/**
 	 * Default constructor
@@ -65,7 +69,10 @@ public class Robot {
 	 */
 	public void init() {
 		// create state
-		state = new LineFollowingState(this);
+		//state = new HorizontalLevelObservingState(this);
+		lineFollowingState = new LineFollowingState(this);
+		//state = new ObstacleAvoidanceState(this);
+		state = lineFollowingState;
 		state.begin();
 	}
 
@@ -99,9 +106,10 @@ public class Robot {
 				if (toRefresh.getAndSet(false) || next != state) {
 					// switching to next state
 					toRefresh.set(false);
-					System.out.println("Switching strategy to " + next.getClass().getCanonicalName());
+					System.out.println("Switching strategy to " + next.getClass().getName());
 					state.end();
 					next.begin();
+					state = next;
 				}
 			} catch (InterruptedExecution e) {
 				// start cycle again and check "run" variable
@@ -151,6 +159,30 @@ public class Robot {
 	 */
 	public void refresh() {
 		toRefresh.set(true);
+	}
+	
+	public void begin() {
+		// move camera up
+		commander.writeMotor(Commander.MOTOR_CAMERA, Config.get().getInt("params/motorPositions/camera/up"));
+		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
+
+		// move arm up
+		commander.writeMotor(Commander.MOTOR_ARM, Config.get().getInt("params/motorPositions/arm/normal"));
+		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
+
+		// turn backlight on
+		commander.light(Commander.BACKLIGHT, true);
+		commander.light(Commander.FLASHLIGHT, true);
+
+		// move camera down
+		commander.writeMotor(Commander.MOTOR_CAMERA, Config.get().getInt("params/motorPositions/camera/down"));
+		TimeTools.sleep(Config.get().getInt("params/motorDelay"));
+	}
+	
+	public void end() {
+		commander.light(0, false);
+		commander.light(1, false);
+		commander.writePropulsionMotors(0, 0);
 	}
 
 }

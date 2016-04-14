@@ -40,7 +40,7 @@ public class CenteringEvacuationState extends AbstractState {
 		double right, left;
 		while (true) {
 
-			left = robot.commander.readUltrasonicSensor(Commander.MOTOR_LEFT);
+			left = robot.commander.readUltrasonicSensor(Commander.ULTRASONIC_LEFT);
 			right = robot.commander.readUltrasonicSensor(Commander.ULTRASONIC_RIGHT);
 
 			if (robot.commander.readUltrasonicSensor(Commander.ULTRASONIC_FRONT) < 60 && left < 40 && right < 40) {

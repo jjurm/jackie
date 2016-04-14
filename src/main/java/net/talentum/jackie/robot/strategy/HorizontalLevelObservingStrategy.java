@@ -4,8 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Triple;
 
 import net.talentum.jackie.module.BooleanImageFilterModule;
 import net.talentum.jackie.module.BorderFinderModule;
@@ -15,6 +19,7 @@ import net.talentum.jackie.robot.MomentData;
 import net.talentum.jackie.robot.RobotInstruction;
 import net.talentum.jackie.system.Config;
 import net.talentum.jackie.tools.InstructionPainter;
+import net.talentum.jackie.tools.Interval;
 import net.talentum.jackie.tools.MathTools;
 
 /**
@@ -31,6 +36,8 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 	BooleanImageFilterModule mBooleanImageFilter;
 	BorderFinderModule mBorderFinder;
 	IntersectionSolver mIntersectionSolver;
+	
+	long observeTopMillis = 0;
 
 	public HorizontalLevelObservingStrategy(ImageModifierModule mImageModifier,
 			BooleanImageFilterModule mBooleanImageFilter, BorderFinderModule mBorderFinder,
@@ -41,27 +48,35 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		this.mIntersectionSolver = mIntersectionSolver;
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public RobotInstruction evaluate() {
+		return evaluateA();
+	}
+
+	@Override
+	public void prepare(BufferedImage image) {
+		super.prepare(image);
+
 		// process image
 		if (mImageModifier != null)
 			d.image = mImageModifier.modify(d.image);
 
 		// create boolean array
 		d.bw = mBooleanImageFilter.filter(d.image);
+	}
 
+	public RobotInstruction evaluateA() {
 		// find line
 		int x = d.image.getWidth() / 2;
 		int y = d.image.getHeight() / 2;
 
-		Point top = checkLine(new Point(x, y - y / 2), -Math.PI / 2);
-		Point middle = checkLine(new Point(x, y), -Math.PI / 2);
-		Point bottom = checkLine(new Point(x, y + y / 2), -Math.PI / 2);
-		Point abottom = checkLine(new Point(x, 2 * y - 10), -Math.PI / 2);
+		Triple<Point, Point, Point> top = checkLine(new Point(x, y - y / 2), -Math.PI / 2);
+		Triple<Point, Point, Point> middle = checkLine(new Point(x, y), -Math.PI / 2);
+		Triple<Point, Point, Point> bottom = checkLine(new Point(x, y + y / 2), -Math.PI / 2);
+		Triple<Point, Point, Point> abottom = checkLine(new Point(x, 2 * y - 10), -Math.PI / 2);
 
-		Point primary = bottom;
-		Point secondary = null;
+		Triple<Point, Point, Point> primary = bottom;
+		Triple<Point, Point, Point> secondary = abottom;
 
 		if (primary == null) {
 			primary = middle;
@@ -73,21 +88,31 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		if (primary == null) {
 			primary = abottom;
 		}
-		if (primary == null) {
-			primary = abottom;
+		if (observeTopMillis + 1000 > System.currentTimeMillis()) {
+			System.out.println("Skipping to top");
+			primary = top;
+			//return new RobotInstruction(d.image, d, new Point(0, 1));
 		}
 		if (primary == null) {
 			return new RobotInstruction(d.image, d, new Point(0, 1));
 		}
 
+		// detect green
+
+		if (primary == bottom && top != null && d.dst(bottom.getLeft(), bottom.getRight()) > d.image.getWidth() / 3) {
+			primary = top;
+			observeTopMillis = System.currentTimeMillis();
+			System.out.println("Recognized intersection");
+		}
+		
 		Point destination;
 		if (secondary == null) {
-			destination = new Point(primary);
+			destination = new Point(primary.getMiddle());
 		} else {
-			destination = new Point((int) Math.round(1.5 * bottom.x - 0.5 * abottom.x), bottom.y);
+			destination = new Point((int) Math.round(1.5 * bottom.getMiddle().x - 0.5 * abottom.getMiddle().x), bottom.getMiddle().y);
 		}
 
-		Point intersection = mIntersectionSolver.findMark(d.image, primary.y);
+		Point intersection = mIntersectionSolver.findMark(d.image, primary.getMiddle().y);
 		if (intersection != null) {
 			d.highlight.add(intersection);
 
@@ -100,6 +125,37 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 		return new RobotInstruction(d.image, d, destination);
 	}
 
+	public RobotInstruction evaluateB() {
+		// process image
+		if (mImageModifier != null)
+			d.image = mImageModifier.modify(d.image);
+
+		// create boolean array
+		d.bw = mBooleanImageFilter.filter(d.image);
+
+		Point center = new Point(d.image.getWidth() / 2, d.image.getHeight() * 3 / 4);
+		int radius = d.image.getHeight() / 2;
+		List<Interval> intervals = checkCircle(center, radius);
+
+		if (intervals.size() == 0) {
+			return new RobotInstruction(d.image, d, new Point(0, 1));
+		}
+
+		double leastDifference = Double.MAX_VALUE;
+		Interval leastDifferenceInterval = null;
+		for (Interval i : intervals) {
+			if (Math.abs(i.getAverage()) < leastDifference) {
+				leastDifference = Math.abs(i.getAverage());
+				leastDifferenceInterval = i;
+			}
+			d.highlight.add(d.move(center, i.getAverage() - Math.PI / 2, radius));
+		}
+
+		int heading = (int) (leastDifferenceInterval.getAverage() * 100);
+
+		return new RobotInstruction(d.image, d, new Point(heading, 0));
+	}
+
 	/**
 	 * Checks trail on the given straight line, which is specified by a point
 	 * and a direction.
@@ -108,7 +164,7 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 	 * @param direction
 	 * @return
 	 */
-	public Point checkLine(Point p, double direction) {
+	public Triple<Point, Point, Point> checkLine(Point p, double direction) {
 		Point trail = d.findLinearlyNearestPoint(p, direction + Math.PI / 2, true, Config.movedst, Integer.MAX_VALUE);
 
 		if (trail != null) {
@@ -123,18 +179,52 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 				Point center = new Point(d.image.getWidth() / 2, p.y);
 				double dstL = d.dst(center, borders.left);
 				double dstR = d.dst(center, borders.right);
-				Point moreDistanced = (dstL > dstR) ? borders.left : borders.right;
-				Point averaged = d.weightedAvg(moreDistanced, center, d.dst(center, moreDistanced) / center.x);
-				Point l = new Point(MathTools.toRange(averaged.x, borders.left.x, borders.right.x),
-						MathTools.toRange(averaged.y, Math.min(borders.left.y, borders.right.y),
-								Math.max(borders.left.y, borders.right.y)));
+				Point l;
+				if (Math.abs(dstL - dstR) < 5) {
+					l = center;
+				} else {
+					Point moreDistanced = (dstL > dstR) ? borders.left : borders.right;
+					Point averaged = d.weightedAvg(moreDistanced, center, d.dst(center, moreDistanced) / center.x);
+					l = new Point(MathTools.toRange(averaged.x, borders.left.x, borders.right.x),
+							MathTools.toRange(averaged.y, Math.min(borders.left.y, borders.right.y),
+									Math.max(borders.left.y, borders.right.y)));
+				}
 				d.line.add(l);
 
-				return l;
+				return new ImmutableTriple<Point, Point, Point>(borders.left, l, borders.right);
 			}
 		}
 
 		return null;
+	}
+
+	public List<Interval> checkCircle(Point center, int radius) {
+		List<Interval> list = new ArrayList<Interval>();
+		boolean last = true, val, first = true;
+		double beginAngle = 0, lastAngle = 0;
+		for (double angle = -Math.PI; angle <= Math.PI; angle += Math.PI * 2 / 40) {
+			Point p = d.move(center, angle - Math.PI / 2, radius);
+			if (!d.inBounds(p)) {
+				continue;
+			}
+			d.line.add(p);
+			val = d.isTrailPoint(p);
+			if (last == false && val == true) {
+				beginAngle = angle;
+				first = false;
+				last = true;
+			}
+			if (last == true && val == false) {
+				last = false;
+				if (first) {
+					first = false;
+					continue;
+				}
+				list.add(new Interval(beginAngle, lastAngle));
+			}
+			lastAngle = angle;
+		}
+		return list;
 	}
 
 	/**
@@ -168,6 +258,9 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 			g.drawLine(0, y * 3 / 2, d.image.getWidth(), y * 3 / 2);
 			g.drawLine(0, 2 * y - 10, d.image.getWidth(), 2 * y - 10);
 
+			// g.drawOval((d.image.getWidth() - d.image.getHeight()) / 2, y,
+			// image.getHeight(), image.getHeight());
+
 			g.setColor(Color.GREEN);
 			d.bordersL.stream().forEach(p -> g.fillOval(p.x - 6, p.y - 6, 12, 12));
 			d.bordersR.stream().forEach(p -> g.fillOval(p.x - 6, p.y - 6, 12, 12));
@@ -177,6 +270,8 @@ public class HorizontalLevelObservingStrategy extends RobotStrategy {
 
 			g.setColor(Color.CYAN);
 			d.highlight.stream().forEach(p -> g.fillRect(p.x - 2, p.y - 2, 4, 4));
+
+			g.setColor(Color.YELLOW);
 
 			return img;
 		}

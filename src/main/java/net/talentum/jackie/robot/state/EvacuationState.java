@@ -45,7 +45,7 @@ public class EvacuationState extends AbstractState {
 	@Override
 	public State run0() {
 
-		Point ball = findBall();
+		
 
 		return this;
 	}

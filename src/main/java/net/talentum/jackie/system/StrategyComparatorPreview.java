@@ -12,6 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import com.github.sarxos.webcam.Webcam;
+
 import net.talentum.jackie.image.SubtractingImageBallFinder;
 import net.talentum.jackie.image.output.BlurredBooleanImageOutput;
 import net.talentum.jackie.image.output.BooleanImageOutput;
@@ -39,8 +41,6 @@ import net.talentum.jackie.robot.strategy.HorizontalLevelObservingStrategy;
 import net.talentum.jackie.robot.strategy.LineFollowingStrategy;
 import net.talentum.jackie.tools.MathTools;
 import net.talentum.jackie.ui.StrategyComparatorPanel;
-
-import com.github.sarxos.webcam.Webcam;
 
 /**
  * Runnable class.

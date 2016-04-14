@@ -85,6 +85,7 @@ public class Main {
 
 		// run robot's cycle infinitely
 		robot.init();
+		robot.begin();
 		robot.start();
 
 		// monitor running
@@ -138,8 +139,8 @@ public class Main {
 		executor.shutdown();
 		robot.stop();
 
-		// end Commander
-		commander.end();
+		// end Robot
+		robot.end();
 
 		// stop ConsoleReader
 		consoleReader.stop();

@@ -8,6 +8,7 @@ import java.util.List;
 import net.talentum.jackie.module.DirectionManagerModule;
 import net.talentum.jackie.module.TrailBordersMonitorModule;
 import net.talentum.jackie.system.Config;
+import net.talentum.jackie.tools.Interval;
 
 /**
  * This object is bonded to {@link Moment}. Contains data, some may be only
