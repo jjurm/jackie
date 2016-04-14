@@ -48,10 +48,18 @@ import com.pi4j.io.i2c.I2CFactory;
  * </tr>
  * 
  * <tr>
- * <th>8/9</th>
- * <td>Write LED digital value, group A/B</td>
+ * <th>8</th>
+ * <td>Write LED digital value</td>
  * <td>LED index in the group</td>
  * <td>value (0/1)</td>
+ * <td></td>
+ * </tr>
+ * 
+ * <tr>
+ * <th>9</th>
+ * <td>Blink LED</td>
+ * <td>LED index in the group</td>
+ * <td></td>
  * <td></td>
  * </tr>
  * 

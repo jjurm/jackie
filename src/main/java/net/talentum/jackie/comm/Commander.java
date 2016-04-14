@@ -120,16 +120,24 @@ public class Commander {
 	/**
 	 * Writes LED value.
 	 * 
-	 * @param group
-	 *            group of the LED ({@code 0=A, 1=B})
 	 * @param led
 	 *            index of the LED (0-7)
 	 * @param value
 	 *            boolean value to write
 	 * @param
 	 */
-	public void writeLED(int group, int led, boolean value) {
-		i2c.deviceB.transfer(0, cmd(0x08 + (group & 0x01), led), b(value));
+	public void writeLED(int led, boolean value) {
+		i2c.deviceC.transfer(0, cmd(0x08, led), b(value));
+	}
+
+	/**
+	 * Blinks LED for constant time.
+	 * 
+	 * @param led
+	 *            index of the LED (0-7)
+	 */
+	public void blinkLED(int led) {
+		i2c.deviceC.transfer(0, cmd(0x09, led));
 	}
 
 	/**
