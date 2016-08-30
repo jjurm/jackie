@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
+import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 
 /**
  * Class responsible for I2C communication.
@@ -212,7 +213,7 @@ public class I2CCommunicator {
 
 			mpu6050.wake();
 
-		} catch (IOException e) {
+		} catch (IOException | UnsupportedBusNumberException e) {
 			e.printStackTrace();
 		}
 	}
